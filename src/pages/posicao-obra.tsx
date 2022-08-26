@@ -10,6 +10,7 @@ import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
 import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
+import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -23,6 +24,9 @@ const PosicaoObra = () => {
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
+
+
+    const [showEditModal, setShowEditModal] = useState(false)
 
     return (
         <div className='flex'>
@@ -93,7 +97,7 @@ const PosicaoObra = () => {
                 />
 
                 <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
-
+                    <EditarModalPorObra isOpen={showEditModal} setIsOpen={setShowEditModal} />
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Posição Armazem por obra</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
@@ -160,7 +164,7 @@ const PosicaoObra = () => {
                                     <td className="w-1/5 ">Sinse Kilamba</td>
                                     <td className="w-1/5 ">22-08-2022</td>
                                     <td className="w-1/5  flex justify-center items-center">
-                                        <button className="hover:brightness-75" title="Editar">
+                                        <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
                                             <FaEdit />
                                         </button>
                                     </td>
@@ -182,7 +186,10 @@ const PosicaoObra = () => {
                                     <td className="w-1/5 ">Sinse Kilamba</td>
                                     <td className="w-1/5 ">22-08-2022</td>
                                     <td className="w-1/5  flex justify-center items-center">
-                                        <button className="hover:brightness-75" title="Editar">
+                                        <button
+                                            onClick={() => setShowEditModal(true)}
+                                            className="hover:brightness-75"
+                                            title="Editar">
                                             <FaEdit />
                                         </button>
                                     </td>
@@ -204,7 +211,10 @@ const PosicaoObra = () => {
                                     <td className="w-1/5 ">Sinse Kilamba</td>
                                     <td className="w-1/5 ">24-08-2022</td>
                                     <td className="w-1/5  flex justify-center items-center">
-                                        <button className="hover:brightness-75" title="Editar">
+                                        <button
+                                            onClick={() => setShowEditModal(true)}
+                                            className="hover:brightness-75"
+                                            title="Editar">
                                             <FaEdit />
                                         </button>
                                     </td>

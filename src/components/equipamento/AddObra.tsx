@@ -24,6 +24,7 @@ type FormValues = {
     descricao_equipamento: string;
     quantidade: number;
     obra_id: number;
+    data_compra: string
 }
 
 const AddObra = ({ isOpen, setIsOpen }: AddObraProps) => {
@@ -107,6 +108,17 @@ const AddObra = ({ isOpen, setIsOpen }: AddObraProps) => {
 
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
+                                                <select
+                                                    {...register('obra_id')}
+
+                                                    className='rounded shadow w-full cursor-pointer'>
+                                                    <option value="#" className='text-gray-400'>Selecione a Obra</option>
+                                                    <option value={1}>Sinse Kilamba</option>
+                                                    <option value={2}>Sinse Maianga</option>
+                                                    <option value={3}>Hotel Académico</option>
+                                                </select>
+                                            </div>
+                                            <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
@@ -118,23 +130,22 @@ const AddObra = ({ isOpen, setIsOpen }: AddObraProps) => {
                                                         min: { message: 'Quantidade insuficiente', value: 1 }
                                                     })}
                                                 />
-
-                                                <select
-                                                    {...register('obra_id')}
-
-                                                    className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
-                                                </select>
+                                                <input
+                                                    min={0}
+                                                    type="date"
+                                                    className='rounded shadow w-1/2'
+                                                    {...register('data_compra', {
+                                                        required: { message: "Por favor, introduza a data da compra.", value: true },
+                                                    })}
+                                                />
                                             </div>
-                                            <div className='flex gap-2 justify-center align-center'>
+                                            {/**
+                                            *  <div className='flex gap-2 justify-center align-center'>
                                                 <select
                                                     {...register('obra_id')}
 
                                                     className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Tempo de duração</option>
+                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
                                                     <option value='0.5 à 1 ano'>0.5 à 1 ano</option>
                                                     <option value='1 à 2 ano'>1 à 2 anos</option>
                                                     <option value='2 à 3 ano'>2 à 3 anos</option>
@@ -146,12 +157,13 @@ const AddObra = ({ isOpen, setIsOpen }: AddObraProps) => {
                                                     {...register('obra_id')}
 
                                                     className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Classificação</option>
+                                                    <option value="#" className='text-gray-400'>Classificação</option>
                                                     <option value={1}>EPI</option>
                                                     <option value={2}>Ferramenta</option>
                                                     <option value={3}>Material</option>
                                                 </select>
                                             </div>
+                                            */}
 
                                             <div className="mt-4 flex justify-end">
                                                 <button

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '../assets/noah.png'
 
-import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome } from 'react-icons/fa'
+import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaArrowCircleRight, FaArrowCircleLeft } from 'react-icons/fa'
 import { AiFillCloseCircle } from 'react-icons/ai'
 
 type SiderBarProps = {
@@ -21,7 +21,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                 <Image src={Logo} alt="NOAH Logo" width={100} height={35} objectFit={'contain'} />
                 {/**   <h3 className="font-bold mt-4 text-lg">S.C.A</h3> */}
             </div>
-            <div className='mt-12 w-full'>
+            <div className='mt-8 w-full'>
                 <ul className='max-w-full mx-auto px-2 space-y-6 text-left text-base'>
                     <li className='flex gap-2 items-center'>
                         <span className='text-gray-400 font-bold cursor-default '>Painel de controlo</span>
@@ -58,6 +58,14 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                         <FaBookOpen className='text-gray-500 text-lg' />
                         <Link href='/posicao-obra'>Posição por Obra</Link>
                     </li>
+                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
+                        <FaArrowCircleRight className='text-gray-500 text-lg' />
+                        <Link href='/saidas'>Saídas</Link>
+                    </li>
+                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'devolucoes' && 'active'}`}>
+                        <FaArrowCircleLeft className='text-gray-500 text-lg' />
+                        <Link href='/devolucoes'>Devoluções</Link>
+                    </li>
                     <li className={`flex gap-2 items-center text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
                         <FaClock className='text-gray-500 text-lg' />
                         <Link href='/esgotar'>À esgotar</Link>
@@ -66,7 +74,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
 
                 </ul>
             </div>
-            <div className='mt-12  max-w-full '>
+            <div className='mt-8  max-w-full '>
 
                 <Link href='/'>
                     <div className='flex gap-2 items-center text-sm  bg-white cursor-pointer'>

@@ -22,6 +22,7 @@ type FormValues = {
     id: number;
     nome: string;
     encarregado: number;
+    estado: 'activa' | 'inactiva' | 'concluida'
 }
 
 
@@ -115,8 +116,19 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                     <option value="2">Avelino Manuel</option>
                                                     <option value="3">Francisco Jamba</option>
                                                 </select>
-
-
+                                            </div>
+                                            <div className='flex gap-2 justify-center align-center'>
+                                                <select
+                                                    {...register('estado', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-full rounded shadow cursor-pointer" >
+                                                    <option value="#" className='text-gray-400'>Estado</option>
+                                                    <option value="activa">Activa</option>
+                                                    <option value="inactiva">Inactiva</option>
+                                                    <option value="concluida">Concluída</option>
+                                                </select>
                                             </div>
 
                                             <div className="mt-4 flex justify-end">

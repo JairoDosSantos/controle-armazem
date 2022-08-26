@@ -13,8 +13,7 @@ import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
 
-
-type RemoveArmGeralParaObraProps = {
+type AddObraProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void
 }
@@ -25,12 +24,10 @@ type FormValues = {
     descricao_equipamento: string;
     quantidade: number;
     obra_id: number;
-    data_transferencia: string
+    data_compra: string
 }
 
-
-const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraProps) => {
-
+const EditarModalPorObra = ({ isOpen, setIsOpen }: AddObraProps) => {
     const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
 
@@ -78,7 +75,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                         as="h3"
                                         className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
                                     >
-                                        Transferir para obra
+                                        Editar equip. de obra
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>
@@ -98,7 +95,6 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                             className='flex flex-col gap-3 justify-center align-center w-[552px] mx-auto'
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
-                                                {/** Pegar um produto do armazem e subtrair a quantidade que a obra pretende ao stock do armazem geral */}
                                                 <input
                                                     type="text"
                                                     className='rounded shadow w-full'
@@ -116,7 +112,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                                     {...register('obra_id')}
 
                                                     className='rounded shadow w-full cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
+                                                    <option value="#" className='text-gray-400'>Selecione a Obra</option>
                                                     <option value={1}>Sinse Kilamba</option>
                                                     <option value={2}>Sinse Maianga</option>
                                                     <option value={3}>Hotel Académico</option>
@@ -138,13 +134,34 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                                     min={0}
                                                     type="date"
                                                     className='rounded shadow w-1/2'
-                                                    placeholder='Quantidade a transferir *'
-                                                    {...register('data_transferencia', {
-                                                        required: { message: "Por favor, introduza a data da transferência.", value: true },
+                                                    {...register('data_compra', {
+                                                        required: { message: "Por favor, introduza a data da compra.", value: true },
                                                     })}
                                                 />
                                             </div>
+                                            <div className='flex gap-2 justify-center align-center'>
+                                                <select
+                                                    {...register('obra_id')}
 
+                                                    className='rounded shadow w-1/2 cursor-pointer'>
+                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
+                                                    <option value='0.5 à 1 ano'>0.5 à 1 ano</option>
+                                                    <option value='1 à 2 ano'>1 à 2 anos</option>
+                                                    <option value='2 à 3 ano'>2 à 3 anos</option>
+                                                    <option value='3 à 5 ano'>3 à 5 anos</option>
+                                                    <option value='5 à 7 ano'>5 à 7 anos</option>
+                                                </select>
+
+                                                <select
+                                                    {...register('obra_id')}
+
+                                                    className='rounded shadow w-1/2 cursor-pointer'>
+                                                    <option value="#" className='text-gray-400'>Classificação</option>
+                                                    <option value={1}>EPI</option>
+                                                    <option value={2}>Ferramenta</option>
+                                                    <option value={3}>Material</option>
+                                                </select>
+                                            </div>
 
                                             <div className="mt-4 flex justify-end">
                                                 <button
@@ -192,4 +209,4 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
     )
 }
 
-export default RemoveArmGeralParaObra
+export default EditarModalPorObra

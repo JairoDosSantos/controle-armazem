@@ -100,13 +100,44 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     type="text"
-                                                    className='rounded shadow w-1/2'
+                                                    className='rounded shadow w-full'
                                                     placeholder='Descrição do equipamento *'
                                                     {...register('descricao_equipamento', {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
+
+                                            </div>
+
+                                            <div className='flex gap-2 justify-center align-center'>
+
+                                                <select
+                                                    {...register('classificacao_id', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-1/2 rounded shadow cursor-pointer" >
+                                                    <option value="#" className='text-gray-400'>Classsificação</option>
+                                                    <option value="1">EPI</option>
+                                                    <option value="2">Material</option>
+                                                    <option value="3">Ferramenta</option>
+                                                </select>
+                                                <select
+                                                    {...register('tempo_duracao', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-1/2 rounded shadow cursor-pointer" >
+                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
+                                                    <option value="0.5 à 1 ano">0.5 à 1 ano</option>
+                                                    <option value="1 à 2 anos">1 à 2 anos</option>
+                                                    <option value="2 à 3 anos">2 à 3 anos</option>
+                                                </select>
+
+
+                                            </div>
+                                            <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
@@ -119,36 +150,12 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                     })}
                                                 />
 
-
+                                                <input
+                                                    type={'date'}
+                                                    placeholder="Data de compra"
+                                                    className="w-1/2 rounded shadow"
+                                                />
                                             </div>
-                                            <div className='flex gap-2 justify-center align-center'>
-
-                                                <select
-                                                    {...register('classificacao_id', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
-                                                    <option value="#">Classsificação</option>
-                                                    <option value="1">EPI</option>
-                                                    <option value="2">Material</option>
-                                                    <option value="3">Ferramenta</option>
-                                                </select>
-                                                <select
-                                                    {...register('tempo_duracao', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
-                                                    <option value="#">Tempo de duração</option>
-                                                    <option value="0.5 à 1 ano">0.5 à 1 ano</option>
-                                                    <option value="1 à 2 anos">1 à 2 anos</option>
-                                                    <option value="2 à 3 anos">2 à 3 anos</option>
-                                                </select>
-
-
-                                            </div>
-
                                             <div className="mt-4 flex justify-end">
                                                 <button
                                                     disabled={!isValid}

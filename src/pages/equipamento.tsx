@@ -15,8 +15,21 @@ import SiderBar from '../components/SiderBar'
 import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralParaObra'
 
 //Componentes Externos
-import { FaEdit, FaSave, FaTrash } from 'react-icons/fa'
+import { FaEdit, FaSave, FaTrash, FaPlusCircle } from 'react-icons/fa'
+import AddNovoModal from '../components/equipamento/AddNovoModal'
+import { SubmitHandler, useForm } from 'react-hook-form'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+
+
+
+//Tipagem do formulário
+type FormValues = {
+    id: number;
+    descricao_equipamento_id: number;
+    quantidade: number;
+    data_aquisicao: string
+}
+
 
 const Equipamento = () => {
 
@@ -26,6 +39,7 @@ const Equipamento = () => {
     const [isOpenRemove, setIsOpenRemove] = useState(false)
     const [isOpenAddObra, setIsOpenAddObra] = useState(false)
     const [isOpenRemoveObraAddAMG, setIsOpenRemoveObraAddAMG] = useState(false)
+    const [isOpenAddNovoModal, setIsOpenAddNovoModal] = useState(false)
 
     const [showEditModal, setShowEditModal] = useState(false)
 
@@ -34,6 +48,13 @@ const Equipamento = () => {
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
+
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        console.log(data)
+        reset()
+    }
 
     return (
         <div className='flex'>
@@ -103,57 +124,92 @@ const Equipamento = () => {
 
                 <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
                     <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
-                    <div className="flex gap-4 w-full bg-white p-5">
+                    <div className="flex  w-full bg-white p-5 justify-between">
+
+                        <div className="flex gap-4  ">
+                            <button
+                                onClick={() => setIsOpenRemoveObraAddAMG(true)}
+                                type="button"
+                                className="bg-blue-700 text-white font-bold px-4 py-2 hover:brightness-75">Devolver ao armazem geral
+                            </button>
+                            <DevolverAMG isOpen={isOpenRemoveObraAddAMG} setIsOpen={setIsOpenRemoveObraAddAMG} />
+                            <button
+                                onClick={() => setIsOpenAddObra(true)}
+                                type="button"
+                                className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75">Add armazem Obra
+                            </button>
+                            {/** Aqui o equipamento será cadastrado directamente ao armazem da obra */}
+                            <AddObra isOpen={isOpenAddObra} setIsOpen={setIsOpenAddObra} />
+                            <button
+                                onClick={() => setIsOpenRemove(true)}
+                                type="button"
+                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Tirar do armazem geral para Obra
+                            </button>
+                            {/** Aqui o equipamento será diminuído do armazem para ser cadastrado ao armazem da obra */}
+                            <RemoveArmGeralParaObra isOpen={isOpenRemove} setIsOpen={setIsOpenRemove} />
+                        </div>
 
                         <button
-                            onClick={() => setIsOpenRemoveObraAddAMG(true)}
+                            onClick={() => setIsOpenAddNovoModal(true)}
                             type="button"
-                            className="bg-blue-700 text-white font-bold px-4 py-2 hover:brightness-75">Devolver ao armazem geral
+                            className="bg-gray-600 text-gray-200 font-bold px-4 py-2 hover:brightness-75 flex items-center gap-2">
+                            <FaPlusCircle /><span>Adicionar novo equipamento</span>
                         </button>
-                        <DevolverAMG isOpen={isOpenRemoveObraAddAMG} setIsOpen={setIsOpenRemoveObraAddAMG} />
-                        <button
-                            onClick={() => setIsOpenAddObra(true)}
-                            type="button"
-                            className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75">Add armazem Obra
-                        </button>
-                        {/** Aqui o equipamento será cadastrado directamente ao armazem da obra */}
-                        <AddObra isOpen={isOpenAddObra} setIsOpen={setIsOpenAddObra} />
-                        <button
-                            onClick={() => setIsOpenRemove(true)}
-                            type="button"
-                            className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Tirar do armazem geral para Obra
-                        </button>
-                        {/** Aqui o equipamento será diminuído do armazem para ser cadastrado ao armazem da obra */}
-                        <RemoveArmGeralParaObra isOpen={isOpenRemove} setIsOpen={setIsOpenRemove} />
+                        <AddNovoModal isOpen={isOpenAddNovoModal} setIsOpen={setIsOpenAddNovoModal} />
 
                     </div>
 
-                    <form className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Cadastro de Eq. no armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="flex gap-5">
-                            <input type="text" placeholder="Descrição" className="w-1/2 rounded shadow" />
-                            <select id="" className="w-1/2 rounded shadow cursor-pointer" >
-                                <option value="#">Classsificação</option>
-                                <option value="#">EPI</option>
-                                <option value="#">Material</option>
-                                <option value="#">Ferramenta</option>
-                            </select>
+                            <input
+                                {...register('descricao_equipamento_id', {
+                                    required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                })}
+                                type="text" placeholder="Descrição" className="w-full rounded shadow" />
+
 
                         </div>
+                        {
+                            /**
+                             *   <div className="flex gap-5">
+                                <select id="" className="w-1/2 rounded shadow cursor-pointer" >
+                                    <option value="#" className='text-gray-400'>Classsificação</option>
+                                    <option value="#">EPI</option>
+                                    <option value="#">Material</option>
+                                    <option value="#">Ferramenta</option>
+                                </select>
+    
+                                <select id="" className="w-1/2 rounded shadow cursor-pointer" >
+                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
+                                    <option value="#">0.5 à 1 ano</option>
+                                    <option value="#">1 à 2 anos</option>
+                                    <option value="#">2 à 3 anos</option>
+                                </select>
+                            </div>
+                             */
+                        }
                         <div className="flex gap-5">
-                            <select id="" className="w-1/2 rounded shadow cursor-pointer" >
-                                <option value="#">Tempo de duração</option>
-                                <option value="#">0.5 à 1 ano</option>
-                                <option value="#">1 à 2 anos</option>
-                                <option value="#">2 à 3 anos</option>
-                            </select>
                             <input
                                 type={'number'}
-                                defaultValue={0}
+                                {...register('quantidade', {
+                                    required: { message: "Por favor, introduza a a quantidade que pretende adicionar.", value: true },
+                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                })}
                                 placeholder="Quantidade"
                                 className="w-1/2 rounded shadow"
                                 min={0}
+                            />
+                            <input
+                                type={'date'}
+                                {...register('data_aquisicao', {
+                                    required: { message: "Por favor, introduza a data de aquisição do produto.", value: true },
+                                })}
+                                className="w-1/2 rounded shadow"
                             />
 
                         </div>

@@ -14,6 +14,15 @@ import SiderBar from '../components/SiderBar'
 import Load from '../assets/load.gif'
 import EditarModal from '../components/encarregado/EditarModal'
 import Head from 'next/head'
+import { SubmitHandler, useForm } from 'react-hook-form'
+
+
+//Tipagem do formulário
+type FormValues = {
+    id: number;
+    nome: string;
+    telefone: number;
+}
 
 const Encarregado = () => {
 
@@ -25,6 +34,13 @@ const Encarregado = () => {
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
+
+
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        console.log(data)
+    }
 
     return (
         <div className='flex'>
@@ -99,12 +115,29 @@ const Encarregado = () => {
                 <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
 
                 <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
-                    <form className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Cadastro de Encarregado</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="flex gap-5">
-                            <input type="text" placeholder="Nome do Encarregado" className="w-1/2 rounded shadow" />
-                            <input type="text" placeholder="Telefone" className="w-1/2 rounded shadow" />
+                            <input
+                                {
+                                ...register('nome', {
+                                    required: { message: "Por favor, introduza o nome do encarregado.", value: true },
+                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                })
+                                }
+                                type="text" placeholder="Nome do Encarregado" className="w-1/2 rounded shadow" />
+                            <input
+                                {
+                                ...register('telefone', {
+                                    required: { message: "Por favor, introduza o telefone do encarregado.", value: true },
+                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                })}
+                                type="number"
+                                placeholder="Telefone"
+                                className="w-1/2 rounded shadow" />
 
                         </div>
                         <div className="flex gap-2 justify-end">

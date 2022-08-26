@@ -13,8 +13,7 @@ import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
 
-
-type RemoveArmGeralParaObraProps = {
+type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void
 }
@@ -23,16 +22,16 @@ type RemoveArmGeralParaObraProps = {
 type FormValues = {
     id: number;
     descricao_equipamento: string;
-    quantidade: number;
-    obra_id: number;
-    data_transferencia: string
+    classificacao_id: number;
+    tempo_duracao: string
 }
 
 
-const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraProps) => {
+const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
 
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
+
 
 
 
@@ -40,9 +39,8 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
         console.log(data)
     }
 
-
-
     function closeModal() {
+        reset()
         setIsOpen(false)
     }
 
@@ -78,7 +76,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                         as="h3"
                                         className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
                                     >
-                                        Transferir para obra
+                                        Alterar informação do equipamento
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>
@@ -97,55 +95,56 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                         <form
                                             className='flex flex-col gap-3 justify-center align-center w-[552px] mx-auto'
                                             onSubmit={handleSubmit(onSubmit)}>
+
                                             <div className='flex gap-2 justify-center align-center'>
-                                                {/** Pegar um produto do armazem e subtrair a quantidade que a obra pretende ao stock do armazem geral */}
                                                 <input
                                                     type="text"
                                                     className='rounded shadow w-full'
-                                                    placeholder='Descrição do Equipamento *'
+                                                    placeholder='Descrição do equipamento *'
                                                     {...register('descricao_equipamento', {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
 
-
                                             </div>
+
                                             <div className='flex gap-2 justify-center align-center'>
+
                                                 <select
-                                                    {...register('obra_id')}
-
-                                                    className='rounded shadow w-full cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
+                                                    {...register('classificacao_id', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-full rounded shadow cursor-pointer" >
+                                                    <option value="#" className='text-gray-400'>Classsificação</option>
+                                                    <option value="1">EPI</option>
+                                                    <option value="2">Material</option>
+                                                    <option value="3">Ferramenta</option>
                                                 </select>
+
+
+
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
-                                                <input
-                                                    min={0}
-                                                    type="number"
-                                                    className='rounded shadow w-1/2'
-                                                    placeholder='Quantidade a transferir *'
-                                                    {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a quantidade a transferir.", value: true },
-                                                        minLength: { message: "Quantidade insuficiente", value: 1 },
-                                                        min: { message: 'Quantidade insuficiente', value: 1 }
+
+                                                <select
+                                                    {...register('tempo_duracao', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-                                                />
+                                                    className="w-1/2 rounded shadow cursor-pointer" >
+                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
+                                                    <option value="0.5 à 1 ano">0.5 à 1 ano</option>
+                                                    <option value="1 à 2 anos">1 à 2 anos</option>
+                                                    <option value="2 à 3 anos">2 à 3 anos</option>
+                                                </select>
                                                 <input
-                                                    min={0}
-                                                    type="date"
-                                                    className='rounded shadow w-1/2'
-                                                    placeholder='Quantidade a transferir *'
-                                                    {...register('data_transferencia', {
-                                                        required: { message: "Por favor, introduza a data da transferência.", value: true },
-                                                    })}
+                                                    type={'date'}
+                                                    placeholder="Data de compra"
+                                                    className="w-1/2 rounded shadow"
                                                 />
                                             </div>
-
-
                                             <div className="mt-4 flex justify-end">
                                                 <button
                                                     disabled={!isValid}
@@ -170,12 +169,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                                 <p className='text-sm'>
                                                     {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
                                                 </p>
-                                                <p className='text-sm'>
-                                                    {errors.obra_id && (errors.obra_id.message)}
-                                                </p>
-                                                <p className='text-sm'>
-                                                    {errors.quantidade && (errors.quantidade.message)}
-                                                </p>
+
                                             </div>
                                         </form>
 
@@ -192,4 +186,4 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
     )
 }
 
-export default RemoveArmGeralParaObra
+export default AddNovoModal

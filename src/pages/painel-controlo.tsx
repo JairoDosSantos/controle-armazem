@@ -23,7 +23,7 @@ const PainelControlo = () => {
                         <PainelItem icone='ferramenta_armazem' quantidade={4} rodape='Total de Ferramentaria em armazem' titulo='Ferramentaria em armazem' />
                         <PainelItem icone='material_armazem' quantidade={7} rodape='Total de Materiais em armazem' titulo='Material em armazem' />
                         <PainelItem icone='encarregado' quantidade={3} rodape='Total de Encarregados em obras' titulo='Encarregados' />
-                        <PainelItem icone='ttl' quantidade={10} rodape='Total de TTL atingido' titulo='TTL atingido em armazem' />
+                        <PainelItem icone='ttl' quantidade={10} rodape='Stock de SOS atingido em armazem' titulo='A esgotar' />
                     </div>
                     <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
                         <span className='font-semibold text-lg'>À esgotar</span>

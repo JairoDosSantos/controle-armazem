@@ -24,6 +24,7 @@ type FormValues = {
     descricao_equipamento: string;
     quantidade: number;
     obra_id: number;
+    data_devolucao: string
 }
 
 const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
@@ -105,6 +106,18 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
 
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
+                                                <select
+                                                    {...register('obra_id')}
+
+                                                    className='rounded shadow w-full cursor-pointer'>
+                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
+                                                    <option value={1}>Sinse Kilamba</option>
+                                                    <option value={2}>Sinse Maianga</option>
+                                                    <option value={3}>Hotel Académico</option>
+                                                </select>
+                                            </div>
+
+                                            <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
@@ -117,15 +130,14 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
                                                     })}
                                                 />
 
-                                                <select
-                                                    {...register('obra_id')}
+                                                <input
+                                                    type="date"
+                                                    className='rounded shadow w-1/2'
+                                                    {...register('data_devolucao', {
+                                                        required: { message: "Por favor, introduza a data da devolução.", value: true },
+                                                    })}
+                                                />
 
-                                                    className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
-                                                </select>
                                             </div>
 
                                             <div className="mt-4 flex justify-end">

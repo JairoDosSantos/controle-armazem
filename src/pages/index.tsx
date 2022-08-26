@@ -62,7 +62,7 @@ const Home: NextPage = () => {
 
       <footer className="flex h-24 w-full items-center justify-center border-t bg-white">
         <span
-          className="flex items-center justify-center gap-2 text-lg"
+          className="flex items-center justify-center gap-2 text-lg select-none"
         >
           Sistema de Controle de Armazem{' '}
           <Image src={Logo} alt="NOAH Logo" width={100} height={25} objectFit={'contain'} />
