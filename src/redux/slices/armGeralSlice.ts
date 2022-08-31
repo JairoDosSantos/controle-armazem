@@ -21,7 +21,7 @@ const initialState: ArmGeralState = {
 }
 
 
-export const fetchArmGeral = createAsyncThunk('/armgeral/fetch', async () => {
+export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
@@ -34,12 +34,29 @@ export const fetchArmGeral = createAsyncThunk('/armgeral/fetch', async () => {
         return (error)
     }
 })
-export const insertArmGeral = createAsyncThunk('/armgeral/create', async ({ data_aquisicao, equipamento_id, quantidade_entrada }: ArmGeralType) => {
+
+export const fetchOne = createAsyncThunk('/armGeral/fetchOne', async (id: number) => {
     try {
 
         const { data, error } = await supabase
             .from('armgeral')
-            .insert({ data_aquisicao, equipamento_id, quantidade_entrada })
+            .select("*")
+            .eq('equipamento_id', id)
+
+        if (error) return error
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
+
+export const insertArmGeral = createAsyncThunk('/armgeral/create', async ({ data_aquisicao, equipamento_id, quantidade_entrada }: Omit<ArmGeralType, 'id'>) => {
+    try {
+
+        const { data, error } = await supabase
+            .from('armgeral')
+            .insert({ data_aquisicao, equipamento_id, quantidade: quantidade_entrada })
             .single()
 
         return data
@@ -54,9 +71,10 @@ export const updateArmGeral = createAsyncThunk('/armgeral/update', async ({ id, 
 
         const { data, error } = await supabase
             .from('armgeral')
-            .update([{ data_aquisicao, equipamento_id, quantidade_entrada }])
-            .match({ id })
+            .update([{ data_aquisicao, quantidade: quantidade_entrada }])
+            .eq('equipamento_id', equipamento_id)
 
+        if (error) return error
         return data
 
     } catch (error) {

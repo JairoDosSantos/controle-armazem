@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 
 import { ToastContainer, toast } from 'react-toastify'
@@ -12,10 +12,36 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
+import { fetchObra } from '../../redux/slices/obraSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { useDispatch } from 'react-redux'
+
+
+type EquipamentoType = {
+    id: number;
+    descricao: string;
+    duracao_id: number;
+    classificacao_id: number;
+    data: string
+}
+type EncarregadoType = {
+    id: number;
+    nome: string;
+    telefone: string
+}
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: EncarregadoType;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
 
 type DevolverAMGProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    equipamentos: EquipamentoType[];
+    setIdEquipamento: (valor: number) => void
 }
 
 //Tipagem do formulário
@@ -27,15 +53,28 @@ type FormValues = {
     data_devolucao: string
 }
 
-const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
+const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: DevolverAMGProps) => {
     const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
 
-
+    const [obras, setObras] = useState<ObraType[]>([])
+    const dispatch = useDispatch<any>()
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         console.log(data)
     }
+
+    const getObras = async () => {
+        const resultDispatch = await dispatch(fetchObra())
+
+        const resultUnwrap = unwrapResult(resultDispatch)
+
+        if (resultUnwrap.lenght) setObras(resultUnwrap)
+    }
+
+    useEffect(() => {
+        getObras()
+    }, [])
 
     function closeModal() {
         setIsOpen(false)
@@ -94,7 +133,8 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem da Obra e adicionar a quantidade em stock do armazem geral  */}
-                                                <input
+                                                {/**
+                                              *    <input
                                                     type="text"
                                                     className='rounded shadow w-full'
                                                     placeholder='Descrição do Equipamento *'
@@ -103,6 +143,9 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
+                                              */}
+
+                                                <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
 
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
@@ -111,9 +154,13 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
 
                                                     className='rounded shadow w-full cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
+                                                    {
+                                                        obras.length && obras.map((obra, index) => (
+                                                            <option
+                                                                key={index}
+                                                                value={obra.id}>{obra.obra_nome}</option>
+                                                        ))
+                                                    }
                                                 </select>
                                             </div>
 
@@ -122,7 +169,7 @@ const DevolverAMG = ({ isOpen, setIsOpen }: DevolverAMGProps) => {
                                                     min={0}
                                                     type="number"
                                                     className='rounded shadow w-1/2'
-                                                    placeholder='Quantidade a transferir *'
+                                                    placeholder='Quantidade a devolver *'
                                                     {...register('quantidade', {
                                                         required: { message: "Por favor, introduza a quantidade a transferir.", value: true },
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },

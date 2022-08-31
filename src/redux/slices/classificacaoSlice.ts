@@ -26,6 +26,7 @@ export const fetchClassificacao = createAsyncThunk('/classificacao/fetch', async
             .from('classificacao')
             .select("*")
 
+        if (error) return error
         return data
 
     } catch (error) {

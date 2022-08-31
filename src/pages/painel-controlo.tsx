@@ -16,7 +16,7 @@ const PainelControlo = () => {
                 </div>
 
                 <div className='overflow-auto max-h-[85vh] overflow-hide-scroll-bar'>
-                    <div className=' flex flex-wrap gap-6 pl-6 mx-auto'>
+                    <div className=' flex flex-wrap gap-6 pl-6 mx-auto justify-center items-center lg:justify-start'>
                         <PainelItem icone='obra_activa' quantidade={2} rodape='Total de obras activas' titulo='Obras activas' />
                         <PainelItem icone='total_obra' quantidade={5} rodape='Número total de obras' titulo='Número de Obras' />
                         <PainelItem icone='epis_armazem' quantidade={8} rodape='Total de EPIs em armazem' titulo='EPIS em armazem' />
@@ -25,7 +25,7 @@ const PainelControlo = () => {
                         <PainelItem icone='encarregado' quantidade={3} rodape='Total de Encarregados em obras' titulo='Encarregados' />
                         <PainelItem icone='ttl' quantidade={10} rodape='Stock de SOS atingido em armazem' titulo='A esgotar' />
                     </div>
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
+                    <div className='mt-4 text-end px-4 py-2 max-w-6xl overflow-x-auto  mx-auto bg-white rounded'>
                         <span className='font-semibold text-lg'>À esgotar</span>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>

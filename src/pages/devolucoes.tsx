@@ -18,6 +18,7 @@ const Devolucoes = () => {
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
 
+    const [filtroPorObra, setFiltroPorObra] = useState(false)
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
@@ -99,31 +100,41 @@ const Devolucoes = () => {
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Devoluções ao Armazem geral</h2>
                         <div className="border w-1/4 border-gray-700 ml-4"></div>
-                        {/** 
-                       *   <div className="ml-auto flex gap-2 -mt-4">
+                        <div className="ml-auto flex gap-2 -mt-4">
                             <div>
-                                <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='ferramenta' className="cursor-pointer" />
+                                <label htmlFor="ferramenta" className="bg-white">Todas&nbsp;</label>
+                                <input
+                                    defaultChecked={true}
+                                    onClick={() => setFiltroPorObra(false)}
+                                    type={"radio"}
+                                    name='classificacao'
+                                    id='ferramenta'
+                                    className="cursor-pointer" />
                             </div>
                             <div>
-                                <label htmlFor="material" className="bg-white">Material&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='material' className="cursor-pointer" />
-                            </div>
-                            <div>
-                                <label htmlFor="epi" className="bg-white">EPI&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='epi' className="cursor-pointer" />
+                                <label htmlFor="material" className="bg-white">Por obra&nbsp;</label>
+                                <input
+                                    onClick={() => setFiltroPorObra(true)}
+
+                                    type={"radio"}
+                                    name='classificacao'
+                                    id='material'
+                                    className="cursor-pointer" />
                             </div>
                         </div>
-                       */}
                         <div className="flex gap-5">
-                            {/**   <input type="search" placeholder="Pesquise pelo equipamento" className="w-full rounded shadow" /> */}
-                            <select
-                                className='rounded shadow w-full cursor-pointer'>
-                                <option value="#" className='text-gray-400'>Selecione a Obra</option>
-                                <option value={1}>Sinse Kilamba</option>
-                                <option value={2}>Sinse Maianga</option>
-                                <option value={3}>Hotel Académico</option>
-                            </select>
+                            {/**    <input type="search" placeholder="Pesquise pelo equipamento" className="w-full rounded shadow" /> */}
+                            {
+                                filtroPorObra && (
+                                    <select
+                                        className='rounded shadow w-full cursor-pointer'>
+                                        <option value="#" className='text-gray-400'>Selecione a Obra</option>
+                                        <option value={1}>Sinse Kilamba</option>
+                                        <option value={2}>Sinse Maianga</option>
+                                        <option value={3}>Hotel Académico</option>
+                                    </select>
+                                )
+                            }
                         </div>
                         <div className=" ml-auto flex gap-2">
                             <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">

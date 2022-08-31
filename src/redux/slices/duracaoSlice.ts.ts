@@ -5,7 +5,7 @@ import { supabase } from "../../utils/supabaseClient";
 
 type duracaoType = {
     id: number;
-    duracao: string;
+    tempo: string;
 }
 
 type duracaoState = {
@@ -19,25 +19,26 @@ const initialState: duracaoState = {
 }
 
 
-export const fetchDuracao = createAsyncThunk('/duracao/fetch', async () => {
+export const fetchDuracao = createAsyncThunk('/duracao/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
             .from('duracao')
             .select("*")
 
+        if (error) return error
         return data
 
     } catch (error) {
         return (error)
     }
 })
-export const insertDuracao = createAsyncThunk('/duracao/create', async ({ duracao }: duracaoType) => {
+export const insertDuracao = createAsyncThunk('/duracao/create', async ({ tempo }: duracaoType) => {
     try {
 
         const { data, error } = await supabase
             .from('duracao')
-            .insert({ duracao })
+            .insert({ tempo })
             .single()
 
         return data
@@ -47,12 +48,12 @@ export const insertDuracao = createAsyncThunk('/duracao/create', async ({ duraca
     }
 })
 
-export const updateDuracao = createAsyncThunk('/duracao/update', async ({ id, duracao }: duracaoType) => {
+export const updateDuracao = createAsyncThunk('/duracao/update', async ({ id, tempo }: duracaoType) => {
     try {
 
         const { data, error } = await supabase
             .from('duracao')
-            .update([{ duracao }])
+            .update([{ tempo }])
             .match({ id })
 
         return data

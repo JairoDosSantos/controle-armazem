@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 
 import { ToastContainer, toast } from 'react-toastify'
@@ -12,11 +12,35 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
+import { useDispatch } from 'react-redux'
+import { fetchObra } from '../../redux/slices/obraSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
+type EquipamentoType = {
+    id: number;
+    descricao: string;
+    duracao_id: number;
+    classificacao_id: number;
+    data: string
+}
+type EncarregadoType = {
+    id: number;
+    nome: string;
+    telefone: string
+}
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: EncarregadoType;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
 
 type RemoveArmGeralParaObraProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    equipamentos: EquipamentoType[];
+    setIdEquipamento: (valor: number) => void
 }
 
 //Tipagem do formulário
@@ -29,22 +53,34 @@ type FormValues = {
 }
 
 
-const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraProps) => {
+const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: RemoveArmGeralParaObraProps) => {
 
     const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
 
-
+    const [obras, setObras] = useState<ObraType[]>([])
+    const dispatch = useDispatch<any>()
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         console.log(data)
     }
 
+    const getObras = async () => {
+        const resultDispatch = await dispatch(fetchObra())
 
+        const resultUnwrap = unwrapResult(resultDispatch)
+
+        if (resultUnwrap.lenght) setObras(resultUnwrap)
+    }
 
     function closeModal() {
         setIsOpen(false)
     }
+
+    useEffect(() => {
+        getObras()
+    }, [])
+
 
     return (
         <>
@@ -99,7 +135,8 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem e subtrair a quantidade que a obra pretende ao stock do armazem geral */}
-                                                <input
+                                                {/**
+                                                *  <input
                                                     type="text"
                                                     className='rounded shadow w-full'
                                                     placeholder='Descrição do Equipamento *'
@@ -108,8 +145,12 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
+                                                */}
 
-
+                                                <EquipamentoAutoComplete
+                                                    equipamentos={equipamentos}
+                                                    setIdEquipamento={setIdEquipamento}
+                                                />
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <select
@@ -117,9 +158,14 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen }: RemoveArmGeralParaObraPro
 
                                                     className='rounded shadow w-full cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
+                                                    {
+                                                        obras.length && obras.map((obra, index) => (
+                                                            <option
+                                                                key={index}
+                                                                value={obra.id}>{obra.obra_nome}</option>
+                                                        ))
+                                                    }
+
                                                 </select>
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>

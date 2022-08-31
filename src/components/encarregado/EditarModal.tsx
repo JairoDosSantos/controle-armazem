@@ -12,10 +12,14 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { updateEncarregados } from '../../redux/slices/encarregadoSlice'
+import { useRouter } from 'next/router'
 
 type EditarModalProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    encarregadoData: EncarregadoType
 }
 //Tipagem do formulário
 type FormValues = {
@@ -23,25 +27,68 @@ type FormValues = {
     nome: string;
     telefone: number;
 }
+//Tipagem do formulário
+type EncarregadoType = {
+    id: number;
+    nome: string;
+    telefone: number;
+}
 
-
-const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
+const EditarModal = ({ isOpen, setIsOpen, encarregadoData }: EditarModalProps) => {
 
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
-
+    const route = useRouter()
+    const dispatch = useDispatch<any>();
 
 
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        const resultDispatch = await dispatch(updateEncarregados({ id: encarregadoData.id, nome: data.nome, telefone: data.telefone.toString() }));
+        setLoad(false)
+        if (resultDispatch.payload) {
+            notifySuccess()
+        } else {
+            notifyError()
+        }
+
     }
 
     function closeModal() {
         reset()
         setIsOpen(false)
     }
+    const notifySuccess = () => {
 
+        setTimeout(function () {
+            setIsOpen(false)
+            route.reload()
+        }, 6500);
+
+        toast.success('Obra alterada com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
@@ -103,6 +150,7 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
+                                                    defaultValue={encarregadoData.nome}
                                                 />
                                                 <input
                                                     min={0}
@@ -114,6 +162,7 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                         minLength: { message: "Quantidade insuficiente", value: 9 },
                                                         min: { message: 'Quantidade insuficiente', value: 900000000 }
                                                     })}
+                                                    defaultValue={encarregadoData.telefone}
                                                 />
 
 

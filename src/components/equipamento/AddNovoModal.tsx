@@ -12,10 +12,15 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { insertEquipamento } from '../../redux/slices/equipamentoSlice'
+import { useRouter } from 'next/router'
 
 type EditarModalProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    duracao: DuracaoType[];
+    classificacao: ClassificacaoType[]
 }
 
 //Tipagem do formulário
@@ -23,27 +28,79 @@ type FormValues = {
     id: number;
     descricao_equipamento: string;
     classificacao_id: number;
-    tempo_duracao: string
+    tempo_duracao: number;
+    stock_emergencia: number
+}
+type DuracaoType = {
+    id: number;
+    tempo: string;
+
+}
+type ClassificacaoType = {
+    id: number;
+    tipo: string;
+
 }
 
 
-const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
+const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModalProps) => {
 
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
 
 
+    const dispatch = useDispatch<any>()
+    const route = useRouter()
 
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        const dispatchResult = await dispatch(insertEquipamento(
+            { classificacao_id: data.classificacao_id, descricao: data.descricao_equipamento, duracao_id: data.tempo_duracao, stock_emergencia: data.stock_emergencia }
+        ))
+
+        if (dispatchResult.payload) notifySuccess()
+        else notifyError()
+
+        setLoad(false)
     }
 
     function closeModal() {
         reset()
         setIsOpen(false)
     }
+    const notifySuccess = () => {
 
+        setTimeout(function () {
+
+            setIsOpen(false)
+            route.reload()
+
+        }, 6500);
+
+        toast.success('Equipamento adicionado com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
@@ -118,9 +175,12 @@ const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                     })}
                                                     className="w-full rounded shadow cursor-pointer" >
                                                     <option value="#" className='text-gray-400'>Classsificação</option>
-                                                    <option value="1">EPI</option>
-                                                    <option value="2">Material</option>
-                                                    <option value="3">Ferramenta</option>
+                                                    {classificacao.length && classificacao.map((classific, index) => (
+                                                        <option
+                                                            key={classific.id}
+                                                            value={classific.id}>{classific.tipo}</option>
+                                                    ))}
+
                                                 </select>
 
 
@@ -135,14 +195,24 @@ const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                     })}
                                                     className="w-1/2 rounded shadow cursor-pointer" >
                                                     <option value="#" className='text-gray-400'>Tempo de duração</option>
-                                                    <option value="0.5 à 1 ano">0.5 à 1 ano</option>
-                                                    <option value="1 à 2 anos">1 à 2 anos</option>
-                                                    <option value="2 à 3 anos">2 à 3 anos</option>
+                                                    {duracao.length && duracao.map((time, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={time.id}>{time.tempo}</option>
+                                                    )
+
+                                                    )}
+
                                                 </select>
                                                 <input
-                                                    type={'date'}
-                                                    placeholder="Data de compra"
+                                                    type={'number'}
+                                                    placeholder="Stock de emergência"
+                                                    min={0}
                                                     className="w-1/2 rounded shadow"
+                                                    {...register('stock_emergencia', {
+                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
                                                 />
                                             </div>
                                             <div className="mt-4 flex justify-end">
@@ -155,7 +225,7 @@ const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                 >
                                                     {
                                                         load ? (
-                                                            <Image src={LoadImage} height={20} width={20} objectFit='cover' />
+                                                            <Image src={LoadImage} width={20} height={15} objectFit='cover' />
                                                         ) : (
 
                                                             <FaSave />
@@ -169,7 +239,15 @@ const AddNovoModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                 <p className='text-sm'>
                                                     {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
                                                 </p>
-
+                                                <p className='text-sm'>
+                                                    {errors.tempo_duracao && (errors.tempo_duracao.message)}
+                                                </p>
+                                                <p className='text-sm'>
+                                                    {errors.stock_emergencia && (errors.stock_emergencia.message)}
+                                                </p>
+                                                <p className='text-sm'>
+                                                    {errors.classificacao_id && (errors.classificacao_id.message)}
+                                                </p>
                                             </div>
                                         </form>
 

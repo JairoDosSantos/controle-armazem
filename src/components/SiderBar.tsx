@@ -29,34 +29,34 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'painel-controlo' && 'active'}`}>
                         <FaHome className='text-gray-500 text-lg ' />
-                        <Link href='/painel-controlo'>Página Inicial</Link>
+                        <Link href='/painel-controlo'>Painel de Controlo</Link>
                     </li>
                     <li className='flex gap-2 items-center'>
                         <span className='text-gray-400 font-bold cursor-default '>Cadastros</span>
                     </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'obra' && 'active'}`}>
-                        <FaBuilding className='text-gray-500 text-lg' />
-                        <Link href='/obra'>Gerir Obra</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'equipamento' && 'active'}`}>
-                        <FaTools className='text-gray-500 text-lg' />
-                        <Link href='/equipamento'>Gerir Equipamento</Link>
-                    </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'encarregado' && 'active'}`}>
 
                         <FaUser className='text-gray-500 text-lg ' />
-                        <Link href='/encarregado'>Gerir Encarregado</Link>
+                        <Link href='/encarregado'>Encarregado</Link>
+                    </li>
+                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'obra' && 'active'}`}>
+                        <FaBuilding className='text-gray-500 text-lg' />
+                        <Link href='/obra'>Obra</Link>
+                    </li>
+                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'equipamento' && 'active'}`}>
+                        <FaTools className='text-gray-500 text-lg' />
+                        <Link href='/equipamento'>Equipamento</Link>
                     </li>
                     <li>
                         <span className='text-gray-400 font-bold cursor-default '>Relatórios</span>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-armazem' && 'active'}`}>
                         <FaBookOpen className='text-gray-500 text-lg' />
-                        <Link href='/posicao-armazem'>Posição armazem</Link>
+                        <Link href='/posicao-armazem'>Armazem geral</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-obra' && 'active'}`}>
                         <FaBookOpen className='text-gray-500 text-lg' />
-                        <Link href='/posicao-obra'>Posição por Obra</Link>
+                        <Link href='/posicao-obra'>Almoxarifários</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
                         <FaArrowCircleRight className='text-gray-500 text-lg' />

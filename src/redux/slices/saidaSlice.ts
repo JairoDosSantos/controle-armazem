@@ -3,7 +3,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { supabase } from "../../utils/supabaseClient";
 
-type SaidaType = {
+type AuditoriaType = {
     id: number;
     equipamento_id: number;
     obra_id: number;
@@ -12,7 +12,7 @@ type SaidaType = {
 }
 
 type duracaoState = {
-    saidas: SaidaType[],
+    saidas: AuditoriaType[],
     loading: 'idle' | 'pending' | 'succeeded' | 'failed'
 }
 
@@ -22,11 +22,11 @@ const initialState: duracaoState = {
 }
 
 
-export const fetchSaida = createAsyncThunk('/saida/fetch', async () => {
+export const fetchSaida = createAsyncThunk('/auditoria/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
-            .from('saida')
+            .from('id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),obra_id(id,obra_nome,encarregado_id),data_retirada,quantidade_retirada,data_devolucao,quantidade_devolvida')
             .select("*")
 
         return data
@@ -35,11 +35,11 @@ export const fetchSaida = createAsyncThunk('/saida/fetch', async () => {
         return (error)
     }
 })
-export const insertSaida = createAsyncThunk('/saida/create', async ({ data_retirada, equipamento_id, obra_id, quantidade_retirada }: SaidaType) => {
+export const insertSaida = createAsyncThunk('/auditoria/create', async ({ data_retirada, equipamento_id, obra_id, quantidade_retirada }: AuditoriaType) => {
     try {
 
         const { data, error } = await supabase
-            .from('saida')
+            .from('auditoria')
             .insert({ data_retirada, equipamento_id, obra_id, quantidade_retirada })
             .single()
 
@@ -50,11 +50,11 @@ export const insertSaida = createAsyncThunk('/saida/create', async ({ data_retir
     }
 })
 
-export const updateSaida = createAsyncThunk('/saida/update', async ({ id, data_retirada, equipamento_id, obra_id, quantidade_retirada }: SaidaType) => {
+export const updateSaida = createAsyncThunk('/auditoria/update', async ({ id, data_retirada, equipamento_id, obra_id, quantidade_retirada }: AuditoriaType) => {
     try {
 
         const { data, error } = await supabase
-            .from('saida')
+            .from('auditoria')
             .update([{ data_retirada, equipamento_id, obra_id, quantidade_retirada }])
             .match({ id })
 
@@ -65,11 +65,11 @@ export const updateSaida = createAsyncThunk('/saida/update', async ({ id, data_r
     }
 })
 
-export const deleteSaida = createAsyncThunk('/saida/delete', async ({ id }: SaidaType) => {
+export const deleteSaida = createAsyncThunk('/auditoria/delete', async ({ id }: AuditoriaType) => {
     try {
 
         const { data, error } = await supabase
-            .from('saida')
+            .from('auditoria')
             .delete()
             .match({ id })
 
@@ -82,18 +82,18 @@ export const deleteSaida = createAsyncThunk('/saida/delete', async ({ id }: Said
 
 
 
-export const duracaoSlice = createSlice({
-    name: 'duracao',
+export const auditoriaSlice = createSlice({
+    name: 'auditoria',
     initialState,
     reducers: {
     },
     extraReducers: (build) => {
         build.addCase(fetchSaida.fulfilled, (state, action) => {
-            state.saidas.push(action.payload as SaidaType)
+            state.saidas.push(action.payload as AuditoriaType)
         });
 
         build.addCase(insertSaida.fulfilled, (state, action) => {
-            state.saidas.push(action.payload as SaidaType)
+            state.saidas.push(action.payload as AuditoriaType)
         });
 
     },
@@ -102,4 +102,4 @@ export const duracaoSlice = createSlice({
 
 //export const { update } = encarregadoSlice.actions;
 
-export default duracaoSlice.reducer;
+export default auditoriaSlice.reducer;

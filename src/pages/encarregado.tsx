@@ -15,6 +15,11 @@ import Load from '../assets/load.gif'
 import EditarModal from '../components/encarregado/EditarModal'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { GetServerSideProps } from 'next'
+import { wrapper } from '../redux/store'
+import { deleteEncarregado, fetchEncarregados, insertEncarregado } from '../redux/slices/encarregadoSlice'
+import { useDispatch } from 'react-redux'
+import { useRouter } from 'next/router'
 
 
 //Tipagem do formulário
@@ -23,24 +28,59 @@ type FormValues = {
     nome: string;
     telefone: number;
 }
+type EncarregadoType = {
+    encarregados: FormValues[]
+}
+const Encarregado = ({ encarregados }: EncarregadoType) => {
 
-const Encarregado = () => {
-
+    const [idEncarregado, setIdEncarregado] = useState(0)
+    const [search, setSearch] = useState('')
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
+    const [loadTable, setLoadTable] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
-
+    const [encarregadoObject, setEncarregadoObject] = useState({} as FormValues)
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
 
-
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const dispatch = useDispatch<any>();
+    const router = useRouter()
+
+
+    const handleEditEncarregado = (Encarregado: FormValues) => {
+        setEncarregadoObject(Encarregado)
+        setShowEditModal(true)
+    }
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        const resultDispatch = await dispatch(insertEncarregado({ nome: data.nome, telefone: data.telefone.toString() }))
+        setLoad(false)
+
+        if (resultDispatch.payload) {
+            setShowConfirmAlert(true)
+
+        } else {
+            setShowErrorAlert(true)
+        }
+
     }
+
+    const handleDeleteEncarregado = async () => {
+        setLoadTable(true)
+        const resultDispatch = await dispatch(deleteEncarregado(idEncarregado))
+        setLoadTable(false)
+        if (resultDispatch.payload) {
+            setShowConfirmAlert(true)
+        } else {
+            setShowErrorAlert(true)
+        }
+    }
+
+    const filteredEncarregados = search && encarregados.length ? encarregados.filter((encarregado) => encarregado.nome.toLowerCase().includes(search.toLowerCase())) : []
 
     return (
         <div className='flex'>
@@ -59,8 +99,8 @@ const Encarregado = () => {
                     backdrop={true}
                     show={showConfirmAlert}
                     title='Sucesso'
-                    text='Novo fornecedor criado com sucesso!'
-                    onConfirm={() => setShowConfirmAlert(false)}
+                    text='Operação efectuada  com sucesso!'
+                    onConfirm={() => { setShowConfirmAlert(false); router.reload() }}
                     didClose={() => setShowConfirmAlert(false)}
                     didDestroy={() => setShowConfirmAlert(false)}
                     icon='success'
@@ -75,7 +115,7 @@ const Encarregado = () => {
                     backdrop={true}
                     show={showErrorAlert}
                     title='Erro'
-                    text='Ocorreu um erro ao efectuar a operação. Por favor, verifique se o fornecedor já não está cadastrado no sistema!'
+                    text='Ocorreu um erro ao efectuar a operação. Por favor, verifique se o encarregado já não está cadastrado no sistema!'
                     icon='error'
                     onConfirm={() => setShowErrorAlert(false)}
                     didClose={() => setShowErrorAlert(false)}
@@ -95,7 +135,7 @@ const Encarregado = () => {
                     title='Atenção'
                     text='Tem a certeza que deseja efectuar esta operação?'
                     icon='question'
-                    onConfirm={() => setShowQuestionAlert(false)}
+                    onConfirm={handleDeleteEncarregado}
                     didClose={() => setShowQuestionAlert(false)}
                     didDestroy={() => setShowQuestionAlert(false)}
                     allowOutsideClick={true}
@@ -112,7 +152,9 @@ const Encarregado = () => {
 
                 {/** Modal para editar os encarregados */}
 
-                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                {showEditModal && (
+                    <EditarModal encarregadoData={encarregadoObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                )}
 
                 <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
                     <form
@@ -141,7 +183,10 @@ const Encarregado = () => {
 
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar</button>
+                            <button
+                                type={'reset'}
+                                className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
+                            </button>
                             <button className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2" >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}
                                 <span>Salvar</span>
@@ -149,8 +194,18 @@ const Encarregado = () => {
                         </div>
                     </form>
 
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Lista de Encarregado</span>
+                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded relative'>
+                        <div className='absolute top-32  left-[33rem] z-50'>
+                            {loadTable && (<Image src={Load} objectFit={"contain"} width={90} height={75} />)}
+                        </div>
+                        <div className='flex items-center justify-between'>
+                            <input
+                                onChange={(e) => setSearch(e.target.value)}
+                                type="search"
+                                className="w-1/3 rounded shadow "
+                                placeholder="Pesquise pelo nome do Encarregado" />
+                            <span className='font-semibold text-lg'>Lista de Encarregado</span>
+                        </div>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
@@ -162,48 +217,65 @@ const Encarregado = () => {
                                 </tr>
                             </thead>
                             <tbody className=''>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">1</td>
-                                    <td className="w-1/5 ">Jairo dos Santos</td>
-                                    <td className="w-1/5 ">+244 929-84-89-58</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="hover:brightness-75"
-                                            title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">2</td>
-                                    <td className="w-1/5 ">Avelino Manuel</td>
-                                    <td className="w-1/5 ">+244 928-30-80-96</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="hover:brightness-75"
-                                            title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
+                                {
+                                    encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
+                                        <tr key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/5 ">{encarregado.id}</td>
+                                            <td className="w-1/5 ">{encarregado.nome}</td>
+                                            <td className="w-1/5 ">{encarregado.telefone}</td>
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEditEncarregado(encarregado)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button
+                                                    onClick={() => {
+                                                        setShowQuestionAlert(true);
+                                                        setIdEncarregado(encarregado.id)
+                                                    }}
+                                                    className="hover:brightness-75"
+                                                    title="Apagar">
+                                                    <FaTrash />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )) : filteredEncarregados.map((encarregadoFiltered, index) => {
+                                        return (
+                                            <tr key={index}
+                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                <td className="w-1/5 ">{encarregadoFiltered.id}</td>
+                                                <td className="w-1/5 ">{encarregadoFiltered.nome}</td>
+                                                <td className="w-1/5 ">{encarregadoFiltered.telefone}</td>
+                                                <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => handleEditEncarregado(encarregadoFiltered)}
+                                                        className="hover:brightness-75"
+                                                        title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                </td>
+                                                <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowQuestionAlert(true);
+                                                            setIdEncarregado(encarregadoFiltered.id)
+                                                        }}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                }
+
+
 
 
                             </tbody>
@@ -216,5 +288,20 @@ const Encarregado = () => {
         </div>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
+    (store) =>
+        async ({ req }) => {
+            const encarregadosDispatch = await store.dispatch(fetchEncarregados());
+
+            const encarregados = encarregadosDispatch.payload
+
+            return {
+                props: {
+                    encarregados
+                },
+            };
+        }
+);
 
 export default Encarregado

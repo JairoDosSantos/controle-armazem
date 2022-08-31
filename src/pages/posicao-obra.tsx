@@ -103,10 +103,16 @@ const PosicaoObra = () => {
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="ml-auto flex gap-2 -mt-4">
                             <div>
-                                <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='ferramenta' className="cursor-pointer" />
+                                {/** <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label> */}
+                                <select className="rounded shadow cursor-pointer" >
+                                    <option value="#">Selecione a classificação</option>
+                                    <option value="#">Ferramentas</option>
+                                    <option value="#">Material</option>
+                                    <option value="#">HSST</option>
+                                </select>
                             </div>
-                            <div>
+                            {/**
+                            *  <div>
                                 <label htmlFor="material" className="bg-white">Material&nbsp;</label>
                                 <input type={"radio"} name='classificacao' id='material' className="cursor-pointer" />
                             </div>
@@ -114,6 +120,7 @@ const PosicaoObra = () => {
                                 <label htmlFor="epi" className="bg-white">EPI&nbsp;</label>
                                 <input type={"radio"} name='classificacao' id='epi' className="cursor-pointer" />
                             </div>
+                            */}
                         </div>
                         <div className="flex gap-5">
                             <input type="search" placeholder="Pesquise pelo equipamento" className="w-1/2 rounded shadow" />

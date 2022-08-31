@@ -20,20 +20,25 @@ const initialState: EncarregadoState = {
 }
 
 
-export const fetchEncarregados = createAsyncThunk('/encarregado/fetch', async () => {
+export const fetchEncarregados = createAsyncThunk('/encarregado/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
             .from('encarregado')
             .select("*")
+            .order('id', { ascending: true })
 
-        return data
+        if (data) {
+            return data
+        } else {
+            return error
+        }
 
     } catch (error) {
         return (error)
     }
 })
-export const insertEncarregado = createAsyncThunk('/encarregado/create', async ({ nome, telefone }: EncarregadoType) => {
+export const insertEncarregado = createAsyncThunk('/encarregado/create', async ({ nome, telefone }: Omit<EncarregadoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
@@ -41,7 +46,10 @@ export const insertEncarregado = createAsyncThunk('/encarregado/create', async (
             .insert({ nome, telefone })
             .single()
 
-        return data
+        if (error) {
+            return false
+        }
+        return true
 
     } catch (error) {
         return (error)
@@ -55,15 +63,15 @@ export const updateEncarregados = createAsyncThunk('/encarregado/update', async 
             .from('encarregado')
             .update([{ nome, telefone }])
             .match({ id })
-
-        return data
+        if (error) return false
+        return true
 
     } catch (error) {
         return (error)
     }
 })
 
-export const deleteEncarregado = createAsyncThunk('/encarregado/delete', async ({ id }: EncarregadoType) => {
+export const deleteEncarregado = createAsyncThunk('/encarregado/delete', async (id: number) => {
     try {
 
         const { data, error } = await supabase
@@ -71,7 +79,13 @@ export const deleteEncarregado = createAsyncThunk('/encarregado/delete', async (
             .delete()
             .match({ id })
 
-        return data
+        if (error) {
+
+            return false
+
+        }
+
+        return true
 
     } catch (error) {
         return (error)

@@ -22,11 +22,11 @@ const initialState: ObraEquipamentoState = {
 }
 
 
-export const fetchObraEquipamento = createAsyncThunk('/obraEquipamento/fetch', async () => {
+export const fetchObraEquipamento = createAsyncThunk('/almoxarifario/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
-            .from('obraequipamento')
+            .from('almoxarifario')
             .select("data_aquisicao,equipamento_id(id,descricao),obra_id(obra_nome,id,estado),quantidade_a_levar")
 
         return data
@@ -35,11 +35,11 @@ export const fetchObraEquipamento = createAsyncThunk('/obraEquipamento/fetch', a
         return (error)
     }
 })
-export const insertobraEquipamento = createAsyncThunk('/obraEquipamento/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
+export const insertobraEquipamento = createAsyncThunk('/almoxarifario/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
     try {
 
         const { data, error } = await supabase
-            .from('obraequipamento')
+            .from('almoxarifario')
             .insert({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar })
             .single()
 
@@ -50,11 +50,11 @@ export const insertobraEquipamento = createAsyncThunk('/obraEquipamento/create',
     }
 })
 
-export const updateobraEquipamento = createAsyncThunk('/obraEquipamento/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
+export const updateobraEquipamento = createAsyncThunk('/almoxarifario/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
     try {
 
         const { data, error } = await supabase
-            .from('obraequipamento')
+            .from('almoxarifario')
             .update([{ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }])
             .match({ id })
 
@@ -65,11 +65,11 @@ export const updateobraEquipamento = createAsyncThunk('/obraEquipamento/update',
     }
 })
 
-export const deleteobraEquipamento = createAsyncThunk('/obraEquipamento/delete', async ({ id }: ObraEquipamentoType) => {
+export const deleteobraEquipamento = createAsyncThunk('/almoxarifario/delete', async ({ id }: ObraEquipamentoType) => {
     try {
 
         const { data, error } = await supabase
-            .from('obraequipamento')
+            .from('almoxarifario')
             .delete()
             .match({ id })
 
@@ -82,8 +82,8 @@ export const deleteobraEquipamento = createAsyncThunk('/obraEquipamento/delete',
 
 
 
-export const obraEquipamentoSlice = createSlice({
-    name: 'ObraEquipamento',
+export const Almoxarifario = createSlice({
+    name: 'Almoxarifario',
     initialState,
     reducers: {
     },
@@ -102,4 +102,4 @@ export const obraEquipamentoSlice = createSlice({
 
 //export const { update } = encarregadoSlice.actions;
 
-export default obraEquipamentoSlice.reducer;
+export default Almoxarifario.reducer;

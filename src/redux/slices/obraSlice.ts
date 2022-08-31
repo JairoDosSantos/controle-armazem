@@ -1,5 +1,3 @@
-
-
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { supabase } from "../../utils/supabaseClient";
 
@@ -17,24 +15,30 @@ type ObraState = {
 
 const initialState: ObraState = {
     obras: [],
-    loading: 'idle',
+    loading: 'idle'
 }
 
-
-export const fetchObra = createAsyncThunk('/encarregado/fetch', async () => {
+export const fetchObra = createAsyncThunk('/obra/fetchAll', async () => {
     try {
+
 
         const { data, error } = await supabase
             .from('obra')
-            .select("*")
+            .select("id,obra_nome,encarregado_id(id,nome,telefone),estado")
 
-        return data
+
+        if (data) {
+            return data
+        } else {
+            return error
+        }
 
     } catch (error) {
         return (error)
     }
 })
-export const insertObra = createAsyncThunk('/obra/create', async ({ encarregado_id, estado, obra_nome }: ObraType) => {
+
+export const insertObra = createAsyncThunk('/obra/create', async ({ encarregado_id, estado, obra_nome, id }: ObraType) => {
     try {
 
         const { data, error } = await supabase
@@ -42,7 +46,10 @@ export const insertObra = createAsyncThunk('/obra/create', async ({ encarregado_
             .insert({ encarregado_id, estado, obra_nome })
             .single()
 
-        return data
+        console.log('error', error)
+        console.log('data', data)
+
+        return { nome: 'Jairo dos Santos' }
 
     } catch (error) {
         return (error)
@@ -54,17 +61,25 @@ export const updateObra = createAsyncThunk('/obra/update', async ({ id, encarreg
 
         const { data, error } = await supabase
             .from('obra')
-            .update([{ encarregado_id, estado, obra_nome }])
+            .update([
+                {
+                    encarregado_id,
+                    estado,
+                    obra_nome
+                }
+            ])
             .match({ id })
 
-        return data
-
+        if (error) {
+            return false
+        }
+        return true
     } catch (error) {
         return (error)
     }
 })
 
-export const deleteObra = createAsyncThunk('/obra/delete', async ({ id }: ObraType) => {
+export const deleteObra = createAsyncThunk('/obra/delete', async (id: number) => {
     try {
 
         const { data, error } = await supabase
@@ -72,32 +87,36 @@ export const deleteObra = createAsyncThunk('/obra/delete', async ({ id }: ObraTy
             .delete()
             .match({ id })
 
-        return data
+        if (error) {
+            return false
+        }
+        return true
+
 
     } catch (error) {
         return (error)
     }
 })
 
-
-
 export const obraSlice = createSlice({
     name: 'Obra',
     initialState,
-    reducers: {
-    },
+    reducers: {},
     extraReducers: (build) => {
         build.addCase(fetchObra.fulfilled, (state, action) => {
-            state.obras.push(action.payload as ObraType)
+            state
+                .obras
+                .push(action.payload as ObraType)
         });
 
         build.addCase(insertObra.fulfilled, (state, action) => {
-            state.obras.push(action.payload as ObraType)
+            state
+                .obras
+                .push(action.payload as ObraType)
         });
 
-    },
+    }
 })
-
 
 //export const { update } = encarregadoSlice.actions;
 

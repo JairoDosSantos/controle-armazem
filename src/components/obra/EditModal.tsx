@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 
 import { ToastContainer, toast } from 'react-toastify'
@@ -12,36 +12,113 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { fetchEncarregados } from '../../redux/slices/encarregadoSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { updateObra } from '../../redux/slices/obraSlice'
+import { useRouter } from 'next/router'
 
 type EditarModalProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    obraObject: ObraType
 }
 //Tipagem do formulário
 type FormValues = {
     id: number;
     nome: string;
     encarregado: number;
-    estado: 'activa' | 'inactiva' | 'concluida'
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
+type EncarregadoType = {
+    id: number;
+    nome: string;
+    telefone: string
+}
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: EncarregadoType;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
 }
 
-
-const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
-
+const EditarModal = ({ isOpen, setIsOpen, obraObject }: EditarModalProps) => {
+    console.log(obraObject)
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+
     const [load, setLoad] = useState(false)
 
+    const [encarregados, setEncarregados] = useState<EncarregadoType[]>([])
 
+    const [obras, setObras] = useState<ObraType>({} as ObraType)
+
+    const ESTADOS = ['Activa', 'Inactiva', 'Concluida']
+
+    const dispatch = useDispatch<any>();
+
+    const route = useRouter()
+    const getEncarregados = async () => {
+        const dispatchEncarregado = await dispatch(fetchEncarregados());
+        const result = unwrapResult(dispatchEncarregado)
+
+        setEncarregados(result)
+    }
+
+    useEffect(() => {
+        setObras(obraObject)
+        getEncarregados()
+
+    }, [])
 
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        const updateObraDispatch = await dispatch(updateObra({ id: obraObject.id, encarregado_id: data.encarregado, estado: data.estado, obra_nome: data.nome }))
+        setLoad(false)
+        if (updateObraDispatch.payload) {
+            notifySuccess()
+        } else {
+            notifyError()
+        }
     }
 
     function closeModal() {
         reset()
+
         setIsOpen(false)
     }
+
+    const notifySuccess = () => {
+
+        setTimeout(function () {
+            setIsOpen(false)
+            route.reload()
+        }, 6500);
+
+        toast.success('Obra alterada com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
+
 
     return (
         <>
@@ -104,18 +181,31 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
+                                                    defaultValue={obras.obra_nome}
                                                 />
+
                                                 <select
                                                     {...register('encarregado', {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
-                                                    <option value="#" className='text-gray-400'>Encarregado</option>
-                                                    <option value="1">Jairo dos Santos</option>
-                                                    <option value="2">Avelino Manuel</option>
-                                                    <option value="3">Francisco Jamba</option>
+                                                    className="w-1/2 rounded shadow cursor-pointer"
+                                                    defaultValue={obras?.encarregado_id?.nome}
+                                                >
+                                                    <option value={obras?.encarregado_id?.id} className='text-gray-400'>{obras?.encarregado_id?.nome}</option>
+                                                    {encarregados.length > 0 && encarregados.map((encarregado) => {
+                                                        if (encarregado.id !== obras?.encarregado_id?.id) {
+                                                            return (
+                                                                <option
+                                                                    key={encarregado.id}
+                                                                    value={encarregado.id}>{encarregado.nome}
+                                                                </option>
+                                                            )
+                                                        }
+                                                    })}
                                                 </select>
+
+
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <select
@@ -123,11 +213,22 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                                                         required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-                                                    className="w-full rounded shadow cursor-pointer" >
-                                                    <option value="#" className='text-gray-400'>Estado</option>
-                                                    <option value="activa">Activa</option>
-                                                    <option value="inactiva">Inactiva</option>
-                                                    <option value="concluida">Concluída</option>
+                                                    className="w-full rounded shadow cursor-pointer"
+                                                    defaultValue={obras.estado}
+                                                >
+                                                    <option value={obras.estado} className='text-gray-400'>{obras.estado}</option>
+                                                    {
+                                                        ESTADOS.map((estado, index) => {
+                                                            if (estado !== obras.estado) {
+                                                                return (
+                                                                    <option
+                                                                        key={index}
+                                                                        value={estado}>{estado}
+                                                                    </option>
+                                                                )
+                                                            }
+                                                        })
+                                                    }
                                                 </select>
                                             </div>
 
@@ -169,8 +270,8 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
                             </Transition.Child>
                         </div>
                     </div>
-                </Dialog>
-            </Transition>
+                </Dialog >
+            </Transition >
         </>
     )
 }
