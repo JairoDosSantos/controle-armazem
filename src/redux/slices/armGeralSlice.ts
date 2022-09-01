@@ -23,10 +23,10 @@ const initialState: ArmGeralState = {
 
 export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => {
     try {
-
+        //acrescentei classificacao_id,duracao_id dia 01-09-2022
         const { data, error } = await supabase
             .from('armgeral')
-            .select("id, equipamento_id(id,descricao),quantidade_entrada,data_aquisicao")
+            .select("id, equipamento_id(id,descricao,classificacao_id,duracao_id),quantidade_entrada,data_aquisicao")
 
         return data
 
