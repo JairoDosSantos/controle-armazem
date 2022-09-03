@@ -20,13 +20,14 @@ import AddNovoModal from '../components/equipamento/AddNovoModal'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { GetServerSideProps } from 'next'
 import { wrapper } from '../redux/store'
-import { fetchEquipamento, insertEquipamento } from '../redux/slices/equipamentoSlice'
+import { fetchEquipamento } from '../redux/slices/equipamentoSlice'
 import EquipamentoAutoComplete from '../components/EquipamentoAutoComplete'
 import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
 import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
 import { useDispatch } from 'react-redux'
-import { fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
+import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import { insertCompra } from '../redux/slices/compraSlice'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 
@@ -56,14 +57,21 @@ type ClassificacaoType = {
     tipo: string;
 
 }
+type ArmGeralType = {
+    id: number;
+    equipamento_id: EquipamentoType;
+    quantidade: number;
+    data_aquisicao: string
+}
 
 type EquipamentoProps = {
     equipamentos: EquipamentoType[];
     duracao: DuracaoType[];
     classificacao: ClassificacaoType[]
+    armazem: ArmGeralType[]
 }
 
-const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps) => {
+const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: EquipamentoProps) => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
@@ -92,6 +100,15 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
         const equipamentoQuantidade = unwrapResult(resultDispatch);
 
         if (equipamentoQuantidade.length > 0) {
+
+            //Trecho de código acrescentado hoje 01-09-2022
+            const comprasInsert = await dispatch(insertCompra({ data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+
+            if (!comprasInsert.payload) {
+                setShowErrorAlert(true)
+                return
+            }
+
             //Insert nas Compras primeiro
             let qtd = Number(equipamentoQuantidade[0].quantidade) + Number(data.quantidade);
 
@@ -105,7 +122,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
         } else {
             //Insert nas Compras primeiro
             const resultDispatch = await dispatch(insertArmGeral({ equipamento_id: data.descricao_equipamento_id, quantidade_entrada: data.quantidade, data_aquisicao: data.data_aquisicao }))
-            const unwrapresultado = unwrapResult(resultDispatch)
+            // const unwrapresultado = unwrapResult(resultDispatch)
             if (resultDispatch.meta.arg) {
                 setShowConfirmAlert(true)
             } else {
@@ -116,7 +133,16 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
         setLoad(false)
         reset()
     }
+    const findDuracao = (id: number) => {
+        const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
+        return duration as DuracaoType
+    }
+
+    const findClassificacao = (id: number) => {
+        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        return classification as ClassificacaoType
+    }
     return (
         <div className='flex'>
 
@@ -194,22 +220,15 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
                                 className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75">Devolver ao armazem geral
                             </button>
                             {isOpenRemoveObraAddAMG && (<DevolverAMG
-                                setIdEquipamento={setIdEquipamento}
                                 equipamentos={equipamentos} isOpen={isOpenRemoveObraAddAMG}
                                 setIsOpen={setIsOpenRemoveObraAddAMG} />)}
-                            {/**
-                           *   <button
-                                onClick={() => setIsOpenAddObra(true)}
-                                type="button"
-                                className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75">Add armazem Obra
-                                </button>
-                           */}
+
                             {/** Aqui o equipamento será cadastrado directamente ao armazem da obra */}
                             <AddObra isOpen={isOpenAddObra} setIsOpen={setIsOpenAddObra} />
                             <button
                                 onClick={() => setIsOpenRemove(true)}
                                 type="button"
-                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Transferir para obra
+                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Transferir para almoxarifário
                             </button>
                             {/** Aqui o equipamento será diminuído do armazem para ser cadastrado ao armazem da obra */}
                             {isOpenRemove && (
@@ -217,7 +236,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
                                     equipamentos={equipamentos}
                                     isOpen={isOpenRemove}
                                     setIsOpen={setIsOpenRemove}
-                                    setIdEquipamento={setIdEquipamento} />
+                                />
                             )}
                         </div>
 
@@ -243,18 +262,6 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold select-none">Cadastro de Eq. no armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="flex gap-3">
-
-                            {/**
-                             * <input
-                                {...register('descricao_equipamento_id', {
-                                    required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                })}
-                                type="text"
-                                placeholder="Descrição"
-                                className="w-full rounded shadow"
-                            />
-                             */}
                             <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
                         </div>
 
@@ -320,29 +327,35 @@ const Equipamento = ({ equipamentos, duracao, classificacao }: EquipamentoProps)
                                 </tr>
                             </thead>
                             <tbody className=''>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">1</td>
-                                    <td className="w-1/5 ">Cimento Cola</td>
-                                    <td className="w-1/5 ">Material</td>
-                                    <td className="w-1/5 ">uso imediato</td>
-                                    <td className="w-1/5 ">30</td>
-                                    <td className="w-1/5 ">22-08-2022</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="hover:brightness-75" title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
+
+                                {armazem && armazem.length && armazem.map((arm, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-1/5 ">{arm.id}</td>
+                                        <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
+                                        <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
+                                        <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
+                                        <td className="w-1/5 ">{arm.quantidade}</td>
+                                        <td className="w-1/5 ">{arm.data_aquisicao}</td>
+                                        <td className="w-1/5  flex justify-center items-center">
+                                            <button
+                                                onClick={() => setShowEditModal(true)}
+                                                className="hover:brightness-75" title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        <td className="w-1/5  flex justify-center items-center">
+                                            <button
+                                                onClick={() => setShowQuestionAlert(true)}
+                                                className="hover:brightness-75"
+                                                title="Apagar">
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+
                             </tbody>
                         </table>
                     </div>
@@ -359,17 +372,20 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const equipamentoDispatch = await store.dispatch(fetchEquipamento());
             const classificacaoDispatch = await store.dispatch(fetchClassificacao());
             const duracaoDispatch = await store.dispatch(fetchDuracao());
+            const armazemDispatch = await store.dispatch(fetchArmGeral());
 
 
             const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
+            const armazem = armazemDispatch.payload
 
             return {
                 props: {
                     equipamentos,
                     classificacao,
-                    duracao
+                    duracao,
+                    armazem
                 },
             };
         }

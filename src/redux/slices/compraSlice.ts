@@ -8,7 +8,7 @@ type CompraType = {
     equipamento_id: number;
     preco: number;
     data_compra: string;
-    quantidade_compra: number
+    quantidade_comprada: number
 }
 
 type compraState = {
@@ -21,12 +21,12 @@ const initialState: compraState = {
     loading: 'idle',
 }
 
-export const fetchSaida = createAsyncThunk('/compra/fetchAll', async () => {
+export const fetchCompra = createAsyncThunk('/compra/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
-            .from('id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),data_compra,quantidade_compra,preco')
-            .select("*")
+            .from('compra')
+            .select("id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),data_compra,quantidade_comprada,preco")
         if (error) return error
         return data
 
@@ -35,27 +35,27 @@ export const fetchSaida = createAsyncThunk('/compra/fetchAll', async () => {
     }
 })
 
-export const insertSaida = createAsyncThunk('/compra/create', async ({ data_compra, equipamento_id, preco, quantidade_compra }: Omit<CompraType, 'id'>) => {
+export const insertCompra = createAsyncThunk('/compra/create', async ({ data_compra, equipamento_id, preco, quantidade_comprada }: Omit<CompraType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('compra')
-            .insert({ data_compra, equipamento_id, preco, quantidade_compra })
+            .insert({ data_compra, equipamento_id, preco, quantidade_comprada })
             .single()
-        if (error) return error
-        return data
+        if (error) return false
+        return true
 
     } catch (error) {
         return (error)
     }
 })
 
-export const updateSaida = createAsyncThunk('/compra/update', async ({ id, data_compra, equipamento_id, preco, quantidade_compra }: CompraType) => {
+export const updateCompra = createAsyncThunk('/compra/update', async ({ id, data_compra, equipamento_id, preco, quantidade_comprada }: CompraType) => {
     try {
 
         const { data, error } = await supabase
             .from('compra')
-            .update([{ data_compra, equipamento_id, preco, quantidade_compra }])
+            .update([{ data_compra, equipamento_id, preco, quantidade_comprada }])
             .match({ id })
 
         if (error) return error
@@ -66,7 +66,7 @@ export const updateSaida = createAsyncThunk('/compra/update', async ({ id, data_
     }
 })
 
-export const deleteSaida = createAsyncThunk('/compra/delete', async ({ id }: CompraType) => {
+export const deleteCompra = createAsyncThunk('/compra/delete', async ({ id }: CompraType) => {
     try {
 
         const { data, error } = await supabase
@@ -82,17 +82,17 @@ export const deleteSaida = createAsyncThunk('/compra/delete', async ({ id }: Com
     }
 })
 
-export const auditoriaSlice = createSlice({
+export const compraSlice = createSlice({
     name: 'compra',
     initialState,
     reducers: {
     },
     extraReducers: (build) => {
-        build.addCase(fetchSaida.fulfilled, (state, action) => {
+        build.addCase(fetchCompra.fulfilled, (state, action) => {
             state.compras.push(action.payload as CompraType)
         });
 
-        build.addCase(insertSaida.fulfilled, (state, action) => {
+        build.addCase(insertCompra.fulfilled, (state, action) => {
             state.compras.push(action.payload as CompraType)
         });
 
@@ -102,4 +102,4 @@ export const auditoriaSlice = createSlice({
 
 //export const { update } = encarregadoSlice.actions;
 
-export default auditoriaSlice.reducer;
+export default compraSlice.reducer;

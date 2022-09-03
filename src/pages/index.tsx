@@ -2,20 +2,59 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { FormEvent, useState } from 'react'
 
 import { FaArrowAltCircleRight } from 'react-icons/fa'
 
 import Logo from '../assets/noah.png'
+import Load from '../assets/load.gif'
+
+//Api
+import api from '../services/api'
 
 
 const Home: NextPage = () => {
 
   const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [load, setLoad] = useState(false)
+
+
+  const signInUser = async (event: FormEvent) => {
+
+    event.preventDefault();
+
+    setLoad(true)
+
+    const response = await api.post('api/login', {
+      email: email,
+      password: password
+    })
+
+
+    setLoad(false)
+
+    const { user } = response.data
+    const status = response.status
+    if (user) {
+      // setShowSuccess('flex')
+      router.push('/painel-controlo')
+
+    } else if (status === 401) {
+      // setShowHide('flex')
+      setLoad(false)
+    }
+
+
+  };
+
+
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2 bg-gray-50">
       <Head>
-        <title>Create Next App</title>
+        <title>SCA | Login</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -34,11 +73,21 @@ const Home: NextPage = () => {
             <form className='w-full flex flex-col gap-4' >
               <div className='flex flex-col justify-start space-y-4'>
                 <label htmlFor="E-mail" className='text-left font-semibold bg-white'>Email :</label>
-                <input type="email" id='E-mail' className='rounded  shadow items-center' placeholder='exemplo@gmail.com' />
+                <input
+                  onChange={(event) => setEmail(event.target.value)}
+                  type="email"
+                  id='E-mail'
+                  className='rounded  shadow items-center'
+                  placeholder='exemplo@gmail.com' />
               </div>
               <div className='flex flex-col space-y-4'>
                 <label htmlFor="Password" className='text-left font-semibold bg-white'>Password :</label>
-                <input type={'password'} id='Password' className='rounded  shadow items-center ' placeholder='**********************' />
+                <input
+                  onChange={(event) => setPassword(event.target.value)}
+                  type={'password'}
+                  id='Password'
+                  className='rounded  shadow items-center '
+                  placeholder='**********************' />
               </div>
 
               <div className='flex space-x-3 justify-end'>
@@ -48,10 +97,11 @@ const Home: NextPage = () => {
                   Cancelar</button>
 
                 <button
-                  onClick={() => router.push('/painel-controlo')}
+                  onClick={signInUser}
                   type='button'
                   className='bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex gap-2 items-center'>
-                  <FaArrowAltCircleRight />
+
+                  {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaArrowAltCircleRight />)}
                   <span>Acessar</span>
                 </button>
               </div>

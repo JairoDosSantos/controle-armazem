@@ -1,8 +1,9 @@
+import { GetServerSidePropsContext } from 'next'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import PainelItem from '../components/Painel-Item'
 import SiderBar from '../components/SiderBar'
-
+import nookies from 'nookies'
 const PainelControlo = () => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
@@ -76,6 +77,22 @@ const PainelControlo = () => {
             </main>
         </div>
     )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+
+    const cookie = nookies.get(context);
+
+    if (!cookie.USER_LOGGED_ARMAZEM) {
+        // If no user, redirect to index.
+        return { props: {}, redirect: { destination: '/', permanent: false } }
+    }
+    return {
+        props:
+        {
+            cookie
+        }
+    }
 }
 
 export default PainelControlo

@@ -16,6 +16,9 @@ import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
 import { fetchObra } from '../../redux/slices/obraSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
+import { fetchOneAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
+import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
+import { fetchOneSaida, updateAuditoria } from '../../redux/slices/auditoriaSlice'
 
 
 type EquipamentoType = {
@@ -41,35 +44,109 @@ type DevolverAMGProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
     equipamentos: EquipamentoType[];
-    setIdEquipamento: (valor: number) => void
 }
 
 //Tipagem do formulário
 type FormValues = {
     id: number;
-    descricao_equipamento: string;
+    descricao_equipamento: number;
     quantidade: number;
     obra_id: number;
-    data_devolucao: string
+    data_devolucao: string;
+    data_retirada: string
 }
 
-const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: DevolverAMGProps) => {
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
+
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
 
     const [obras, setObras] = useState<ObraType[]>([])
+    const [idEquipamento, setIdEquipamento] = useState(0)
+
     const dispatch = useDispatch<any>()
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+
+        data.descricao_equipamento = idEquipamento;
+        const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+        const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
+
+        if (equipamentoQuantidade.length) {
+            const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+            const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
+
+            if (almoxarifarioFinded.length <= 0) {
+                notifyError('Equipamento não existe no almoxarifário desta obra! 😥')
+
+                setLoad(false)
+                return
+            }
+            if (data.quantidade > almoxarifarioFinded[0].quantidade) {
+                notifyError('O almoxarifário não tem toda essa quantidade! 😥')
+
+                setLoad(false)
+                return
+            }
+            let qtdTotalAlmo = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+            let qtdTotalAMG = Number(equipamentoQuantidade[0].quantidade) + Number(data.quantidade)
+
+            const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotalAlmo }))
+
+
+            if (!almoxarifarioUpdate.meta.arg) {
+                // notificar o erro
+                notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
+                setLoad(false)
+                return
+            }
+
+            const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalAMG }))
+
+            if (!armQtdUpdate.meta.arg) {
+                // notificar o erro
+                let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+                const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
+
+
+                notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
+                setLoad(false)
+                return
+            }
+        } else {
+
+            setLoad(false)
+
+            notifyError('Equipamento não existe em armazem! 😥')
+            return
+        }
+
+        const fetchOneSaidaByDate = await dispatch(fetchOneSaida({ data_retirada: data.data_retirada, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+        const auditorias = unwrapResult(fetchOneSaidaByDate)
+
+        //Vê bem esta actualização
+        let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
+
+        const auditoria = await dispatch(updateAuditoria({ ...auditorias[0], data_devolucao: data.data_devolucao, quantidade_devolvida: qtdAuditoria }))
+        if (auditoria.meta.arg) {
+
+            notifySuccess()
+            //sucesso
+        } else {
+            notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
+        }
+
+        setLoad(false)
     }
+
 
     const getObras = async () => {
         const resultDispatch = await dispatch(fetchObra())
 
         const resultUnwrap = unwrapResult(resultDispatch)
 
-        if (resultUnwrap.lenght) setObras(resultUnwrap)
+        if (resultUnwrap.length) setObras(resultUnwrap)
     }
 
     useEffect(() => {
@@ -79,6 +156,36 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: Devo
     function closeModal() {
         setIsOpen(false)
     }
+
+    const notifySuccess = () => {
+
+        setTimeout(function () {
+
+            reset()
+
+        }, 6500);
+
+        toast.success('Equipamento adicionado com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+    }
+
+    const notifyError = (messageError: string) => toast.error(messageError, {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
 
     return (
         <>
@@ -133,17 +240,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: Devo
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem da Obra e adicionar a quantidade em stock do armazem geral  */}
-                                                {/**
-                                              *    <input
-                                                    type="text"
-                                                    className='rounded shadow w-full'
-                                                    placeholder='Descrição do Equipamento *'
-                                                    {...register('descricao_equipamento', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                />
-                                              */}
+
 
                                                 <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
 
@@ -152,19 +249,18 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: Devo
                                                 <select
                                                     {...register('obra_id')}
 
-                                                    className='rounded shadow w-full cursor-pointer'>
+                                                    className='rounded shadow w-1/2 cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
                                                     {
-                                                        obras.length && obras.map((obra, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={obra.id}>{obra.obra_nome}</option>
-                                                        ))
+                                                        obras.length && obras.map((obra, index) => {
+                                                            if (obra.estado === 'Activa') {
+                                                                return <option
+                                                                    key={index}
+                                                                    value={obra.id}>{obra.obra_nome}</option>
+                                                            }
+                                                        })
                                                     }
                                                 </select>
-                                            </div>
-
-                                            <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
@@ -176,14 +272,32 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: Devo
                                                         min: { message: 'Quantidade insuficiente', value: 1 }
                                                     })}
                                                 />
+                                            </div>
 
-                                                <input
-                                                    type="date"
-                                                    className='rounded shadow w-1/2'
-                                                    {...register('data_devolucao', {
-                                                        required: { message: "Por favor, introduza a data da devolução.", value: true },
-                                                    })}
-                                                />
+                                            <div className='flex gap-2 justify-center align-center'>
+
+                                                <div className='w-1/2'>
+                                                    <label htmlFor="retirada">Data Retirada</label>
+                                                    <input
+                                                        id='retirada'
+                                                        type="date"
+                                                        className='rounded shadow w-full'
+                                                        {...register('data_retirada', {
+                                                            required: { message: "Por favor, introduza a data da devolução.", value: true },
+                                                        })}
+                                                    />
+                                                </div>
+                                                <div className='w-1/2'>
+                                                    <label htmlFor="entrada">Data Devolução</label>
+                                                    <input
+                                                        id='entrada'
+                                                        type="date"
+                                                        className='rounded shadow w-full'
+                                                        {...register('data_devolucao', {
+                                                            required: { message: "Por favor, introduza a data da devolução.", value: true },
+                                                        })}
+                                                    />
+                                                </div>
 
                                             </div>
 

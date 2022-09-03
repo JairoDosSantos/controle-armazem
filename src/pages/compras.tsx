@@ -10,26 +10,30 @@ import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
-import { wrapper } from "../redux/store"
 import { GetServerSideProps } from "next"
-import { fetchEquipamento } from "../redux/slices/equipamentoSlice"
-import { fetchArmGeral } from "../redux/slices/armGeralSlice"
+import { wrapper } from "../redux/store"
+import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+
 type EquipamentoType = {
     id: number;
     descricao: string;
     duracao_id: number;
     classificacao_id: number;
-    data: string
+    data: string;
+    stock_emergencia: number
 }
 
-type EquipamentosARMType = {
+type CompraType = {
     id: number;
-    quantidade: number;
-    equipamento_id: EquipamentoType
+    equipamento_id: EquipamentoType;
+    preco: number;
+    data_compra: string;
+    quantidade_comprada: number
 }
+
 type DuracaoType = {
     id: number;
     tempo: string;
@@ -41,24 +45,24 @@ type ClassificacaoType = {
 
 }
 
-type PosicaoArmazemProps = {
-    equipamentosARM: EquipamentosARMType[];
-    duracao: DuracaoType[];
-    classificacao: ClassificacaoType[]
+type CompraProps = {
+    compras: CompraType[];
+    classificacao: ClassificacaoType[];
+    duracao: DuracaoType[]
 }
-
-const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
+const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
 
+    const [filtroTipo, setFiltroTipo] = useState(false)
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
-    const [search, setSearch] = useState('')
-    const [searchByClassificacao, setSearchByClassificacao] = useState(0)
+    const [searchByEquipamento, setSearchByEquipamento] = useState('')
+    const [searchByDate, setSearchByDate] = useState('')
 
     const [showEditModal, setShowEditModal] = useState(false)
 
@@ -72,33 +76,22 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
         const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
     }
-
-    let findedEquipamento: EquipamentosARMType[] = []
-
-
-
-
-    if (equipamentosARM) {
-        if (search && searchByClassificacao === 0) {
-            findedEquipamento = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
-        } else if (searchByClassificacao !== 0 && search === '') {
-            findedEquipamento = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.classificacao_id === searchByClassificacao)
-        } else {
-
-            findedEquipamento = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && equipamento.equipamento_id.classificacao_id === searchByClassificacao)
-        }
-
+    let findedCompras: CompraType[] = []
+    if (compras.length && filtroTipo) {
+        if (searchByEquipamento && searchByDate === '') findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()))
+        else if (searchByEquipamento === '' && searchByDate) findedCompras = compras.filter((compra) => compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
+        else findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) && compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
     }
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="posicao-armazem" hideSideBar={hideSideBar} />
+            <SiderBar itemActive="devolucoes" hideSideBar={hideSideBar} />
             <main className='flex-1 space-y-6'>
                 <div>
                     <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
                 </div>
                 <Head>
-                    <title>SCA | Posição em armazem</title>
+                    <title>SCA | Compras</title>
                 </Head>
 
                 {/**Confirm alert**/}
@@ -158,33 +151,49 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                 <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
                 <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
-                        <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
-                        <div className="border w-1/5 border-gray-700 ml-4"></div>
+                        <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
+                        <div className="border w-1/4 border-gray-700 ml-4"></div>
                         <div className="ml-auto flex gap-2 -mt-4">
                             <div>
-                                {/** <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label> */}
-                                <select
-                                    onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
-                                    className="rounded shadow cursor-pointer" >
-                                    <option value={0}>Selecione a classificação</option>
-                                    {
-                                        (classificacao && classificacao.length) && classificacao.map((classific, index) => (
-                                            <option
-                                                key={index}
-                                                value={classific.id}>{classific.tipo}</option>
-                                        ))
-                                    }
-                                </select>
+                                <label htmlFor="ferramenta" className="bg-white">Todas&nbsp;</label>
+                                <input
+                                    defaultChecked={true}
+                                    onClick={() => setFiltroTipo(false)}
+                                    type={"radio"}
+                                    name='classificacao'
+                                    id='ferramenta'
+                                    className="cursor-pointer" />
                             </div>
+                            <div>
+                                <label htmlFor="material" className="bg-white">Por eq. / data&nbsp;</label>
+                                <input
+                                    onClick={() => setFiltroTipo(true)}
 
+                                    type={"radio"}
+                                    name='classificacao'
+                                    id='material'
+                                    className="cursor-pointer" />
+                            </div>
                         </div>
                         <div className="flex gap-5">
-                            <input
-                                onChange={(event) => setSearch(event.target.value)}
-                                type="search"
-                                placeholder="Pesquise pelo equipamento"
-                                className="w-full rounded shadow" />
 
+                            {
+                                filtroTipo && (
+                                    <>
+                                        <input
+                                            onChange={(event) => setSearchByEquipamento(event.target.value)}
+                                            className="rounded shadow w-full lg:w-1/2 animate__animated animate__fadeIn"
+                                            type={"search"}
+                                            placeholder='Descrição do equipamento'
+                                        />
+                                        <input
+                                            onChange={(event) => setSearchByDate(event.target.value)}
+                                            type="date"
+                                            className="rounded shadow w-full lg:w-1/2 animate__animated animate__fadeIn"
+                                        />
+                                    </>
+                                )
+                            }
                         </div>
                         <div className=" ml-auto flex gap-2">
                             <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
@@ -199,34 +208,35 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                     </div>
 
                     <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Relatório armazem geral</span>
+                        <span className='font-semibold text-lg'>Relatório de Compras</span>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
-                                    {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                <tr className='flex justify-between items-center bg-gray-200 px-4 py-2 rounded'>
+                                    <th className='text-gray-600 font-bold w-1/4 '>ID</th>
+                                    <th className='text-gray-600 font-bold w-1/4  '>Descrição</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Classificação</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Duração</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Qtd. comprada</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Preço</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Data de compra</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
+                                    <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                                 </tr>
                             </thead>
                             <tbody className=''>
                                 {
-                                    (equipamentosARM && equipamentosARM.length && findedEquipamento.length === 0) ? equipamentosARM.map((equipamento, index) => (
+                                    compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
                                         <tr
                                             key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{equipamento.id}</td>
-                                            <td className="w-1/5 ">{equipamento.equipamento_id.descricao}</td>
-                                            <td className="w-1/5 ">{findClassificacao(equipamento.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/5 ">{findDuracao(equipamento.equipamento_id.duracao_id).tempo}</td>
-
-                                            <td className="w-1/5 ">{equipamento.quantidade}</td>
-                                            {/**    <td className="w-1/5 ">22-08-2022</td> */}
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/4  ">{compra.id}</td>
+                                            <td className="w-1/4  ">{compra.equipamento_id.descricao}</td>
+                                            <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                            <td className="w-1/4  ">{compra.quantidade_comprada}</td>
+                                            <td className="w-1/4  ">{compra.preco}</td>
+                                            <td className="w-1/4  ">{compra.data_compra}</td>
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowEditModal(true)}
                                                     className="hover:brightness-75"
@@ -234,7 +244,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
                                                     className="hover:brightness-75"
@@ -243,27 +253,26 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                                 </button>
                                             </td>
                                         </tr>
-                                    )) : findedEquipamento.map((finded, index) => (
+                                    )) : findedCompras.map((compra, index) => (
                                         <tr
                                             key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{finded.id}</td>
-                                            <td className="w-1/5 ">{finded.equipamento_id.descricao}</td>
-                                            <td className="w-1/5 ">{findClassificacao(finded.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/5 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
-                                            <td className="w-1/5 ">{finded.quantidade}</td>
-
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/4  ">{compra.id}</td>
+                                            <td className="w-1/4  ">{compra.equipamento_id.descricao}</td>
+                                            <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                            <td className="w-1/4  ">{compra.quantidade_comprada}</td>
+                                            <td className="w-1/4  ">{compra.preco}</td>
+                                            <td className="w-1/4  ">{compra.data_compra}</td>
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
-
-
                                                     onClick={() => setShowEditModal(true)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
                                                     className="hover:brightness-75"
@@ -273,7 +282,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                             </td>
                                         </tr>
                                     ))
-
                                 }
 
                             </tbody>
@@ -291,20 +299,18 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async ({ req }) => {
 
-            //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
+            const compraDispatch = await store.dispatch(fetchCompra());
+
             const classificacaoDispatch = await store.dispatch(fetchClassificacao());
             const duracaoDispatch = await store.dispatch(fetchDuracao());
-            const equipamentoARM = await store.dispatch(fetchArmGeral());
 
-
-            // const equipamentos = equipamentoDispatch.payload
+            const compras = compraDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
-            const equipamentosARM = equipamentoARM.payload
 
             return {
                 props: {
-                    equipamentosARM,
+                    compras,
                     classificacao,
                     duracao
                 },
@@ -312,4 +318,4 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
         }
 );
 
-export default PosicaoArmazem
+export default Devolucoes

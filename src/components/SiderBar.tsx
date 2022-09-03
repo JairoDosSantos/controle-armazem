@@ -5,8 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '../assets/noah.png'
 
-import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaArrowCircleRight, FaArrowCircleLeft } from 'react-icons/fa'
+import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaArrowCircleRight, FaArrowCircleLeft, FaShopify, FaArrowsAltH } from 'react-icons/fa'
 import { AiFillCloseCircle } from 'react-icons/ai'
+import api from '../services/api'
+import { useRouter } from 'next/router'
 
 type SiderBarProps = {
 
@@ -14,7 +16,20 @@ type SiderBarProps = {
     itemActive: string
 }
 
+
+
 const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
+    const router = useRouter()
+    const logOut = async () => {
+
+        const response = await api.post('api/logout')
+
+        if (response.data) {
+            router.reload()
+        }
+
+    }
+
     return (
         <aside className={`bg-white w-72 border-r min-h-screen ${!hideSideBar ? 'flex flex-col ' : 'hidden'} gap-4 px-6 py-6 text-center `}>
             <div className='flex flex-col justify-center items-center '>
@@ -59,12 +74,12 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                         <Link href='/posicao-obra'>Almoxarifários</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
-                        <FaArrowCircleRight className='text-gray-500 text-lg' />
-                        <Link href='/saidas'>Saídas</Link>
+                        <FaArrowsAltH className='text-gray-500 text-lg' />
+                        <Link href='/auditoria'>Movimentações</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'devolucoes' && 'active'}`}>
-                        <FaArrowCircleLeft className='text-gray-500 text-lg' />
-                        <Link href='/devolucoes'>Devoluções</Link>
+                        <FaShopify className='text-gray-500 text-lg' />
+                        <Link href='/compras'>Compras</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
                         <FaClock className='text-gray-500 text-lg' />
@@ -79,7 +94,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                 <Link href='/'>
                     <div className='flex gap-2 items-center text-sm  bg-white cursor-pointer'>
                         <AiFillCloseCircle className='text-gray-500 text-lg' />
-                        <span>Terminar sessão</span>
+                        <span onClick={logOut}>Terminar sessão</span>
                     </div>
                 </Link>
 

@@ -29,19 +29,7 @@ export default function EquipamentoAutoComplete({ equipamentos, setIdEquipamento
     const [selected, setSelected] = useState({ id: 0, descricao: '', duracao_id: 0, classificacao_id: 0, data: '' } as EquipamentosType)
     const [query, setQuery] = useState('')
 
-    /**
-     * const handleChange = (event: FormEvent) => {
-        event.preventDefault();
-        const queryValue = event.target as HTMLInputElement
-        if (queryValue.value !== '') {
-            setSelected({ id: 0, descricao: '', duracao_id: 0, classificacao_id: 0, data: '' })
-            setQuery(queryValue.value);
 
-
-            setIdEquipamento(0)
-        }
-    }
-     */
     const filteredEquipamento = query !== '' && equipamentos.length ? equipamentos.filter((equipamento) => equipamento.descricao.toLowerCase().includes(query.toLowerCase())) : []
 
     useEffect(() => {

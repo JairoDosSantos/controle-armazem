@@ -26,8 +26,8 @@ export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => 
         //acrescentei classificacao_id,duracao_id dia 01-09-2022
         const { data, error } = await supabase
             .from('armgeral')
-            .select("id, equipamento_id(id,descricao,classificacao_id,duracao_id),quantidade_entrada,data_aquisicao")
-
+            .select("id, equipamento_id(id,descricao,classificacao_id,duracao_id),quantidade,data_aquisicao")
+        if (error) return null
         return data
 
     } catch (error) {
@@ -74,7 +74,7 @@ export const updateArmGeral = createAsyncThunk('/armgeral/update', async ({ id, 
             .update([{ data_aquisicao, quantidade: quantidade_entrada }])
             .eq('equipamento_id', equipamento_id)
 
-        if (error) return error
+        if (error) return null
         return data
 
     } catch (error) {

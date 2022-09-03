@@ -10,7 +10,8 @@ import encarregadoSlice from "./slices/encarregadoSlice"
 import equipamentoSlice from "./slices/equipamentoSlice"
 import almoxarifarioSlice from "./slices/almoxarifarioSlice"
 import obraSlice from "./slices/obraSlice"
-import saidaSlice from "./slices/saidaSlice"
+import auditoriaSlice from "./slices/auditoriaSlice"
+import compraSlice from "./slices/compraSlice"
 
 
 const combineReducer = combineReducers({
@@ -22,7 +23,8 @@ const combineReducer = combineReducers({
     Almoxarifario: almoxarifarioSlice,
     ArmGeral: armGeralSlice,
     Devolucao: devolverSlice,
-    Saida: saidaSlice
+    Auditoria: auditoriaSlice,
+    Compra: compraSlice
 })
 
 export const store = () => configureStore({

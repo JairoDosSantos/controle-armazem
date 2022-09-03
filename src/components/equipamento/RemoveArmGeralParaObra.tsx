@@ -16,6 +16,10 @@ import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
 import { useDispatch } from 'react-redux'
 import { fetchObra } from '../../redux/slices/obraSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import { deleteAlmoxarifario, fetchOneAlmoxarifario, insertAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
+import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
+import { insertAuditoria } from '../../redux/slices/auditoriaSlice'
+import { useRouter } from 'next/router'
 
 type EquipamentoType = {
     id: number;
@@ -40,29 +44,115 @@ type RemoveArmGeralParaObraProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
     equipamentos: EquipamentoType[];
-    setIdEquipamento: (valor: number) => void
+
 }
 
 //Tipagem do formulário
 type FormValues = {
     id: number;
-    descricao_equipamento: string;
+    descricao_equipamento: number;
     quantidade: number;
     obra_id: number;
     data_transferencia: string
 }
 
 
-const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipamento }: RemoveArmGeralParaObraProps) => {
+const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGeralParaObraProps) => {
 
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
-
+    const [idEquipamento, setIdEquipamento] = useState(0)
     const [obras, setObras] = useState<ObraType[]>([])
     const dispatch = useDispatch<any>()
+    const route = useRouter()
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        data.descricao_equipamento = idEquipamento
+        const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+        const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
+
+        if (equipamentoQuantidade.length > 0) {
+
+            const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+            const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
+
+            if (almoxarifarioFinded && almoxarifarioFinded.length > 0) {
+                //Se a quantidade no armazem for maior ou igual a quantidade que se pretende, então faz-se a operação
+                if (Number(equipamentoQuantidade[0].quantidade) >= Number(data.quantidade)) {
+
+                    let qtdTotal = Number(almoxarifarioFinded[0].quantidade) + Number(data.quantidade)
+
+
+                    const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal }))
+
+                    if (!almoxarifarioUpdate.meta.arg) {
+                        // notificar o erro
+                        notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
+                        setLoad(false)
+                        return
+                    }
+
+                    let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+                    const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
+
+                    //se acontecer um erro ao retirar do armazem, visto que a quantidade já foi adicionada no almoxarifário então devemos retirar do almoxarifário
+                    if (!armQtdUpdate.meta.arg) {
+                        // notificar o erro
+                        let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+                        const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
+
+                        notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
+                        setLoad(false)
+                        return
+                    }
+                    //Se chegar até aquí, então sucesso. Devemos cadastrar agora no final em auditoría
+                } else {
+
+                    setLoad(false)
+                    notifyError('Estoque em armazem insuficiente! 😥')
+                    return
+                }
+
+            } else {
+
+                const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
+                const almoxarifarioData = unwrapResult(almoxarifarioInsert)
+
+
+                if (almoxarifarioInsert.meta.arg) {
+                    let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+                    const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
+                    if (!armQtdUpdate.meta.arg) {
+                        await dispatch(deleteAlmoxarifario(almoxarifarioData[0].id));
+                        setLoad(false)
+                        return
+                    }
+                }
+
+
+
+            }
+
+            const auditoria = await dispatch(insertAuditoria({ data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+            if (auditoria.meta.arg) {
+                // console.log('sucesso', auditoria.payload)
+                //sucesso
+                notifySuccess()
+            } else {
+                notifyError('Erro insesperado. Contacte o admin. 🤔')
+            }
+            setLoad(false)
+        }
+
+        //Primeiro deve-se 
+        //1- buscar o equipamento na tabela armazem geral; 
+        //2- Se existir , inserir o almoxarifário caso não tenha... caso tenha,actualizar  ;
+        //3- subtrair a quantidade do equipamento no armazem geral; 
+        //4- consequentemente cadastrar em auditoria ;
+
+
+
     }
 
     const getObras = async () => {
@@ -70,7 +160,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipame
 
         const resultUnwrap = unwrapResult(resultDispatch)
 
-        if (resultUnwrap.lenght) setObras(resultUnwrap)
+        if (resultUnwrap.length) setObras(resultUnwrap)
     }
 
     function closeModal() {
@@ -81,6 +171,37 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipame
         getObras()
     }, [])
 
+    const notifySuccess = () => {
+
+        setTimeout(function () {
+
+            reset()
+
+        }, 6500);
+
+        toast.success('Equipamento adicionado com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = (messageError: string) => toast.error(messageError, {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
 
     return (
         <>
@@ -135,17 +256,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipame
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem e subtrair a quantidade que a obra pretende ao stock do armazem geral */}
-                                                {/**
-                                                *  <input
-                                                    type="text"
-                                                    className='rounded shadow w-full'
-                                                    placeholder='Descrição do Equipamento *'
-                                                    {...register('descricao_equipamento', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                />
-                                                */}
+
 
                                                 <EquipamentoAutoComplete
                                                     equipamentos={equipamentos}
@@ -159,11 +270,13 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos, setIdEquipame
                                                     className='rounded shadow w-full cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
                                                     {
-                                                        obras.length && obras.map((obra, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={obra.id}>{obra.obra_nome}</option>
-                                                        ))
+                                                        obras.length && obras.map((obra, index) => {
+                                                            if (obra.estado === 'Activa') {
+                                                                return <option
+                                                                    key={index}
+                                                                    value={obra.id}>{obra.obra_nome}</option>
+                                                            }
+                                                        })
                                                     }
 
                                                 </select>

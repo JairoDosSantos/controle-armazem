@@ -274,10 +274,6 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                         )
                                     })
                                 }
-
-
-
-
                             </tbody>
                         </table>
                     </div>

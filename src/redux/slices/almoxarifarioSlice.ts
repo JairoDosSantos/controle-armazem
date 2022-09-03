@@ -22,27 +22,17 @@ const initialState: ObraEquipamentoState = {
 }
 
 
-export const fetchObraEquipamento = createAsyncThunk('/almoxarifario/fetchAll', async () => {
+
+export const fetchOneAlmoxarifario = createAsyncThunk('/almoxarifario/fetchOne', async ({ equipamento_id, obra_id }: Omit<ObraEquipamentoType, 'id' | 'data_aquisicao' | 'quantidade_a_levar'>) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .select("data_aquisicao,equipamento_id(id,descricao),obra_id(obra_nome,id,estado),quantidade_a_levar")
+            .select("id,data_aquisicao,equipamento_id,obra_id,quantidade")
+            .eq('equipamento_id', equipamento_id)
+            .eq('obra_id', obra_id)
 
-        return data
-
-    } catch (error) {
-        return (error)
-    }
-})
-export const insertobraEquipamento = createAsyncThunk('/almoxarifario/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
-    try {
-
-        const { data, error } = await supabase
-            .from('almoxarifario')
-            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar })
-            .single()
-
+        if (error) return null
         return data
 
     } catch (error) {
@@ -50,13 +40,28 @@ export const insertobraEquipamento = createAsyncThunk('/almoxarifario/create', a
     }
 })
 
-export const updateobraEquipamento = createAsyncThunk('/almoxarifario/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
+export const fetchAlmoxarifario = createAsyncThunk('/almoxarifario/fetchAll', async () => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .update([{ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }])
-            .match({ id })
+            .select("id,data_aquisicao,equipamento_id(id,descricao,classificacao_id,duracao_id),obra_id(obra_nome,id,estado),quantidade")
+        if (error) return null
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
+
+export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: Omit<ObraEquipamentoType, 'id'>) => {
+    try {
+
+        const { data, error } = await supabase
+            .from('almoxarifario')
+            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar })
+
+        if (error) return error
 
         return data
 
@@ -65,14 +70,29 @@ export const updateobraEquipamento = createAsyncThunk('/almoxarifario/update', a
     }
 })
 
-export const deleteobraEquipamento = createAsyncThunk('/almoxarifario/delete', async ({ id }: ObraEquipamentoType) => {
+export const updateAlmoxarifario = createAsyncThunk('/almoxarifario/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
+    try {
+
+        const { data, error } = await supabase
+            .from('almoxarifario')
+            .update([{ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar }])
+            .eq('id', id)
+        if (error) return null
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
+
+export const deleteAlmoxarifario = createAsyncThunk('/almoxarifario/delete', async ({ id }: ObraEquipamentoType) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
             .delete()
             .match({ id })
-
+        if (error) return null
         return data
 
     } catch (error) {
@@ -88,11 +108,11 @@ export const Almoxarifario = createSlice({
     reducers: {
     },
     extraReducers: (build) => {
-        build.addCase(fetchObraEquipamento.fulfilled, (state, action) => {
+        build.addCase(fetchAlmoxarifario.fulfilled, (state, action) => {
             state.equipamentosObras.push(action.payload as ObraEquipamentoType)
         });
 
-        build.addCase(insertobraEquipamento.fulfilled, (state, action) => {
+        build.addCase(insertAlmoxarifario.fulfilled, (state, action) => {
             state.equipamentosObras.push(action.payload as ObraEquipamentoType)
         });
 

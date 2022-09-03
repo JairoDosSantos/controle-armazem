@@ -11,10 +11,53 @@ import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
+import { GetServerSideProps } from "next"
+import { wrapper } from "../redux/store"
+import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
+import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
+import { fetchAlmoxarifario } from "../redux/slices/almoxarifarioSlice"
+import { fetchObra } from "../redux/slices/obraSlice"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
-const PosicaoObra = () => {
+type DuracaoType = {
+    id: number;
+    tempo: string;
+
+}
+type ClassificacaoType = {
+    id: number;
+    tipo: string;
+
+}
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: number;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
+type EquipamentoType = {
+    id: number;
+    descricao: string;
+    duracao_id: number;
+    classificacao_id: number;
+    data: string
+}
+type Almoxarifario = {
+    id: number;
+    equipamento_id: EquipamentoType;
+    quantidade: number;
+    obra_id: ObraType;
+    data_transferencia: string
+}
+type PosicaoObraProps = {
+    almoxarifarios: Almoxarifario[];
+    classificacao: ClassificacaoType[];
+    duracao: DuracaoType[];
+    obras: ObraType[]
+}
+
+const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoObraProps) => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
@@ -24,9 +67,33 @@ const PosicaoObra = () => {
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
-
+    const [search, setSearch] = useState('')
+    const [searchByObraId, setSearchByObraId] = useState(0)
+    const [searchClassificacao, setSearchClassificacao] = useState(0)
 
     const [showEditModal, setShowEditModal] = useState(false)
+
+    const findDuracao = (id: number) => {
+        const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
+
+        return duration as DuracaoType
+    }
+
+    const findClassificacao = (id: number) => {
+        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        return classification as ClassificacaoType
+    }
+
+    let findedEquipamento: Almoxarifario[] = []
+
+
+    if (almoxarifarios) {
+        if (search && searchByObraId === 0 && searchClassificacao === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+        else if (searchClassificacao !== 0 && search === '' && searchByObraId === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+        else if (searchByObraId !== 0 && search === '' && searchClassificacao === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
+        else findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+
+    }
 
     return (
         <div className='flex'>
@@ -104,11 +171,16 @@ const PosicaoObra = () => {
                         <div className="ml-auto flex gap-2 -mt-4">
                             <div>
                                 {/** <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label> */}
-                                <select className="rounded shadow cursor-pointer" >
-                                    <option value="#">Selecione a classificação</option>
-                                    <option value="#">Ferramentas</option>
-                                    <option value="#">Material</option>
-                                    <option value="#">HSST</option>
+                                <select
+                                    onChange={(event) => setSearchClassificacao(Number(event.target.value))}
+                                    className="rounded shadow cursor-pointer" >
+                                    <option value={0}>Selecione a classificação</option>
+                                    {
+                                        (classificacao && classificacao.length) && classificacao.map((classific, index) => (
+                                            <option
+                                                key={index}
+                                                value={classific.id}> {classific.tipo}</option>
+                                        ))}
                                 </select>
                             </div>
                             {/**
@@ -123,13 +195,24 @@ const PosicaoObra = () => {
                             */}
                         </div>
                         <div className="flex gap-5">
-                            <input type="search" placeholder="Pesquise pelo equipamento" className="w-1/2 rounded shadow" />
+                            <input
+                                onChange={(event) => setSearch(event.target.value)}
+                                type="search"
+                                placeholder="Pesquise pelo equipamento"
+                                className="w-1/2 rounded shadow" />
                             {/** Lista apenas na tabela se no mínimo uma obra for selecionada, caso contrário a tabela deve ser vazia */}
-                            <select id="obra" className="w-1/2 rounded shadow cursor-pointer">
-                                <option value="">Selecione a obra</option>
-                                <option value="#">Sinse Kilamba</option>
-                                <option value="#">Sinse Maianga</option>
-                                <option value="#">Hotel</option>
+                            <select
+                                onChange={(event) => setSearchByObraId(Number(event.target.value))}
+                                id="obra"
+                                className="w-1/2 rounded shadow cursor-pointer">
+                                <option value={0}>Selecione a obra</option>
+                                {
+                                    (obras && obras.length) && obras.map((obr, index) => (
+                                        <option
+                                            key={index}
+                                            value={obr.id}>{obr.obra_nome}</option>
+                                    ))
+                                }
                             </select>
                         </div>
 
@@ -146,9 +229,10 @@ const PosicaoObra = () => {
                     </div>
 
                     <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Relatório</span>
+                        <span className='font-semibold text-lg'>Relatório almoxarifário</span>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
+
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
                                     <th className='text-gray-600 font-bold w-1/5'>ID</th>
                                     <th className='text-gray-600 font-bold w-1/5 '>Descrição</th>
@@ -156,84 +240,71 @@ const PosicaoObra = () => {
                                     <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Obra</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th>
+                                    {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
                                     <th className='text-gray-600 font-bold w-1/5'>Editar</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
                                 </tr>
                             </thead>
                             <tbody className=''>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">1</td>
-                                    <td className="w-1/5 ">Cimento Cola</td>
-                                    <td className="w-1/5 ">Material</td>
-                                    <td className="w-1/5 ">uso imediato</td>
-                                    <td className="w-1/5 ">30</td>
-                                    <td className="w-1/5 ">Sinse Kilamba</td>
-                                    <td className="w-1/5 ">22-08-2022</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">2</td>
-                                    <td className="w-1/5 ">Martelo de burracha</td>
-                                    <td className="w-1/5 ">Ferramenta</td>
-                                    <td className="w-1/5 ">2 à 5 anos</td>
-                                    <td className="w-1/5 ">3</td>
-                                    <td className="w-1/5 ">Sinse Kilamba</td>
-                                    <td className="w-1/5 ">22-08-2022</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="hover:brightness-75"
-                                            title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">2</td>
-                                    <td className="w-1/5 ">Capacete</td>
-                                    <td className="w-1/5 ">EPI</td>
-                                    <td className="w-1/5 ">0.5 à 1 ano</td>
-                                    <td className="w-1/5 ">5</td>
-                                    <td className="w-1/5 ">Sinse Kilamba</td>
-                                    <td className="w-1/5 ">24-08-2022</td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowEditModal(true)}
-                                            className="hover:brightness-75"
-                                            title="Editar">
-                                            <FaEdit />
-                                        </button>
-                                    </td>
-                                    <td className="w-1/5  flex justify-center items-center">
-                                        <button
-                                            onClick={() => setShowQuestionAlert(true)}
-                                            className="hover:brightness-75"
-                                            title="Apagar">
-                                            <FaTrash />
-                                        </button>
-                                    </td>
-                                </tr>
+                                {
+                                    (almoxarifarios && almoxarifarios.length && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/5 ">{almoxarifario.id}</td>
+                                            <td className="w-1/5 ">{almoxarifario.equipamento_id.descricao}</td>
+
+                                            <td className="w-1/5"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
+
+                                            <td className="w-1/5 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-1/5 ">{almoxarifario.quantidade}</td>
+                                            <td className="w-1/5 ">{almoxarifario.obra_id.obra_nome}</td>
+                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button
+                                                    onClick={() => setShowQuestionAlert(true)}
+                                                    className="hover:brightness-75"
+                                                    title="Apagar">
+                                                    <FaTrash />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )) : findedEquipamento.map((finded, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/5 ">{finded.id}</td>
+                                            <td className="w-1/5 ">{finded.equipamento_id.descricao}</td>
+
+                                            <td className="w-1/5"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
+
+                                            <td className="w-1/5 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-1/5 ">{finded.quantidade}</td>
+                                            <td className="w-1/5 ">{finded.obra_id.obra_nome}</td>
+                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            <td className="w-1/5  flex justify-center items-center">
+                                                <button
+                                                    onClick={() => setShowQuestionAlert(true)}
+                                                    className="hover:brightness-75"
+                                                    title="Apagar">
+                                                    <FaTrash />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
+
+
 
                             </tbody>
                         </table>
@@ -241,9 +312,37 @@ const PosicaoObra = () => {
                 </div>
 
 
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }
+export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
+    (store) =>
+        async ({ req }) => {
+
+            //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
+            const classificacaoDispatch = await store.dispatch(fetchClassificacao());
+            const duracaoDispatch = await store.dispatch(fetchDuracao());
+            const almoxarifario = await store.dispatch(fetchAlmoxarifario());
+            const obra = await store.dispatch(fetchObra());
+
+
+            // const equipamentos = equipamentoDispatch.payload
+            const classificacao = classificacaoDispatch.payload
+            const duracao = duracaoDispatch.payload
+            const almoxarifarios = almoxarifario.payload
+            const obras = obra.payload
+
+            return {
+                props: {
+                    almoxarifarios,
+                    classificacao,
+                    duracao,
+                    obras
+                },
+            };
+        }
+);
+
 
 export default PosicaoObra
