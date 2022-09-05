@@ -12,6 +12,7 @@ import almoxarifarioSlice from "./slices/almoxarifarioSlice"
 import obraSlice from "./slices/obraSlice"
 import auditoriaSlice from "./slices/auditoriaSlice"
 import compraSlice from "./slices/compraSlice"
+import geralSlice from "./slices/geralSlice"
 
 
 const combineReducer = combineReducers({
@@ -24,7 +25,8 @@ const combineReducer = combineReducers({
     ArmGeral: armGeralSlice,
     Devolucao: devolverSlice,
     Auditoria: auditoriaSlice,
-    Compra: compraSlice
+    Compra: compraSlice,
+    geral: geralSlice,
 })
 
 export const store = () => configureStore({

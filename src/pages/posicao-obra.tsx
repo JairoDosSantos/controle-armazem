@@ -5,13 +5,13 @@ import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
 import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
-
+import nookies from 'nookies'
 //Imagens
 import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
-import { GetServerSideProps } from "next"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { wrapper } from "../redux/store"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
@@ -88,12 +88,34 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
 
     if (almoxarifarios) {
-        if (search && searchByObraId === 0 && searchClassificacao === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
-        else if (searchClassificacao !== 0 && search === '' && searchByObraId === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
-        else if (searchByObraId !== 0 && search === '' && searchClassificacao === 0) findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
-        else findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+        if (search && searchByObraId === 0 && searchClassificacao === 0) {
+
+            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+        }
+        else if
+
+            (searchClassificacao !== 0 && search === '' && searchByObraId === 0) {
+            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+        }
+
+        else if (searchByObraId !== 0 && search === '' && searchClassificacao === 0) {
+            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
+        }
+        else if (searchByObraId !== 0 && search && searchClassificacao === 0) {
+            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+        }
+        else if
+
+            (searchClassificacao !== 0 && search && searchByObraId === 0) {
+            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+        }
+        else { findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
+
+    console.log('Finded', findedEquipamento)
+    console.log('Search', search)
+
 
     return (
         <div className='flex'>
@@ -163,7 +185,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
                 />
 
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <EditarModalPorObra isOpen={showEditModal} setIsOpen={setShowEditModal} />
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Posição Armazem por obra</h2>
@@ -247,7 +269,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                             </thead>
                             <tbody className=''>
                                 {
-                                    (almoxarifarios && almoxarifarios.length && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
+                                    (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -318,13 +340,15 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 }
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
+        async (context: GetServerSidePropsContext) => {
+
+            const cookie = nookies.get(context);
 
             //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
-            const classificacaoDispatch = await store.dispatch(fetchClassificacao());
-            const duracaoDispatch = await store.dispatch(fetchDuracao());
-            const almoxarifario = await store.dispatch(fetchAlmoxarifario());
-            const obra = await store.dispatch(fetchObra());
+            const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
+            const duracaoDispatch: any = await store.dispatch(fetchDuracao());
+            const almoxarifario: any = await store.dispatch(fetchAlmoxarifario());
+            const obra: any = await store.dispatch(fetchObra());
 
 
             // const equipamentos = equipamentoDispatch.payload
@@ -332,7 +356,10 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const duracao = duracaoDispatch.payload
             const almoxarifarios = almoxarifario.payload
             const obras = obra.payload
-
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
             return {
                 props: {
                     almoxarifarios,

@@ -30,7 +30,7 @@ const PainelItem = ({ titulo, quantidade, rodape, icone }: PainelItemProps) => {
 
                 </div>
 
-                <span className='font-bold text-blue-700 text-6xl select-none'>{quantidade}</span>
+                <span className={`font-bold ${quantidade > 0 ? 'text-blue-700' : 'text-red-700'} text-6xl select-none`}>{quantidade}</span>
 
             </div>
 

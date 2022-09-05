@@ -5,13 +5,14 @@ import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
 import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
+import nookies from 'nookies'
 
 import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
 import { wrapper } from "../redux/store"
-import { GetServerSideProps } from "next"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { fetchEquipamento } from "../redux/slices/equipamentoSlice"
 import { fetchArmGeral } from "../redux/slices/armGeralSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
@@ -155,8 +156,8 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                     confirmButtonText="Sim"
 
                 />
-                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} data={[]} />
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
@@ -289,19 +290,24 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
+        async (context: GetServerSidePropsContext) => {
+
+            const cookie = nookies.get(context);
 
             //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
-            const classificacaoDispatch = await store.dispatch(fetchClassificacao());
-            const duracaoDispatch = await store.dispatch(fetchDuracao());
-            const equipamentoARM = await store.dispatch(fetchArmGeral());
+            const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
+            const duracaoDispatch: any = await store.dispatch(fetchDuracao());
+            const equipamentoARM: any = await store.dispatch(fetchArmGeral());
 
 
             // const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
             const equipamentosARM = equipamentoARM.payload
-
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
             return {
                 props: {
                     equipamentosARM,

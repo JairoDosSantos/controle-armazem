@@ -21,6 +21,38 @@ const initialState: ArmGeralState = {
 }
 
 
+export const fetchEsgotar = createAsyncThunk('/armgeral/fetchAllEsgotar', async () => {
+    try {
+        //Método para buscar os equipamentos à esgotar
+        const { data, error } = await supabase
+            .from('armgeral')
+            .select("*, equipamento_id!inner(*)")
+            .filter('equipamento_id.stock_emergencia', 'lt', 'quantidade')
+        if (error) return error
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
+
+export const fetchArmGeralByClassificcao = createAsyncThunk('/armgeral/fetchAll', async (id: number) => {
+    try {
+        //acrescentei classificacao_id,duracao_id dia 01-09-2022
+        const { data, error } = await supabase
+            .from('armgeral')
+            .select("*, equipamento_id!inner(*)", { count: 'exact' })
+            .filter('equipamento_id.classificacao_id', 'eq', id)
+            .filter('quantidade', 'gt', 0)
+
+        if (error) return null
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
+
 export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => {
     try {
         //acrescentei classificacao_id,duracao_id dia 01-09-2022

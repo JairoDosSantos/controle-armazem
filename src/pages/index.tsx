@@ -5,12 +5,14 @@ import { useRouter } from 'next/router'
 import { FormEvent, useState } from 'react'
 
 import { FaArrowAltCircleRight } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
 
 import Logo from '../assets/noah.png'
 import Load from '../assets/load.gif'
 
 //Api
 import api from '../services/api'
+import { updateUser } from '../redux/slices/geralSlice'
 
 
 const Home: NextPage = () => {
@@ -19,7 +21,7 @@ const Home: NextPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [load, setLoad] = useState(false)
-
+  const dispatch = useDispatch<any>();
 
   const signInUser = async (event: FormEvent) => {
 
@@ -33,12 +35,14 @@ const Home: NextPage = () => {
     })
 
 
-    setLoad(false)
-
     const { user } = response.data
+
+
     const status = response.status
     if (user) {
+      await dispatch(updateUser({ user: user.email }))
       // setShowSuccess('flex')
+      setLoad(false)
       router.push('/painel-controlo')
 
     } else if (status === 401) {

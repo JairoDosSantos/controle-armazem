@@ -10,11 +10,12 @@ import Load from '../assets/load.gif'
 import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
-import { GetServerSideProps } from "next"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { wrapper } from "../redux/store"
 import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
+import nookies from 'nookies'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -149,7 +150,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
                 />
                 <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
                         <div className="border w-1/4 border-gray-700 ml-4"></div>
@@ -219,8 +220,10 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                     <th className='text-gray-600 font-bold w-1/4 '>Qtd. comprada</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Preço</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Data de compra</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
+                                    {/**
+                             *         <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
+                             */}
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -236,7 +239,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             <td className="w-1/4  ">{compra.quantidade_comprada}</td>
                                             <td className="w-1/4  ">{compra.preco}</td>
                                             <td className="w-1/4  ">{compra.data_compra}</td>
-                                            <td className="w-1/4   flex justify-center items-center">
+                                            {/**
+                                             * <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowEditModal(true)}
                                                     className="hover:brightness-75"
@@ -252,6 +256,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                     <FaTrash />
                                                 </button>
                                             </td>
+                                             */}
                                         </tr>
                                     )) : findedCompras.map((compra, index) => (
                                         <tr
@@ -262,9 +267,13 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
                                             <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-1/4  ">{compra.quantidade_comprada}</td>
-                                            <td className="w-1/4  ">{compra.preco}</td>
+                                            <td className="w-1/4  ">{compra.preco.toLocaleString('pt', {
+                                                style: 'currency',
+                                                currency: 'KWZ'
+                                            })}</td>
                                             <td className="w-1/4  ">{compra.data_compra}</td>
-                                            <td className="w-1/4   flex justify-center items-center">
+                                            {/**
+                                            *  <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowEditModal(true)}
                                                     className="hover:brightness-75"
@@ -280,6 +289,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                     <FaTrash />
                                                 </button>
                                             </td>
+                                            */}
                                         </tr>
                                     ))
                                 }
@@ -297,17 +307,21 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
+        async (context: GetServerSidePropsContext) => {
+            const cookie = nookies.get(context);
+            const compraDispatch: any = await store.dispatch(fetchCompra());
 
-            const compraDispatch = await store.dispatch(fetchCompra());
-
-            const classificacaoDispatch = await store.dispatch(fetchClassificacao());
-            const duracaoDispatch = await store.dispatch(fetchDuracao());
+            const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
+            const duracaoDispatch: any = await store.dispatch(fetchDuracao());
 
             const compras = compraDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
 
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
             return {
                 props: {
                     compras,

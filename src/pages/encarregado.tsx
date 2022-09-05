@@ -5,6 +5,7 @@ import Image from 'next/image'
 //Componentes Externos
 import { FaEdit, FaSave, FaTrash } from 'react-icons/fa'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+import nookies from 'nookies'
 
 //Componentes Internos
 import Header from '../components/Header'
@@ -15,7 +16,7 @@ import Load from '../assets/load.gif'
 import EditarModal from '../components/encarregado/EditarModal'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { GetServerSideProps } from 'next'
+import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { wrapper } from '../redux/store'
 import { deleteEncarregado, fetchEncarregados, insertEncarregado } from '../redux/slices/encarregadoSlice'
 import { useDispatch } from 'react-redux'
@@ -156,7 +157,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                     <EditarModal encarregadoData={encarregadoObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
                 )}
 
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <form
                         onSubmit={handleSubmit(onSubmit)}
                         className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
@@ -203,7 +204,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                 onChange={(e) => setSearch(e.target.value)}
                                 type="search"
                                 className="w-1/3 rounded shadow "
-                                placeholder="Pesquise pelo nome do Encarregado" />
+                                placeholder="Pesq. pelo nome do Encarregado" />
                             <span className='font-semibold text-lg'>Lista de Encarregado</span>
                         </div>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
@@ -218,7 +219,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                             </thead>
                             <tbody className=''>
                                 {
-                                    encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
+                                    encarregados && encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-1/5 ">{encarregado.id}</td>
@@ -287,10 +288,18 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
-            const encarregadosDispatch = await store.dispatch(fetchEncarregados());
+        async (context: GetServerSidePropsContext) => {
 
-            const encarregados = encarregadosDispatch.payload
+            const cookie = nookies.get(context);
+
+            const encarregadosDispatch: any = await store.dispatch(fetchEncarregados());
+
+            const encarregados: any = encarregadosDispatch.payload
+
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
 
             return {
                 props: {

@@ -25,7 +25,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
         const response = await api.post('api/logout')
 
         if (response.data) {
-            router.reload()
+            router.push('/')
         }
 
     }

@@ -28,11 +28,10 @@ export const fetchEncarregados = createAsyncThunk('/encarregado/fetchAll', async
             .select("*")
             .order('id', { ascending: true })
 
-        if (data) {
-            return data
-        } else {
-            return error
-        }
+        if (data) return data
+
+        return null
+
 
     } catch (error) {
         return (error)

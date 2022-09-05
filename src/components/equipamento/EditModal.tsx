@@ -15,7 +15,8 @@ import Image from 'next/image'
 
 type EditarModalProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    data: []
 }
 
 //Tipagem do formulário
@@ -28,7 +29,7 @@ type FormValues = {
 }
 
 
-const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
+const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
@@ -99,18 +100,17 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
 
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
+                                                    readOnly={true}
                                                     type="text"
-                                                    className='rounded shadow w-full'
+                                                    className='rounded shadow w-full read-only:ring-0 read-only:border-0'
                                                     placeholder='Descrição do equipamento *'
-                                                    {...register('descricao_equipamento', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
+                                                    {...register('descricao_equipamento')}
                                                 />
 
                                             </div>
 
-                                            <div className='flex gap-2 justify-center align-center'>
+                                            {/**
+                                           *   <div className='flex gap-2 justify-center align-center'>
 
                                                 <select
                                                     {...register('classificacao_id', {
@@ -137,24 +137,27 @@ const EditarModal = ({ isOpen, setIsOpen }: EditarModalProps) => {
 
 
                                             </div>
+                                           */}
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
-                                                    className='rounded shadow w-1/2'
+                                                    className='rounded shadow w-full'
                                                     placeholder='Quantidade *'
                                                     {...register('quantidade', {
                                                         required: { message: "Por favor, introduza a número de telefone.", value: true },
-                                                        minLength: { message: "Quantidade insuficiente", value: 9 },
-                                                        min: { message: 'Quantidade insuficiente', value: 900000000 }
+                                                        minLength: { message: "Quantidade insuficiente", value: 1 },
+                                                        min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}
                                                 />
 
-                                                <input
+                                                {/**
+                                                *  <input
                                                     type={'date'}
                                                     placeholder="Data de compra"
                                                     className="w-1/2 rounded shadow"
                                                 />
+                                                */}
                                             </div>
                                             <div className="mt-4 flex justify-end">
                                                 <button

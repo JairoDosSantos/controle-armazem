@@ -13,7 +13,7 @@ import { SubmitHandler, useForm } from "react-hook-form"
 import { useDispatch } from "react-redux"
 import { deleteObra, fetchObra, insertObra } from "../redux/slices/obraSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
-import { GetServerSideProps } from "next"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 
 import { wrapper } from "../redux/store"
 import { fetchEncarregados } from "../redux/slices/encarregadoSlice"
@@ -176,7 +176,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
 
 
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <form
 
                         onSubmit={handleSubmit(onSubmit)}
@@ -203,7 +203,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
                                 <option value='' className='text-gray-400' >Selecione o encarregado</option>
                                 {
-                                    encarregados.length && encarregados.map((encarregado) =>
+                                    encarregados && encarregados.length && encarregados.map((encarregado) =>
                                     (<option
                                         key={encarregado.id}
                                         value={encarregado.id}>{encarregado.nome}
@@ -249,7 +249,8 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                             <tbody className=''>
 
                                 {
-                                    obras.length && search === '' ? obras.map((obra) => (
+
+                                    (obras && obras.length && search === '') ? obras.map((obra) => (
                                         <tr key={obra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-1/5 ">{obra.id}</td>
                                             <td className="w-1/5 ">{obra.obra_nome}</td>
@@ -310,13 +311,21 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
-            const obrasDispatch = await (await store.dispatch(fetchObra()));
+        async (context: GetServerSidePropsContext) => {
 
-            const encarregadosDispatch = await store.dispatch(fetchEncarregados());
+            const cookie = nookies.get(context);
+
+            const obrasDispatch: any = await (await store.dispatch(fetchObra()));
+
+            const encarregadosDispatch: any = await store.dispatch(fetchEncarregados());
+
             const obras = obrasDispatch.payload
             const encarregados = encarregadosDispatch.payload
 
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
             return {
                 props: {
                     obras,

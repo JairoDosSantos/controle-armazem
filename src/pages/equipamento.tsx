@@ -16,19 +16,22 @@ import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralPara
 
 //Componentes Externos
 import { FaEdit, FaSave, FaTrash, FaPlusCircle } from 'react-icons/fa'
+import nookies from 'nookies'
+import { useDispatch } from 'react-redux'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { GetServerSideProps, GetServerSidePropsContext } from 'next'
+const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+
+
 import AddNovoModal from '../components/equipamento/AddNovoModal'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { GetServerSideProps } from 'next'
 import { wrapper } from '../redux/store'
 import { fetchEquipamento } from '../redux/slices/equipamentoSlice'
 import EquipamentoAutoComplete from '../components/EquipamentoAutoComplete'
 import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
 import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
-import { useDispatch } from 'react-redux'
 import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
-import { unwrapResult } from '@reduxjs/toolkit'
 import { insertCompra } from '../redux/slices/compraSlice'
-const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 
 
@@ -209,7 +212,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
                 />
 
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     {showEditModal && (<EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />)}
                     <div className="flex  w-full bg-white p-5 justify-between">
 
@@ -367,19 +370,23 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
+        async (context: GetServerSidePropsContext) => {
 
-            const equipamentoDispatch = await store.dispatch(fetchEquipamento());
-            const classificacaoDispatch = await store.dispatch(fetchClassificacao());
-            const duracaoDispatch = await store.dispatch(fetchDuracao());
-            const armazemDispatch = await store.dispatch(fetchArmGeral());
+            const cookie = nookies.get(context);
+            const equipamentoDispatch: any = await store.dispatch(fetchEquipamento());
+            const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
+            const duracaoDispatch: any = await store.dispatch(fetchDuracao());
+            const armazemDispatch: any = await store.dispatch(fetchArmGeral());
 
 
             const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
             const armazem = armazemDispatch.payload
-
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
             return {
                 props: {
                     equipamentos,

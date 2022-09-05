@@ -5,11 +5,11 @@ import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
 import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
-
+import nookies from 'nookies'
 
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
-import { GetServerSideProps } from "next"
+import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest } from "next"
 import { wrapper } from "../redux/store"
 import { fetchSaida } from "../redux/slices/auditoriaSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
@@ -136,7 +136,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
                 />
                 <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Mov. em armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
@@ -252,7 +252,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/5 text-center">{devolucao.equipamento_id.descricao}</td>
                                                 <td className="w-1/5 text-center">{devolucao.obra_id.obra_nome}</td>
                                                 <td className="w-1/5 text-center">{devolucao.quantidade_retirada}</td>
-                                                <td className="w-1/5 text-center">{devolucao.quantidade_devolvida}</td>
+                                                <td className="w-1/5 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
                                                 <td className="w-1/5 text-center">{devolucao.data_retirada}</td>
                                                 <td className="w-1/5 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
                                                 {/**
@@ -281,7 +281,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/5 text-center ">{findAud.equipamento_id.descricao}</td>
                                                 <td className="w-1/5 text-center ">{findAud.obra_id.obra_nome}</td>
                                                 <td className="w-1/5 text-center ">{findAud.quantidade_retirada}</td>
-                                                <td className="w-1/5 text-center ">{findAud.quantidade_devolvida}</td>
+                                                <td className="w-1/5 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
                                                 <td className="w-1/5 text-center ">{findAud.data_retirada}</td>
                                                 <td className="w-1/5 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
                                                 {/**
@@ -316,8 +316,9 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                             <th className='text-gray-600 font-bold w-1/4 '>Obra</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Quantidade tirada</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Data de saída</th>
-                                            <th className='text-gray-600 font-bold w-1/4 '>Data de Compra</th>
+
                                             {/**
+                                             * <th className='text-gray-600 font-bold w-1/4 '>Data de Compra</th>
                                             *  <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                                             */}
@@ -333,9 +334,11 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/4  ">{saida.obra_id.obra_nome}</td>
                                                 <td className="w-1/4  ">{saida.quantidade_retirada}</td>
                                                 <td className="w-1/4  ">{saida.data_retirada}</td>
-                                                <td className="w-1/4  ">22-08-2022</td>
+
                                                 {/**
-                                                *  <td className="w-1/4   flex justify-center items-center">
+                                                *  
+                                                * <td className="w-1/4  ">22-08-2022</td>
+                                                * <td className="w-1/4   flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowEditModal(true)}
                                                         className="hover:brightness-75"
@@ -402,15 +405,21 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
-        async ({ req }) => {
+        async (context: GetServerSidePropsContext) => {
 
-            const auditoriaDispatch = await store.dispatch(fetchSaida());
-            const obrasDispatch = await store.dispatch(fetchObra())
+            const cookie = nookies.get(context);
+
+            const auditoriaDispatch: any = await store.dispatch(fetchSaida());
+            const obrasDispatch: any = await store.dispatch(fetchObra())
 
 
             const auditoria = auditoriaDispatch.payload
             const obras = obrasDispatch.payload
 
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                // If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
 
             return {
                 props: {

@@ -17,6 +17,22 @@ const initialState: ObraState = {
     obras: [],
     loading: 'idle'
 }
+export const fetchObraActiva = createAsyncThunk('/obra/fetchAllActiva', async () => {
+    try {
+
+
+        const { data, error } = await supabase
+            .from('obra')
+            .select("id,obra_nome,encarregado_id(id,nome,telefone),estado")
+            .eq('estado', 'Activa')
+
+        if (error) return null
+        return data
+
+    } catch (error) {
+        return (error)
+    }
+})
 
 export const fetchObra = createAsyncThunk('/obra/fetchAll', async () => {
     try {
@@ -30,7 +46,7 @@ export const fetchObra = createAsyncThunk('/obra/fetchAll', async () => {
         if (data) {
             return data
         } else {
-            return error
+            return null
         }
 
     } catch (error) {
