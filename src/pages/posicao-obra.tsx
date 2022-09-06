@@ -48,7 +48,7 @@ type Almoxarifario = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     obra_id: ObraType;
-    data_transferencia: string
+    data_aquisicao: string
 }
 type PosicaoObraProps = {
     almoxarifarios: Almoxarifario[];
@@ -72,7 +72,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
     const [searchClassificacao, setSearchClassificacao] = useState(0)
 
     const [showEditModal, setShowEditModal] = useState(false)
-
+    const [almoxarifarioObject, setAlmoxarifarioObject] = useState({} as Almoxarifario)
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
@@ -112,10 +112,10 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
         else { findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
-
-    console.log('Finded', findedEquipamento)
-    console.log('Search', search)
-
+    const handleEdit = (equipamentoObra: Almoxarifario) => {
+        setAlmoxarifarioObject(equipamentoObra)
+        setShowEditModal(true)
+    }
 
     return (
         <div className='flex'>
@@ -186,7 +186,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                 />
 
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
-                    <EditarModalPorObra isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                    {showEditModal && <EditarModalPorObra data={almoxarifarioObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />}
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Posição Armazem por obra</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
@@ -264,7 +264,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                     <th className='text-gray-600 font-bold w-1/5'>Obra</th>
                                     {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
                                     <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                    {/**  <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -283,18 +283,20 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             <td className="w-1/5 ">{almoxarifario.obra_id.obra_nome}</td>
                                             {/**   <td className="w-1/5 ">22-08-2022</td> */}
                                             <td className="w-1/5  flex justify-center items-center">
-                                                <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
+                                                <button onClick={() => handleEdit(almoxarifario)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => setShowQuestionAlert(true)}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
+                                            {/**
+                                             * <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                </td>
+                                             */}
                                         </tr>
                                     )) : findedEquipamento.map((finded, index) => (
                                         <tr
@@ -310,18 +312,20 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             <td className="w-1/5 ">{finded.obra_id.obra_nome}</td>
                                             {/**   <td className="w-1/5 ">22-08-2022</td> */}
                                             <td className="w-1/5  flex justify-center items-center">
-                                                <button onClick={() => setShowEditModal(true)} className="hover:brightness-75" title="Editar">
+                                                <button onClick={() => handleEdit(finded)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => setShowQuestionAlert(true)}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
+                                            {/**
+                                            *  <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                 </td>
+                                            */}
                                         </tr>
                                     ))
                                 }

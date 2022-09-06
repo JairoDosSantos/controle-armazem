@@ -42,7 +42,7 @@ const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST
                         <PainelItem icone='encarregado' quantidade={totalEncarregados} rodape='Total de Encarregados em obras' titulo='Encarregados' />
                         {/**      <PainelItem icone='ttl' quantidade={10} rodape='Stock de SOS atingido em armazem' titulo='A esgotar' /> */}
                     </div>
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl overflow-x-auto  mx-auto bg-white rounded'>
+                    <div className='mt-4 text-end px-4 py-2 max-w-6xl hidden overflow-x-auto  mx-auto bg-white rounded'>
                         <span className='font-semibold text-lg'>À esgotar</span>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>

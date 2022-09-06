@@ -4,20 +4,20 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
+import { FaEdit, FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 
-import Load from '../assets/load.gif'
-import Image from "next/image"
+
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
 import { wrapper } from "../redux/store"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { fetchEquipamento } from "../redux/slices/equipamentoSlice"
+
 import { fetchArmGeral } from "../redux/slices/armGeralSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -29,7 +29,8 @@ type EquipamentoType = {
 type EquipamentosARMType = {
     id: number;
     quantidade: number;
-    equipamento_id: EquipamentoType
+    equipamento_id: EquipamentoType;
+    data_aquisicao: string
 }
 type DuracaoType = {
     id: number;
@@ -63,6 +64,8 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
     const [showEditModal, setShowEditModal] = useState(false)
 
+    const [armazemObject, setArmazemObject] = useState<EquipamentosARMType>({} as EquipamentosARMType)
+
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
@@ -88,6 +91,14 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
             findedEquipamento = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && equipamento.equipamento_id.classificacao_id === searchByClassificacao)
         }
+
+    }
+
+    const handleEdit = (armazem: EquipamentosARMType) => {
+
+        setArmazemObject(armazem);
+        setShowEditModal(true)
+
 
     }
 
@@ -156,7 +167,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                     confirmButtonText="Sim"
 
                 />
-                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} data={[]} />
+                {showEditModal && <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} data={armazemObject} />}
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
@@ -211,7 +222,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
                                     <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                    {/**    <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -229,20 +240,22 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                             {/**    <td className="w-1/5 ">22-08-2022</td> */}
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => setShowEditModal(true)}
+                                                    onClick={() => handleEdit(equipamento)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => setShowQuestionAlert(true)}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
+                                            {/**
+                                             * <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                </td> 
+                                            */}
                                         </tr>
                                     )) : findedEquipamento.map((finded, index) => (
                                         <tr
@@ -256,22 +269,22 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-
-
-                                                    onClick={() => setShowEditModal(true)}
+                                                    onClick={() => handleEdit(finded)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => setShowQuestionAlert(true)}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
+                                            {/**
+                                          *    <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                </td>
+                                          */}
                                         </tr>
                                     ))
 

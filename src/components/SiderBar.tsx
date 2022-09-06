@@ -22,12 +22,14 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
     const router = useRouter()
     const logOut = async () => {
 
-        const response = await api.post('api/logout')
-
-        if (response.data) {
-            router.push('/')
-        }
-
+        /**
+         *  const response = await api.post('api/logout')
+ 
+         if (response.data) {
+             router.push('/')
+         }
+         */
+        router.push('/sair')
     }
 
     return (
@@ -49,7 +51,8 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                     <li className='flex gap-2 items-center'>
                         <span className='text-gray-400 font-bold cursor-default '>Cadastros</span>
                     </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'encarregado' && 'active'}`}>
+                    {/**
+                   *   <li className={`flex gap-2 items-center text-sm ${itemActive === 'encarregado' && 'active'}`}>
 
                         <FaUser className='text-gray-500 text-lg ' />
                         <Link href='/encarregado'>Encarregado</Link>
@@ -58,6 +61,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                         <FaBuilding className='text-gray-500 text-lg' />
                         <Link href='/obra'>Obra</Link>
                     </li>
+                   */}
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'equipamento' && 'active'}`}>
                         <FaTools className='text-gray-500 text-lg' />
                         <Link href='/equipamento'>Equipamento</Link>
@@ -81,7 +85,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                         <FaShopify className='text-gray-500 text-lg' />
                         <Link href='/compras'>Compras</Link>
                     </li>
-                    <li className={`flex gap-2 items-center text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
+                    <li className={`flex gap-2 items-center hidden text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
                         <FaClock className='text-gray-500 text-lg' />
                         <Link href='/esgotar'>À esgotar</Link>
                         {itemActive !== 'esgotar' && (<span className='bg-red-700 text-white px-2 py-[2px] rounded-full absolute -top-3 right-28 cursor-default select-none'>3</span>)}

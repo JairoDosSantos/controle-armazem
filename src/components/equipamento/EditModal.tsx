@@ -12,11 +12,30 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { updateArmGeral } from '../../redux/slices/armGeralSlice'
+import { useRouter } from 'next/router'
+
+type EquipamentoType = {
+    id: number;
+    descricao: string;
+    duracao_id: number;
+    classificacao_id: number;
+    data: string
+}
+
+
+type EquipamentosARMType = {
+    id: number;
+    quantidade: number;
+    equipamento_id: EquipamentoType;
+    data_aquisicao: string
+}
 
 type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
-    data: []
+    data: EquipamentosARMType
 }
 
 //Tipagem do formulário
@@ -31,20 +50,58 @@ type FormValues = {
 
 const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
+    const dispatch = useDispatch<any>();
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
+    const route = useRouter();
+    const onSubmit: SubmitHandler<FormValues> = async (arm) => {
+
+        setLoad(true)
+
+        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
+
+        setLoad(false)
+        if (editEquipamentoDispatch.payload !== null) notifySuccess()
+        else notifyError()
 
 
-
-
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
     }
 
     function closeModal() {
         reset()
         setIsOpen(false)
     }
+
+    const notifySuccess = () => {
+
+        setTimeout(function () {
+            setIsOpen(false)
+            route.reload()
+        }, 6500);
+
+        toast.success('Quantidade alterada com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
 
     return (
         <>
@@ -105,39 +162,11 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                                     className='rounded shadow w-full read-only:ring-0 read-only:border-0'
                                                     placeholder='Descrição do equipamento *'
                                                     {...register('descricao_equipamento')}
+                                                    defaultValue={data.equipamento_id.descricao}
                                                 />
 
                                             </div>
 
-                                            {/**
-                                           *   <div className='flex gap-2 justify-center align-center'>
-
-                                                <select
-                                                    {...register('classificacao_id', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
-                                                    <option value="#" className='text-gray-400'>Classsificação</option>
-                                                    <option value="1">EPI</option>
-                                                    <option value="2">Material</option>
-                                                    <option value="3">Ferramenta</option>
-                                                </select>
-                                                <select
-                                                    {...register('tempo_duracao', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
-                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
-                                                    <option value="0.5 à 1 ano">0.5 à 1 ano</option>
-                                                    <option value="1 à 2 anos">1 à 2 anos</option>
-                                                    <option value="2 à 3 anos">2 à 3 anos</option>
-                                                </select>
-
-
-                                            </div>
-                                           */}
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
@@ -149,15 +178,11 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },
                                                         min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}
+
+                                                    defaultValue={data.quantidade}
                                                 />
 
-                                                {/**
-                                                *  <input
-                                                    type={'date'}
-                                                    placeholder="Data de compra"
-                                                    className="w-1/2 rounded shadow"
-                                                />
-                                                */}
+
                                             </div>
                                             <div className="mt-4 flex justify-end">
                                                 <button

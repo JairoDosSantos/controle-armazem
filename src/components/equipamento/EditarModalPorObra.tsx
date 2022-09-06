@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 
 
 import { ToastContainer, toast } from 'react-toastify'
@@ -12,10 +12,16 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
+import { useRouter } from 'next/router'
+import { fetchObra, fetchObraActiva } from '../../redux/slices/obraSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 type AddObraProps = {
     isOpen: boolean;
-    setIsOpen: (valor: boolean) => void
+    setIsOpen: (valor: boolean) => void;
+    data: Almoxarifario
 }
 
 //Tipagem do formulário
@@ -26,23 +32,88 @@ type FormValues = {
     obra_id: number;
     data_compra: string
 }
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: number;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
+type EquipamentoType = {
+    id: number;
+    descricao: string;
+    duracao_id: number;
+    classificacao_id: number;
+    data: string
+}
+type Almoxarifario = {
+    id: number;
+    equipamento_id: EquipamentoType;
+    quantidade: number;
+    obra_id: ObraType;
+    data_aquisicao: string
+}
+const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
 
-const EditarModalPorObra = ({ isOpen, setIsOpen }: AddObraProps) => {
-    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const route = useRouter()
+    const dispatch = useDispatch<any>()
+    const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const [obras, setObras] = useState<ObraType[]>([])
     const [load, setLoad] = useState(false)
 
+    const onSubmit: SubmitHandler<FormValues> = async (almoxaroifario) => {
+        //Na auditoria também deve alterar as informações que se altera aquí
 
-
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
-        console.log(data)
+        setLoad(true)
+        const almoxarifarioUpadate = await dispatch(updateAlmoxarifario({ ...data, equipamento_id: data.equipamento_id.id, obra_id: almoxaroifario.obra_id, quantidade_a_levar: almoxaroifario.quantidade }))
+        if (almoxarifarioUpadate.payload !== null) notifySuccess()
+        else notifyError()
+        setLoad(false)
     }
 
+    const getAllObras = async () => {
+        const dispatchObras = await dispatch(fetchObraActiva());
+        const unwrap = unwrapResult(dispatchObras)
+        setObras(unwrap)
+    }
 
+    useEffect(() => {
+        getAllObras()
+    }, [])
 
     function closeModal() {
         setIsOpen(false)
     }
 
+    const notifySuccess = () => {
+
+        setTimeout(function () {
+            setIsOpen(false)
+            route.reload()
+        }, 6500);
+
+        toast.success('Quantidade alterada com sucesso! 😁', {
+            position: 'top-center',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined
+        })
+
+
+
+    }
+
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+    })
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
@@ -96,13 +167,12 @@ const EditarModalPorObra = ({ isOpen, setIsOpen }: AddObraProps) => {
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
+                                                    readOnly={true}
                                                     type="text"
-                                                    className='rounded shadow w-full'
+                                                    className='rounded shadow w-full read-only:text-gray-300 read-only:border read-only:border-gray-300 focus:ring-0'
                                                     placeholder='Descrição do Equipamento *'
-                                                    {...register('descricao_equipamento', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                                    })}
+                                                    {...register('descricao_equipamento')}
+                                                    defaultValue={data.equipamento_id.descricao}
                                                 />
 
 
@@ -110,15 +180,18 @@ const EditarModalPorObra = ({ isOpen, setIsOpen }: AddObraProps) => {
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <select
                                                     {...register('obra_id')}
+                                                    className='rounded shadow w-1/2 cursor-pointer'>
+                                                    <option value={data.obra_id.id} className='text-gray-400'>{data.obra_id.obra_nome}</option>
 
-                                                    className='rounded shadow w-full cursor-pointer'>
-                                                    <option value="#" className='text-gray-400'>Selecione a Obra</option>
-                                                    <option value={1}>Sinse Kilamba</option>
-                                                    <option value={2}>Sinse Maianga</option>
-                                                    <option value={3}>Hotel Académico</option>
+                                                    {obras && obras.map((obra, index) => {
+                                                        if (obra.obra_nome !== data.obra_id.obra_nome) {
+                                                            return (
+                                                                <option key={index} value={obra.id}>{obra.obra_nome}</option>
+                                                            )
+                                                        }
+                                                    })}
+
                                                 </select>
-                                            </div>
-                                            <div className='flex gap-2 justify-center align-center'>
                                                 <input
                                                     min={0}
                                                     type="number"
@@ -127,40 +200,10 @@ const EditarModalPorObra = ({ isOpen, setIsOpen }: AddObraProps) => {
                                                     {...register('quantidade', {
                                                         required: { message: "Por favor, introduza a quantidade a transferir.", value: true },
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },
-                                                        min: { message: 'Quantidade insuficiente', value: 1 }
+                                                        min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}
+                                                    defaultValue={data.quantidade}
                                                 />
-                                                <input
-                                                    min={0}
-                                                    type="date"
-                                                    className='rounded shadow w-1/2'
-                                                    {...register('data_compra', {
-                                                        required: { message: "Por favor, introduza a data da compra.", value: true },
-                                                    })}
-                                                />
-                                            </div>
-                                            <div className='flex gap-2 justify-center align-center'>
-                                                <select
-                                                    {...register('obra_id')}
-
-                                                    className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-400'>Tempo de duração</option>
-                                                    <option value='0.5 à 1 ano'>0.5 à 1 ano</option>
-                                                    <option value='1 à 2 ano'>1 à 2 anos</option>
-                                                    <option value='2 à 3 ano'>2 à 3 anos</option>
-                                                    <option value='3 à 5 ano'>3 à 5 anos</option>
-                                                    <option value='5 à 7 ano'>5 à 7 anos</option>
-                                                </select>
-
-                                                <select
-                                                    {...register('obra_id')}
-
-                                                    className='rounded shadow w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-400'>Classificação</option>
-                                                    <option value={1}>EPI</option>
-                                                    <option value={2}>Ferramenta</option>
-                                                    <option value={3}>Material</option>
-                                                </select>
                                             </div>
 
                                             <div className="mt-4 flex justify-end">

@@ -43,7 +43,7 @@ type ObraType = {
 }
 
 const EditarModal = ({ isOpen, setIsOpen, obraObject }: EditarModalProps) => {
-    console.log(obraObject)
+
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
 
     const [load, setLoad] = useState(false)

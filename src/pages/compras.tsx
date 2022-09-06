@@ -4,19 +4,24 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
+import { FaPrint } from 'react-icons/fa'
 
 import Load from '../assets/load.gif'
-import Image from "next/image"
-import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
+import Image from "next/image"
+
+import dynamic from "next/dynamic"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { wrapper } from "../redux/store"
 import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import nookies from 'nookies'
+
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+
+//const ComprasReport = dynamic(() => import('../components/relatorios/ComprasReport'), { ssr: false })
+
 
 type EquipamentoType = {
     id: number;
@@ -149,8 +154,12 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                     confirmButtonText="Sim"
 
                 />
-                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                {
+                    //showEditModal && <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                }
+
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
+
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
                         <div className="border w-1/4 border-gray-700 ml-4"></div>
@@ -299,8 +308,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                     </div>
                 </div>
 
-
             </main>
+
         </div>
     )
 }

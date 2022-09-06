@@ -4,7 +4,6 @@ import type { AppProps } from 'next/app'
 import 'animate.css';
 import Head from 'next/head';
 import { wrapper } from '../redux/store';
-
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
@@ -12,6 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <title>Sistema de Controle de Armazem</title>
         {/**  <link rel="icon" href='/noah.png' /> */}
       </Head>
+
       <Component {...pageProps} />
     </>
   )

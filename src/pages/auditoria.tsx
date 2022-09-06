@@ -135,7 +135,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                     confirmButtonText="Sim"
 
                 />
-                <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                <EditarModal data={[]} isOpen={showEditModal} setIsOpen={setShowEditModal} />
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Mov. em armazem geral</h2>
@@ -364,8 +364,9 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/4  ">{findAud.obra_id.obra_nome}</td>
                                                 <td className="w-1/4  ">{findAud.quantidade_retirada}</td>
                                                 <td className="w-1/4  ">{findAud.data_retirada}</td>
-                                                <td className="w-1/4  ">{findAud.data_devolucao ?? 'N/D'}</td>
+
                                                 {/**
+                                                 *    <td className="w-1/4  ">{findAud.data_devolucao ?? 'N/D'}</td>
                                                 *  <td className="w-1/4   flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowEditModal(true)}
