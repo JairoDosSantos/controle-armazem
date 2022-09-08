@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '../assets/noah.png'
 
-import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaArrowCircleRight, FaArrowCircleLeft, FaShopify, FaArrowsAltH } from 'react-icons/fa'
+import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaShopify, FaArrowsAltH } from 'react-icons/fa'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import api from '../services/api'
 import { useRouter } from 'next/router'
@@ -75,7 +75,7 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-obra' && 'active'}`}>
                         <FaBookOpen className='text-gray-500 text-lg' />
-                        <Link href='/posicao-obra'>Almoxarifários</Link>
+                        <Link href='/posicao-obra'>Almoxarifado</Link>
                     </li>
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
                         <FaArrowsAltH className='text-gray-500 text-lg' />
@@ -85,11 +85,13 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                         <FaShopify className='text-gray-500 text-lg' />
                         <Link href='/compras'>Compras</Link>
                     </li>
-                    <li className={`flex gap-2 items-center hidden text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
+                    {/**
+                     * <li className={`flex gap-2 items-center hidden text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
                         <FaClock className='text-gray-500 text-lg' />
                         <Link href='/esgotar'>À esgotar</Link>
                         {itemActive !== 'esgotar' && (<span className='bg-red-700 text-white px-2 py-[2px] rounded-full absolute -top-3 right-28 cursor-default select-none'>3</span>)}
                     </li>
+                     */}
 
                 </ul>
             </div>

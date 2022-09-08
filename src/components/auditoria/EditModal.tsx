@@ -13,8 +13,10 @@ import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
 import { useDispatch } from 'react-redux'
-import { updateArmGeral } from '../../redux/slices/armGeralSlice'
+import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { useRouter } from 'next/router'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { fetchOneAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
 
 type EquipamentoType = {
     id: number;
@@ -23,18 +25,27 @@ type EquipamentoType = {
     classificacao_id: number;
     data: string
 }
+type ObraType = {
+    id: number
+    obra_nome: string;
+    encarregado_id: number;
+    estado: 'Activa' | 'Inactiva' | 'Concluida'
+}
 
-type EquipamentosARMType = {
+type AuditoriaType = {
     id: number;
-    quantidade: number;
     equipamento_id: EquipamentoType;
-    data_aquisicao: string
+    obra_id: ObraType;
+    data_retirada: string;
+    quantidade_retirada: number;
+    data_devolucao: string;
+    quantidade_devolvida: number
 }
 
 type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
-    data: EquipamentosARMType
+    data: AuditoriaType
 }
 
 //Tipagem do formulário
@@ -42,8 +53,7 @@ type FormValues = {
     id: number;
     descricao_equipamento: string;
     quantidade: number;
-    classificacao_id: number;
-    tempo_duracao: string
+
 }
 const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
@@ -55,12 +65,39 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
     const onSubmit: SubmitHandler<FormValues> = async (arm) => {
 
         setLoad(true)
+        //1º  Buscar o equipamento no armazem e no almoxarifado
+        const buscaARMDispatch = await dispatch(fetchOne(data.equipamento_id.id));
+        const ARMunwrap = unwrapResult(buscaARMDispatch);
+        console.log('Armazem', ARMunwrap)
+        if (!ARMunwrap.length) { notifyError(); setLoad(false); return }
 
-        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
+        const buscarAlmoxarifado = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id }))
+        const AlmoxarifadoUnwrap = unwrapResult(buscarAlmoxarifado);
+        if (!AlmoxarifadoUnwrap.length) { notifyError(); setLoad(false); return }
+        //2º Ver se a quantidade que se pretende devolver não é maior que a quantidade em almoxarifado
+        if (Number(AlmoxarifadoUnwrap[0].quantidade) < Number(arm.quantidade)) { notifyError(); setLoad(false); return }
+        //3º adicionar ao stock em armazem o stock em almoxarifado, e subtrair a quantidade que se pretende realmente em almoxarifado
+        let soma = (Number(ARMunwrap[0].quantidade) + Number(AlmoxarifadoUnwrap[0].quantidade)) - Number(arm.quantidade)
+        console.log(soma)
+        //4º Actualizar o stcok do armazem
+        const updateARM = await dispatch(updateArmGeral({ ...ARMunwrap[0], quantidade_entrada: soma }))
+        const ARMactualizado = unwrapResult(updateARM)
+
+        if (updateARM.payload === null) { notifyError(); setLoad(false); return }
+        //5º Actualizar o stock do almoxarifado
+        const updateAlmoxarifado = await dispatch(updateAlmoxarifario({ ...AlmoxarifadoUnwrap[0], quantidade_a_levar: arm.quantidade }))
+
+        const almoxarifadoUpdateUnwrap = unwrapResult(updateAlmoxarifado)
+
+        console.log('Almoxarifado Actualizado', updateAlmoxarifado)
+
+        if (updateAlmoxarifado.payload === null) { notifyError(); setLoad(false); return }
+        //6º Fim
+        notifySuccess()
 
         setLoad(false)
-        if (editEquipamentoDispatch.payload !== null) notifySuccess()
-        else notifyError()
+        // if (editEquipamentoDispatch.payload !== null) notifySuccess()
+        // else notifyError()
 
     }
 
@@ -73,7 +110,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
         setTimeout(function () {
             setIsOpen(false)
-            route.reload()
+
         }, 6500);
 
         toast.success('Quantidade alterada com sucesso! 😁', {
@@ -174,7 +211,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                                         min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}
 
-                                                    defaultValue={data.quantidade}
+                                                    defaultValue={data.quantidade_retirada}
                                                 />
 
 

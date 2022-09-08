@@ -80,8 +80,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
     let findedEquipamento: EquipamentosARMType[] = []
 
 
-
-
     if (equipamentosARM) {
         if (search && searchByClassificacao === 0) {
             findedEquipamento = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
@@ -178,7 +176,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                 <select
                                     onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
                                     className="rounded shadow cursor-pointer" >
-                                    <option value={0}>Selecione a classificação</option>
+                                    <option value={0} className='text-gray-400'>Selecione a classificação</option>
                                     {
                                         (classificacao && classificacao.length) && classificacao.map((classific, index) => (
                                             <option
@@ -188,7 +186,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                     }
                                 </select>
                             </div>
-
                         </div>
                         <div className="flex gap-5">
                             <input
@@ -221,8 +218,8 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                     <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    {/**    <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
+                                    {/**   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
+                                      <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -238,24 +235,26 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                                             <td className="w-1/5 ">{equipamento.quantidade}</td>
                                             {/**    <td className="w-1/5 ">22-08-2022</td> */}
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEdit(equipamento)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            {/**
-                                             * <td className="w-1/5  flex justify-center items-center">
+                                            {
+                                                /**
+                                                 *  <td className="w-1/5  flex justify-center items-center">
                                                     <button
-                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        onClick={() => handleEdit(equipamento)}
                                                         className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
+                                                        title="Editar">
+                                                        <FaEdit />
                                                     </button>
-                                                </td> 
-                                            */}
+                                                </td>
+                                                <td className="w-1/5  flex justify-center items-center">
+                                                        <button
+                                                            onClick={() => setShowQuestionAlert(true)}
+                                                            className="hover:brightness-75"
+                                                            title="Apagar">
+                                                            <FaTrash />
+                                                        </button>
+                                                    </td>
+                                                */
+                                            }
                                         </tr>
                                     )) : findedEquipamento.map((finded, index) => (
                                         <tr
@@ -267,7 +266,9 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                             <td className="w-1/5 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-1/5 ">{finded.quantidade}</td>
 
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            {
+                                            /**
+                                            *<td className="w-1/5  flex justify-center items-center">
                                                 <button
                                                     onClick={() => handleEdit(finded)}
                                                     className="hover:brightness-75"
@@ -275,8 +276,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            {/**
-                                          *    <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-1/5  flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowQuestionAlert(true)}
                                                         className="hover:brightness-75"

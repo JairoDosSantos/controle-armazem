@@ -133,7 +133,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                         as="h3"
                                         className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
                                     >
-                                        Alterar informação do equipamento
+                                        Adicionar equipamento
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>

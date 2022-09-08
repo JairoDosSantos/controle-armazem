@@ -37,15 +37,15 @@ const Home: NextPage = () => {
 
     const { user } = response.data
 
-
     const status = response.status
+
     if (user) {
       await dispatch(updateUser({ user: user.email }))
       // setShowSuccess('flex')
       setLoad(false)
       router.push('/painel-controlo')
 
-    } else if (status === 401) {
+    } else {
       // setShowHide('flex')
       setLoad(false)
     }

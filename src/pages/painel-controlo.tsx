@@ -36,8 +36,8 @@ const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST
                     <div className=' flex flex-wrap gap-6  justify-center items-center'>
                         <PainelItem icone='obra_activa' quantidade={obrasActivas} rodape='Total de obras activas' titulo='Obras activas' />
                         <PainelItem icone='total_obra' quantidade={totalObras} rodape='Número total de obras' titulo='Número de Obras' />
-                        <PainelItem icone='epis_armazem' quantidade={TotalHSST} rodape='Total de EPIs em armazem' titulo='EPIS em armazem' />
-                        <PainelItem icone='ferramenta_armazem' quantidade={TotalFerramenta} rodape='Total de Ferramentaria em armazem' titulo='Ferramentaria em armazem' />
+                        <PainelItem icone='epis_armazem' quantidade={TotalHSST} rodape='Total de Mat. de HSST em armazem' titulo='Higiene e Seg. em armazem' />
+                        <PainelItem icone='ferramenta_armazem' quantidade={TotalFerramenta} rodape='Total de Ferramentas em armazem' titulo='Ferramenta em armazem' />
                         <PainelItem icone='material_armazem' quantidade={TotalMateriais} rodape='Total de Materiais em armazem' titulo='Material em armazem' />
                         <PainelItem icone='encarregado' quantidade={totalEncarregados} rodape='Total de Encarregados em obras' titulo='Encarregados' />
                         {/**      <PainelItem icone='ttl' quantidade={10} rodape='Stock de SOS atingido em armazem' titulo='A esgotar' /> */}

@@ -8,7 +8,7 @@ import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 
 import dynamic from "next/dynamic"
-import EditarModal from "../components/equipamento/EditModal"
+import EditarModal from "../components/auditoria/EditModal"
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest } from "next"
 import { wrapper } from "../redux/store"
 import { fetchSaida } from "../redux/slices/auditoriaSlice"
@@ -60,7 +60,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
     const [searchData, setSearchData] = useState('')
 
     const [showEditModal, setShowEditModal] = useState(false)
-
+    const [auditoriaObject, setAuditoriaObject] = useState<AuditoriaType>({} as AuditoriaType);
     //const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
 
     let findedAuditoria: AuditoriaType[] = []
@@ -68,6 +68,11 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
         if (searchObra !== 0 && searchData === '') findedAuditoria = auditoria.filter((saidaEntrada) => saidaEntrada.obra_id.id === searchObra)
         else if (searchData && searchObra === 0) findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()))
         else findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()) && entradaSaida.obra_id.id === searchObra)
+    }
+
+    const handleEdit = (saida: AuditoriaType) => {
+        setAuditoriaObject(saida)
+        setShowEditModal(true)
     }
 
     return (
@@ -135,7 +140,9 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                     confirmButtonText="Sim"
 
                 />
-                <EditarModal data={[]} isOpen={showEditModal} setIsOpen={setShowEditModal} />
+
+                {showEditModal && <EditarModal data={auditoriaObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />}
+
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Mov. em armazem geral</h2>
@@ -245,26 +252,28 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                     </thead>
                                     <tbody className=''>
 
-                                        {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((devolucao, index) => (
-                                            <tr key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/5 text-center">{devolucao.id}</td>
-                                                <td className="w-1/5 text-center">{devolucao.equipamento_id.descricao}</td>
-                                                <td className="w-1/5 text-center">{devolucao.obra_id.obra_nome}</td>
-                                                <td className="w-1/5 text-center">{devolucao.quantidade_retirada}</td>
-                                                <td className="w-1/5 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
-                                                <td className="w-1/5 text-center">{devolucao.data_retirada}</td>
-                                                <td className="w-1/5 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
-                                                {/**
-                                                 * <td className="w-1/5 text-center flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowEditModal(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                <td className="w-1/5  flex justify-center items-center">
+                                        {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((devolucao, index) => {
+                                            if (devolucao.data_devolucao) {
+                                                return (
+                                                    <tr key={index}
+                                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                        <td className="w-1/5 text-center">{devolucao.id}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.equipamento_id.descricao}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.obra_id.obra_nome}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.quantidade_retirada}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.data_retirada}</td>
+                                                        <td className="w-1/5 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
+                                                        {/**    <td className="w-1/5 text-center flex justify-center items-center">
+                                                            <button
+                                                                onClick={() => handleEdit(devolucao)}
+                                                                className="hover:brightness-75"
+                                                                title="Editar">
+                                                                <FaEdit />
+                                                            </button>
+                                                        </td>
+
+                                                 *   <td className="w-1/5  flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowQuestionAlert(true)}
                                                         className="hover:brightness-75"
@@ -273,27 +282,30 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     </button>
                                                 </td>
                                                  */}
-                                            </tr>
-                                        )) : findedAuditoria.map((findAud, index) => (
-                                            <tr key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/5 text-center ">{findAud.id}</td>
-                                                <td className="w-1/5 text-center ">{findAud.equipamento_id.descricao}</td>
-                                                <td className="w-1/5 text-center ">{findAud.obra_id.obra_nome}</td>
-                                                <td className="w-1/5 text-center ">{findAud.quantidade_retirada}</td>
-                                                <td className="w-1/5 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
-                                                <td className="w-1/5 text-center ">{findAud.data_retirada}</td>
-                                                <td className="w-1/5 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
-                                                {/**
-                                                *  <td className="w-1/5 text-center  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowEditModal(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                <td className="w-1/5  flex justify-center items-center">
+                                                    </tr>
+                                                )
+                                            }
+                                        }) : findedAuditoria.map((findAud, index) => {
+                                            if (findAud.quantidade_devolvida) {
+                                                return (<tr key={index}
+                                                    className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                    <td className="w-1/5 text-center ">{findAud.id}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.equipamento_id.descricao}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.obra_id.obra_nome}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.quantidade_retirada}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.data_retirada}</td>
+                                                    <td className="w-1/5 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
+                                                    {/**       <td className="w-1/5 text-center  flex justify-center items-center">
+                                                        <button
+                                                            onClick={() => handleEdit(findAud)}
+                                                            className="hover:brightness-75"
+                                                            title="Editar">
+                                                            <FaEdit />
+                                                        </button>
+                                                    </td>
+
+                                                * <td className="w-1/5  flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowQuestionAlert(true)}
                                                         className="hover:brightness-75"
@@ -302,8 +314,9 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     </button>
                                                 </td>
                                                 */}
-                                            </tr>
-                                        ))
+                                                </tr>)
+                                            }
+                                        })
                                         }
                                     </tbody>
                                 </table>
@@ -317,9 +330,9 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                             <th className='text-gray-600 font-bold w-1/4 '>Quantidade tirada</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Data de saída</th>
 
+                                            <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
                                             {/**
                                              * <th className='text-gray-600 font-bold w-1/4 '>Data de Compra</th>
-                                            *  <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                                             */}
                                         </tr>
@@ -334,18 +347,18 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/4  ">{saida.obra_id.obra_nome}</td>
                                                 <td className="w-1/4  ">{saida.quantidade_retirada}</td>
                                                 <td className="w-1/4  ">{saida.data_retirada}</td>
-
-                                                {/**
-                                                *  
-                                                * <td className="w-1/4  ">22-08-2022</td>
-                                                * <td className="w-1/4   flex justify-center items-center">
+                                                <td className="w-1/4   flex justify-center items-center">
                                                     <button
-                                                        onClick={() => setShowEditModal(true)}
+                                                        onClick={() => handleEdit(saida)}
                                                         className="hover:brightness-75"
                                                         title="Editar">
                                                         <FaEdit />
                                                     </button>
                                                 </td>
+                                                {/**
+                                                *  
+                                                * <td className="w-1/4  ">22-08-2022</td>
+                                                * 
                                                 <td className="w-1/4   flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowQuestionAlert(true)}
@@ -364,17 +377,17 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <td className="w-1/4  ">{findAud.obra_id.obra_nome}</td>
                                                 <td className="w-1/4  ">{findAud.quantidade_retirada}</td>
                                                 <td className="w-1/4  ">{findAud.data_retirada}</td>
-
-                                                {/**
-                                                 *    <td className="w-1/4  ">{findAud.data_devolucao ?? 'N/D'}</td>
-                                                *  <td className="w-1/4   flex justify-center items-center">
+                                                <td className="w-1/4   flex justify-center items-center">
                                                     <button
-                                                        onClick={() => setShowEditModal(true)}
+                                                        onClick={() => handleEdit(findAud)}
                                                         className="hover:brightness-75"
                                                         title="Editar">
                                                         <FaEdit />
                                                     </button>
                                                 </td>
+                                                {/**
+                                                 *    <td className="w-1/4  ">{findAud.data_devolucao ?? 'N/D'}</td>
+                                                *  
                                                 <td className="w-1/4   flex justify-center items-center">
                                                     <button
                                                         onClick={() => setShowQuestionAlert(true)}

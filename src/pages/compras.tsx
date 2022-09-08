@@ -4,10 +4,10 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaPrint } from 'react-icons/fa'
+import { FaEdit, FaPrint } from 'react-icons/fa'
 
 import Load from '../assets/load.gif'
-import EditarModal from "../components/equipamento/EditModal"
+import EditarModal from "../components/compras/EditarModal"
 import Image from "next/image"
 
 import dynamic from "next/dynamic"
@@ -20,7 +20,8 @@ import nookies from 'nookies'
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
-//const ComprasReport = dynamic(() => import('../components/relatorios/ComprasReport'), { ssr: false })
+const RelatorioCompras = dynamic(() => import('../components/relatorios/Testando'), { ssr: false })
+
 
 
 type EquipamentoType = {
@@ -71,6 +72,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     const [searchByDate, setSearchByDate] = useState('')
 
     const [showEditModal, setShowEditModal] = useState(false)
+    const [emitirRelatorio, setEmitirRelatorio] = useState(false)
+    const [compraObject, setCompraObject] = useState<CompraType>({} as CompraType)
 
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
@@ -89,10 +92,18 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
         else findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) && compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
     }
 
+    const handleEdit = (compra: CompraType) => {
+        setCompraObject(compra)
+        setShowEditModal(true)
+    }
+
     return (
         <div className='flex'>
+            {/**    <RelatorioCompras compras={compras} /> */}
+
             <SiderBar itemActive="devolucoes" hideSideBar={hideSideBar} />
             <main className='flex-1 space-y-6'>
+
                 <div>
                     <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
                 </div>
@@ -155,10 +166,11 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
                 />
                 {
-                    //showEditModal && <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                    showEditModal && <EditarModal compraData={compraObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                    // <PdfViewer pageNumber={1} url='./text.pdf' width={200} />
                 }
-
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
+
 
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
@@ -229,9 +241,10 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                     <th className='text-gray-600 font-bold w-1/4 '>Qtd. comprada</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Preço</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Data de compra</th>
+
+                                    <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
                                     {/**
-                             *         <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
+                                     *  <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                              */}
                                 </tr>
                             </thead>
@@ -246,18 +259,21 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
                                             <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-1/4  ">{compra.quantidade_comprada}</td>
-                                            <td className="w-1/4  ">{compra.preco}</td>
+                                            <td className="w-1/4  ">{compra.preco.toLocaleString('pt', {
+                                                style: 'currency',
+                                                currency: 'KWZ'
+                                            })}</td>
                                             <td className="w-1/4  ">{compra.data_compra}</td>
-                                            {/**
-                                             * <td className="w-1/4   flex justify-center items-center">
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
-                                                    onClick={() => setShowEditModal(true)}
+                                                    onClick={() => handleEdit(compra)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/4   flex justify-center items-center">
+                                            {/**
+                                             * <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
                                                     className="hover:brightness-75"
@@ -281,16 +297,16 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 currency: 'KWZ'
                                             })}</td>
                                             <td className="w-1/4  ">{compra.data_compra}</td>
-                                            {/**
-                                            *  <td className="w-1/4   flex justify-center items-center">
+                                            <td className="w-1/4   flex justify-center items-center">
                                                 <button
-                                                    onClick={() => setShowEditModal(true)}
+                                                    onClick={() => handleEdit(compra)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/4   flex justify-center items-center">
+                                            {/**
+                                            *     <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
                                                     className="hover:brightness-75"

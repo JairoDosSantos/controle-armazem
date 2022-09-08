@@ -58,7 +58,7 @@ export const updateCompra = createAsyncThunk('/compra/update', async ({ id, data
             .update([{ data_compra, equipamento_id, preco, quantidade_comprada }])
             .match({ id })
 
-        if (error) return error
+        if (error) return null
         return data
 
     } catch (error) {

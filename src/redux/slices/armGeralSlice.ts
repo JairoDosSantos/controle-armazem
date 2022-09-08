@@ -90,7 +90,7 @@ export const insertArmGeral = createAsyncThunk('/armgeral/create', async ({ data
             .from('armgeral')
             .insert({ data_aquisicao, equipamento_id, quantidade: quantidade_entrada })
             .single()
-
+        if (error) return null
         return data
 
     } catch (error) {

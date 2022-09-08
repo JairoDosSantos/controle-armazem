@@ -15,7 +15,7 @@ import SiderBar from '../components/SiderBar'
 import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralParaObra'
 
 //Componentes Externos
-import { FaEdit, FaSave, FaTrash, FaPlusCircle } from 'react-icons/fa'
+import { FaEdit, FaSave, FaPlusCircle } from 'react-icons/fa'
 import nookies from 'nookies'
 import { useDispatch } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
@@ -83,7 +83,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     const [isOpenAddObra, setIsOpenAddObra] = useState(false)
     const [isOpenRemoveObraAddAMG, setIsOpenRemoveObraAddAMG] = useState(false)
     const [isOpenAddNovoModal, setIsOpenAddNovoModal] = useState(false)
-
+    const [armazemObject, setAmazemObject] = useState<ArmGeralType>({} as ArmGeralType)
     const [showEditModal, setShowEditModal] = useState(false)
 
     const [idEquipamento, setIdEquipamento] = useState(0)
@@ -145,6 +145,11 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     const findClassificacao = (id: number) => {
         const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
+    }
+
+    const handleEdit = (armazem: ArmGeralType) => {
+        setAmazemObject(armazem)
+        setShowEditModal(true)
     }
     return (
         <div className='flex'>
@@ -213,7 +218,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                 />
 
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
-                    {showEditModal && (<EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} />)}
+                    {showEditModal && (<EditarModal data={armazemObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />)}
                     <div className="flex  w-full bg-white p-5 justify-between">
 
                         <div className="flex gap-4  ">
@@ -231,7 +236,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             <button
                                 onClick={() => setIsOpenRemove(true)}
                                 type="button"
-                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Transferir para almoxarifário
+                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Transferir para almoxarifado
                             </button>
                             {/** Aqui o equipamento será diminuído do armazem para ser cadastrado ao armazem da obra */}
                             {isOpenRemove && (
@@ -326,38 +331,50 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                    {   /**
+                                *   <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                */}
                                 </tr>
                             </thead>
                             <tbody className=''>
 
-                                {armazem && armazem.length && armazem.map((arm, index) => (
-                                    <tr
-                                        key={index}
-                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-1/5 ">{arm.id}</td>
-                                        <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
-                                        <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
-                                        <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
-                                        <td className="w-1/5 ">{arm.quantidade}</td>
-                                        <td className="w-1/5 ">{arm.data_aquisicao}</td>
-                                        <td className="w-1/5  flex justify-center items-center">
-                                            <button
-                                                onClick={() => setShowEditModal(true)}
-                                                className="hover:brightness-75" title="Editar">
-                                                <FaEdit />
-                                            </button>
-                                        </td>
-                                        <td className="w-1/5  flex justify-center items-center">
-                                            <button
-                                                onClick={() => setShowQuestionAlert(true)}
-                                                className="hover:brightness-75"
-                                                title="Apagar">
-                                                <FaTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {armazem && armazem.length && armazem.map((arm, index) => {
+                                    if (index < 5) {
+                                        return (
+                                            <tr
+                                                key={index}
+                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                <td className="w-1/5 ">{arm.id}</td>
+                                                <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
+                                                <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
+                                                <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
+                                                <td className="w-1/5 ">{arm.quantidade}</td>
+                                                <td className="w-1/5 ">{arm.data_aquisicao}</td>
+                                                <td className="w-1/5  flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => handleEdit(arm)}
+                                                        className="hover:brightness-75" title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                </td>
+                                                {
+                                                    /**
+                                                     * <td className="w-1/5  flex justify-center items-center">
+                                                            <button
+                                                                onClick={() => setShowQuestionAlert(true)}
+                                                                className="hover:brightness-75"
+                                                                title="Apagar">
+                                                                <FaTrash />
+                                                            </button>
+                                                        </td>
+                                                     */
+                                                }
+                                            </tr>
+                                        )
+                                    } else {
+                                        return
+                                    }
+                                })}
 
                             </tbody>
                         </table>
