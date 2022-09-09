@@ -351,7 +351,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     <button
                                                         onClick={() => handleEdit(saida)}
                                                         className="hover:brightness-75"
-                                                        title="Editar">
+                                                        title="Editar saída">
                                                         <FaEdit />
                                                     </button>
                                                 </td>
@@ -381,7 +381,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     <button
                                                         onClick={() => handleEdit(findAud)}
                                                         className="hover:brightness-75"
-                                                        title="Editar">
+                                                        title="Editar saída">
                                                         <FaEdit />
                                                     </button>
                                                 </td>
