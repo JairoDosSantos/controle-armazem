@@ -66,33 +66,34 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
     const onSubmit: SubmitHandler<FormValues> = async (arm) => {
 
         setLoad(true)
+        //0º Ver se a saída que se pretende alterar já não tem uma devolução
+        if (data.data_devolucao) { notifyError('Não pode alterar a saída, visto que já há uma devolução para esta saída.'); setLoad(false); return }
+
         //1º  Buscar o equipamento no armazem e no almoxarifado
         const buscaARMDispatch = await dispatch(fetchOne(data.equipamento_id.id));
         const ARMunwrap = unwrapResult(buscaARMDispatch);
-        console.log('Armazem Wrap', ARMunwrap)
+
         if (!ARMunwrap.length) { notifyError('Armazem não encontrado'); setLoad(false); return }
 
         const buscarAlmoxarifado = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id }))
         const AlmoxarifadoUnwrap = unwrapResult(buscarAlmoxarifado);
-        console.log('Almoxarifário Wrap', AlmoxarifadoUnwrap)
+
         if (!AlmoxarifadoUnwrap.length) { notifyError('Almoxarifado não encontrado'); setLoad(false); return }
         //2º Ver se a quantidade que se pretende devolver não é maior que a quantidade em almoxarifado
         if (Number(AlmoxarifadoUnwrap[0].quantidade) < Number(arm.quantidade)) { notifyError('Não é possivel devolver esta quantidade'); setLoad(false); return }
+
         //3º adicionar ao stock em armazem o stock em almoxarifado, e subtrair a quantidade que se pretende realmente em almoxarifado
         let soma = (Number(ARMunwrap[0].quantidade) + Number(AlmoxarifadoUnwrap[0].quantidade))
         const qtdFinal = soma - Number(arm.quantidade)
-        console.log("Soma", qtdFinal)
+
         //4º Actualizar o stcok do armazem
         const updateARM = await dispatch(updateArmGeral({ ...ARMunwrap[0], quantidade_entrada: qtdFinal }))
-        const ARMactualizado = unwrapResult(updateARM)
-        console.log('Actualização armazem geral', updateARM)
+
+
         if (updateARM.payload === null) { notifyError('Erro ao efectuar a devolução'); setLoad(false); return }
         //5º Actualizar o stock do almoxarifado
         const updateAlmoxarifado = await dispatch(updateAlmoxarifario({ ...AlmoxarifadoUnwrap[0], quantidade_a_levar: arm.quantidade }))
 
-        const almoxarifadoUpdateUnwrap = unwrapResult(updateAlmoxarifado)
-
-        console.log('Almoxarifado Actualizado', updateAlmoxarifado)
 
         if (updateAlmoxarifado.payload === null) { notifyError('Erro ao efectuar a retirada no almoxarifário'); setLoad(false); return }
         //6º Actualizar a quantidade em auditoria
@@ -125,7 +126,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
         }, 6500);
 
-        toast.success('Quantidade alterada com sucesso! ', {
+        toast.success('Saída alterada com sucesso! ', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,
