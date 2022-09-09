@@ -5,7 +5,7 @@ import { supabase } from '../utils/supabaseClient'
 import Head from 'next/head'
 
 import dynamic from 'next/dynamic'
-const RelatorioCompras = dynamic(() => import('../components/relatorios/Testando'), { ssr: false })
+//const RelatorioCompras = dynamic(() => import('../components/relatorios/Testando'), { ssr: false })
 
 const Sair = () => {
     return (
@@ -13,24 +13,25 @@ const Sair = () => {
             <Head>
                 <title>Saindo ...</title>
             </Head>
-            <RelatorioCompras />
+            {/**
+       *       <RelatorioCompras />
+       */}
         </div>
     )
 }
-/**
- * 
-    export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 
-        //let { error } = await supabase.auth.signOut();
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 
-        nookies.destroy(context, 'USER_LOGGED_ARMAZEM')
+    //let { error } = await supabase.auth.signOut();
 
-        // If no user, redirect to index.
-        return { props: {}, redirect: { destination: '/', permanent: false } }
+    nookies.destroy(context, 'USER_LOGGED_ARMAZEM')
+
+    // If no user, redirect to index.
+    return { props: {}, redirect: { destination: '/', permanent: false } }
 
 
-    }
- */
+}
+
 
 
 export default Sair
