@@ -330,8 +330,9 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                     <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
+
                                     {   /**
+                                     *   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
                                 *   <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
                                 */}
                                 </tr>
@@ -350,15 +351,16 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                                 <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
                                                 <td className="w-1/5 ">{arm.quantidade}</td>
                                                 <td className="w-1/5 ">{arm.data_aquisicao}</td>
-                                                <td className="w-1/5  flex justify-center items-center">
+
+                                                {
+                                                    /**
+                                                     *    <td className="w-1/5  flex justify-center items-center">
                                                     <button
                                                         onClick={() => handleEdit(arm)}
                                                         className="hover:brightness-75" title="Editar">
                                                         <FaEdit />
                                                     </button>
                                                 </td>
-                                                {
-                                                    /**
                                                      * <td className="w-1/5  flex justify-center items-center">
                                                             <button
                                                                 onClick={() => setShowQuestionAlert(true)}
