@@ -5,7 +5,6 @@ import {
     View,
     StyleSheet,
     PDFViewer,
-    PDFDownloadLink,
     Image
 
 } from "@react-pdf/renderer";
@@ -23,9 +22,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         borderColor: '#f6f6f',
         width: '30%',
-        fontSize: '10px',
+        fontSize: '8px',
         textAlign: 'center'
-
     },
     viewer: {
         width: window.innerWidth, //the pdf viewer will take up all of the width and height
@@ -43,23 +41,25 @@ const styles = StyleSheet.create({
         borderBottomWidth: '0.5px',
         borderTopWidth: '0.5px',
         textAlign: 'center',
-        marginBottom: 5
+        marginBottom: 5,
+        fontWeight: 'extrabold',
+        fontSize: '10px'
     },
 
     corpo: {
-
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: '15px',
+        marginTop: '10px',
         padding: 5,
         borderBottomWidth: '0.5px',
-        fontWeight: 'light'
+        fontWeight: 'light',
+        borderWidth: '1px',
+        borderRadius: '5px'
     },
     titulo: {
-
         fontWeight: 'ultrabold',
         display: 'flex',
         flexDirection: 'row',
@@ -68,16 +68,14 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         paddingTop: 15,
         paddingBottom: 4,
-        fontSize: '14px',
+        fontSize: '12px',
         borderTop: '0.5px',
         textAlign: 'center'
     },
     logo: {
         width: 74,
         height: 40,
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        borderWidth: 1
+        borderWidth: 1,
     },
     assinaturas: {
         width: '100%',
@@ -87,6 +85,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 55,
         fontSize: '10px',
+        paddingHorizontal: '45px'
     },
     assinaturaIndividual: {
         paddingVertical: 10,
@@ -99,6 +98,20 @@ const styles = StyleSheet.create({
     },
     textoTitulo: {
         fontWeight: 'bold'
+    },
+    fotoTitulo: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontSize: '8px'
+    },
+    rodape: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: '8px',
+        paddingTop: '35px'
     }
 
 });
@@ -126,21 +139,23 @@ type CompraProps = {
 }
 
 // Create Document Component
-export default function BasicDocument() {
-
-    const compras: CompraProps[] = []
+export default function BasicDocument({ compras }: CompraProps) {
 
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
             <Document title="Relatório de Compras">
                 {/*render a single page*/}
-                <Page size="A4" style={styles.page}>
+                <Page size="A4" style={styles.page} wrap>
 
-                    <Image style={styles.logo} src='https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png' />
+
+                    <View style={styles.fotoTitulo}>
+                        <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
+                        <Text>NOAH CONSTUCTIONS</Text>
+                    </View>
 
                     <View style={styles.titulo}>
-                        <Text>COMPRAS DE EQUIPAMENTOS</Text>
+                        <Text>RELATÓRIO DE COMPRAS DE EQUIPAMENTOS DO DIA 12-09-2022</Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -157,49 +172,35 @@ export default function BasicDocument() {
                         <View style={styles.section}>
                             <Text>Quantidade</Text>
                         </View>
+
                         <View style={styles.section}>
                             <Text>Data de compra</Text>
                         </View>
 
                     </View>
-                    <View style={styles.corpo}>
+                    {
+                        compras.length && compras.map((compra, index) => (
+                            <View style={styles.corpo} key={index}>
 
-                        <View style={styles.section}>
-                            <Text>Bloco de 12</Text>
-                        </View>
+                                <View style={styles.section}>
+                                    <Text>{compra.equipamento_id.descricao}</Text>
+                                </View>
 
-                        <View style={styles.section}>
-                            <Text>AKWZ 1.200,00</Text>
-                        </View>
+                                <View style={styles.section}>
+                                    <Text>{compra.preco}</Text>
+                                </View>
 
-                        <View style={styles.section}>
-                            <Text>10</Text>
-                        </View>
+                                <View style={styles.section}>
+                                    <Text>{compra.quantidade_comprada}</Text>
+                                </View>
 
-                        <View style={styles.section}>
-                            <Text>2022-02-07</Text>
-                        </View>
+                                <View style={styles.section}>
+                                    <Text>{compra.data_compra}</Text>
+                                </View>
 
-                    </View>
-                    <View style={styles.corpo}>
-
-                        <View style={styles.section}>
-                            <Text>Bloco de 12</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>AKWZ 1.200,00</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>10</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text>2022-02-07</Text>
-                        </View>
-
-
-                    </View>
+                            </View>
+                        ))
+                    }
 
 
                     <View style={styles.assinaturas}>
@@ -211,6 +212,10 @@ export default function BasicDocument() {
                         </View>
 
 
+                    </View>
+
+                    <View style={styles.rodape}>
+                        <Text>Luanda aos, 12-09-2022</Text>
                     </View>
 
 

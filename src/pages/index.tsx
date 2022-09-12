@@ -9,7 +9,9 @@ import { useDispatch } from 'react-redux'
 
 import Logo from '../assets/noah.png'
 import Load from '../assets/load.gif'
+import dynamic from 'next/dynamic'
 
+const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 //Api
 import api from '../services/api'
 import { updateUser } from '../redux/slices/geralSlice'
@@ -22,6 +24,7 @@ const Home: NextPage = () => {
   const [password, setPassword] = useState('')
   const [load, setLoad] = useState(false)
   const dispatch = useDispatch<any>();
+  const [showErrorAlert, setShowErrorAlert] = useState(false)
 
   const signInUser = async (event: FormEvent) => {
 
@@ -38,17 +41,21 @@ const Home: NextPage = () => {
     const { user } = response.data
 
     const status = response.status
-
+    if (status === 401) {
+      // setShowHide('flex')
+      setShowErrorAlert(true)
+      setLoad(false)
+      return
+    }
     if (user) {
       await dispatch(updateUser({ user: user.email }))
       // setShowSuccess('flex')
       setLoad(false)
       router.push('/painel-controlo')
 
-    } else {
-      // setShowHide('flex')
-      setLoad(false)
     }
+
+
 
 
   };
@@ -61,7 +68,23 @@ const Home: NextPage = () => {
         <title>SCA | Login</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      {/**Error Alert */}
+      <SweetAlert2
+        backdrop={true}
+        show={showErrorAlert}
+        title='Erro'
+        text='Ocorreu um erro ao efectuar a operação. Por favor, certifique-se que tem a permissão para acessar o sistema!'
+        icon='error'
+        onConfirm={() => setShowErrorAlert(false)}
+        didClose={() => setShowErrorAlert(false)}
+        didDestroy={() => setShowErrorAlert(false)}
+        allowOutsideClick={true}
+        allowEnterKey={true}
+        allowEscapeKey={true}
+        showConfirmButton={true}
+        confirmButtonColor="#4051ef"
 
+      />
       <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center ">
         <div className='shadow-md py-8 px-12 rounded w-[720px] bg-white animate__animated animate__fadeIn'>
 

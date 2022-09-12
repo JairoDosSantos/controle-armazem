@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { HYDRATE } from "next-redux-wrapper";
 
 export const geralSlice = createSlice({
     name: 'Search',
@@ -8,8 +9,17 @@ export const geralSlice = createSlice({
     reducers: {
         updateUser: (state, action) => {
             state.user = action.payload.user
+        },
+       /**
+        *  extraReducers: {
+            [HYDRATE]: (state, action) => {
+                return {
+                    ...state,
+                    ...action.payload.Search
+                }
+            }
         }
-
+        */
     }
 })
 

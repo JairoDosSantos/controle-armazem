@@ -331,19 +331,22 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                     <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th>
 
-                                    {   /**
-                                     *   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                *   <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
-                                */}
+                                    {
+                                        /*
+                                            *
+                                            *   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
+                                            *   <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
+                                        */
+                                    }
                                 </tr>
                             </thead>
                             <tbody >
 
-                                {armazem && armazem.length && armazem.map((arm, index) => (
-                                    (index < 5) && (
-                                        <tr
+                                {armazem && armazem.map((arm, index) => {
+                                    if (index < 5) {
+                                        return <tr
                                             key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2' >
                                             <td className="w-1/5 ">{arm.id}</td>
                                             <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
                                             <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
@@ -371,16 +374,16 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                                 */
                                             }
                                         </tr>
-                                    )
-                                )
+                                    }
+                                }
                                 )}
 
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }
 
