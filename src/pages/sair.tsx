@@ -22,16 +22,20 @@ const Sair = () => {
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 
-    //let { error } = await supabase.auth.signOut();
+    let { error } = await supabase.auth.signOut();
 
-    nookies.destroy(context, 'USER_LOGGED_ARMAZEM')
+    if (!error) {
 
-    // If no user, redirect to index.
-    return { props: {}, redirect: { destination: '/', permanent: false } }
+        nookies.destroy(context, 'USER_LOGGED_ARMAZEM', {
+            path: '/'
+        })
+
+        // If no user, redirect to index.
+        return { props: {}, redirect: { destination: '/', permanent: false } }
+    }
 
 
 }
-
 
 
 export default Sair

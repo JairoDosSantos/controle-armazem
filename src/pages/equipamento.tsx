@@ -15,7 +15,7 @@ import SiderBar from '../components/SiderBar'
 import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralParaObra'
 
 //Componentes Externos
-import { FaEdit, FaSave, FaPlusCircle } from 'react-icons/fa'
+import { FaSave, FaPlusCircle } from 'react-icons/fa'
 import nookies from 'nookies'
 import { useDispatch } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
@@ -337,46 +337,43 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                 */}
                                 </tr>
                             </thead>
-                            <tbody className=''>
+                            <tbody >
 
-                                {armazem && armazem.length && armazem.map((arm, index) => {
-                                    if (index < 5) {
-                                        return (
-                                            <tr
-                                                key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/5 ">{arm.id}</td>
-                                                <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
-                                                <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
-                                                <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
-                                                <td className="w-1/5 ">{arm.quantidade}</td>
-                                                <td className="w-1/5 ">{arm.data_aquisicao}</td>
+                                {armazem && armazem.length && armazem.map((arm, index) => (
+                                    (index < 5) && (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/5 ">{arm.id}</td>
+                                            <td className="w-1/5 ">{arm.equipamento_id.descricao}</td>
+                                            <td className="w-1/5 "> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
+                                            <td className="w-1/5 "> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-1/5 ">{arm.quantidade}</td>
+                                            <td className="w-1/5 ">{arm.data_aquisicao}</td>
 
-                                                {
-                                                    /**
-                                                     *    <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEdit(arm)}
-                                                        className="hover:brightness-75" title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                     * <td className="w-1/5  flex justify-center items-center">
-                                                            <button
-                                                                onClick={() => setShowQuestionAlert(true)}
-                                                                className="hover:brightness-75"
-                                                                title="Apagar">
-                                                                <FaTrash />
-                                                            </button>
-                                                        </td>
-                                                     */
-                                                }
-                                            </tr>
-                                        )
-                                    } else {
-                                        return
-                                    }
-                                })}
+                                            {
+                                                /**
+                                                   *<td className="w-1/5  flex justify-center items-center">
+                                                        <button
+                                                            onClick={() => handleEdit(arm)}
+                                                            className="hover:brightness-75" title="Editar">
+                                                            <FaEdit />
+                                                        </button>
+                                                    </td>
+                                                    *<td className="w-1/5  flex justify-center items-center">
+                                                        <button
+                                                            onClick={() => setShowQuestionAlert(true)}
+                                                            className="hover:brightness-75"
+                                                            title="Apagar">
+                                                            <FaTrash />
+                                                        </button>
+                                                    </td>
+                                                */
+                                            }
+                                        </tr>
+                                    )
+                                )
+                                )}
 
                             </tbody>
                         </table>
@@ -396,7 +393,6 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
             const duracaoDispatch: any = await store.dispatch(fetchDuracao());
             const armazemDispatch: any = await store.dispatch(fetchArmGeral());
-
 
             const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
