@@ -6,7 +6,6 @@ import {
     StyleSheet,
     PDFViewer,
     Image
-
 } from "@react-pdf/renderer";
 
 // Create styles
@@ -22,7 +21,6 @@ const styles = StyleSheet.create({
         width: '30%',
         fontSize: '8px',
         textAlign: 'center'
-
     },
     total: {
         color: '#cd1212'
@@ -76,7 +74,6 @@ const styles = StyleSheet.create({
     logo: {
         width: 74,
         height: 40,
-        borderWidth: 1,
     },
     assinaturas: {
         width: '100%',
@@ -117,7 +114,6 @@ const styles = StyleSheet.create({
 
 });
 
-
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -125,6 +121,7 @@ type EquipamentoType = {
     classificacao_id: number;
     data: string
 }
+
 type ObraType = {
     id: number
     obra_nome: string;
@@ -145,25 +142,24 @@ type AuditoriaProps = {
     auditoria: AuditoriaType[];
 
 }
-
 // Create Document Component
+
 export default function BasicDocument({ auditoria }: AuditoriaProps) {
 
     return (
-        <PDFViewer style={styles.viewer}>
+        <PDFViewer style={styles.viewer} >
             {/* Start of the document*/}
             <Document title="Relatório de Movimentações">
                 {/*render a single page*/}
                 <Page size="A4" style={styles.page} >
 
-
                     <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
+                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE MOV. DE EQUIP. EM ALMOXARIFADOS </Text>
+                        <Text>RELATÓRIO DE MOV. DE EQUIP. NOS ALMOXARIFADOS </Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -231,8 +227,6 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                         ))
                     }
 
-
-
                     <View style={styles.assinaturas}>
 
                         <View>
@@ -251,6 +245,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
 
                 </Page>
             </Document>
+
         </PDFViewer>
     );
 }

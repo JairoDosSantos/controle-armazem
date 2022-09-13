@@ -2,11 +2,13 @@ import Head from 'next/head'
 
 import dynamic from 'next/dynamic'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { wrapper } from '../../redux/store'
-import { fetchClassificacao } from '../../redux/slices/classificacaoSlice'
-import { fetchDuracao } from '../../redux/slices/duracaoSlice.ts'
-import { fetchArmGeral } from '../../redux/slices/armGeralSlice'
-const RelatorioArmazem = dynamic(() => import('../../components/relatorios/Armazem'), { ssr: false })
+import { wrapper } from '../../../redux/store'
+import { fetchClassificacao } from '../../../redux/slices/classificacaoSlice'
+import { fetchDuracao } from '../../../redux/slices/duracaoSlice.ts'
+import { fetchArmGeral } from '../../../redux/slices/armGeralSlice'
+import { useRouter } from 'next/router'
+import nookies from 'nookies'
+const RelatorioArmazem = dynamic(() => import('../../../components/relatorios/Armazem'), { ssr: false })
 
 
 
@@ -42,12 +44,37 @@ type PosicaoArmazemProps = {
 }
 
 const Armazem = ({ equipamentosARM }: PosicaoArmazemProps) => {
+
+    let armazemData: EquipamentosARMType[] = []
+
+    const { query } = useRouter();
+
+    const { slug } = query
+
+    if (slug?.length === 1 && slug[0] === 'all') armazemData = equipamentosARM
+
+    else {
+
+        if (slug && equipamentosARM) {
+            if (slug[0] !== 'equipamento' && Number(slug[1]) === 0) {
+                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()))
+            } else if (Number(slug[1]) !== 0 && slug[0] === 'equipamento') {
+                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.classificacao_id === Number(slug[1]))
+            } else if (slug[0] !== 'equipamento' && Number(slug[1]) !== 0) {
+                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()) && equipamento.equipamento_id.classificacao_id === Number(slug[1]))
+            }
+
+        }
+    }
+
     return (
+
         <div>
             <Head>
                 <title>Relatório do Armazem</title>
             </Head>
-            <RelatorioArmazem equipamentosARM={equipamentosARM} />
+
+            <RelatorioArmazem equipamentosARM={armazemData} />
 
         </div>
     )
@@ -57,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            // const cookie = nookies.get(context);
+            const cookie = nookies.get(context);
 
             //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
             const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
@@ -69,12 +96,12 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
             const equipamentosARM = equipamentoARM.payload
-            /**
-             *            if (!cookie.USER_LOGGED_ARMAZEM) {
-                           // If no user, redirect to index.
-                           return { props: {}, redirect: { destination: '/', permanent: false } }
-                       }
-             */
+
+            if (!cookie.USER_LOGGED_ARMAZEM) {
+                //If no user, redirect to index.
+                return { props: {}, redirect: { destination: '/', permanent: false } }
+            }
+
             return {
                 props: {
                     equipamentosARM,

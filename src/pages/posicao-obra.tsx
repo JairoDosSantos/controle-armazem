@@ -7,8 +7,8 @@ import SiderBar from "../components/SiderBar"
 import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 //Imagens
-import Load from '../assets/load.gif'
-import Image from "next/image"
+//import Load from '../assets/load.gif'
+//import Image from "next/image"
 import dynamic from "next/dynamic"
 import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
@@ -17,6 +17,7 @@ import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchAlmoxarifario } from "../redux/slices/almoxarifarioSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
+import { useRouter } from "next/router"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -61,7 +62,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
-
+    const route = useRouter()
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
@@ -192,7 +193,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="ml-auto flex gap-2 -mt-4">
                             <div>
-                                {/** <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label> */}
+
                                 <select
                                     onChange={(event) => setSearchClassificacao(Number(event.target.value))}
                                     className="rounded shadow cursor-pointer" >
@@ -205,16 +206,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                         ))}
                                 </select>
                             </div>
-                            {/**
-                            *  <div>
-                                <label htmlFor="material" className="bg-white">Material&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='material' className="cursor-pointer" />
-                            </div>
-                            <div>
-                                <label htmlFor="epi" className="bg-white">EPI&nbsp;</label>
-                                <input type={"radio"} name='classificacao' id='epi' className="cursor-pointer" />
-                            </div>
-                            */}
+
                         </div>
                         <div className="flex gap-5">
                             <input
@@ -239,11 +231,16 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </div>
 
                         <div className=" ml-auto flex gap-2">
-                            <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                onClick={() => route.push('/relatorio/almoxarifado/all')}
+                                className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
                                 <span>Imprimir tudo</span>
                             </button>
-                            <button className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                disabled={!(search || searchByObraId || searchClassificacao)}
+                                onClick={() => route.push(`/relatorio/almoxarifado/${search === '' ? 'equipamento' : search}/${searchByObraId}/${searchClassificacao}`)}
+                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>

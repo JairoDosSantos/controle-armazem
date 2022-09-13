@@ -16,6 +16,7 @@ import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { fetchArmGeral } from "../redux/slices/armGeralSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
+import { useRouter } from "next/router"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -53,7 +54,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
-
+    const route = useRouter()
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
@@ -66,6 +67,9 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
     const [armazemObject, setArmazemObject] = useState<EquipamentosARMType>({} as EquipamentosARMType)
 
+
+
+    //Funções
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
@@ -172,7 +176,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="ml-auto flex gap-2 -mt-4">
                             <div>
-                                {/** <label htmlFor="ferramenta" className="bg-white">Ferramenta&nbsp;</label> */}
                                 <select
                                     onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
                                     className="rounded shadow cursor-pointer" >
@@ -196,11 +199,16 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                         </div>
                         <div className=" ml-auto flex gap-2">
-                            <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                onClick={() => route.push('/relatorio/armazem/all')}
+                                className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
                                 <span>Imprimir tudo</span>
                             </button>
-                            <button className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                disabled={!(search || searchByClassificacao)}
+                                onClick={() => route.push(`/relatorio/armazem/${search === '' ? 'equipamento' : search}/${searchByClassificacao}`)}
+                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>

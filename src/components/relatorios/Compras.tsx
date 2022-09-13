@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     logo: {
         width: 74,
         height: 40,
-        borderWidth: 1,
     },
     assinaturas: {
         width: '100%',
@@ -150,7 +149,7 @@ export default function BasicDocument({ compras }: CompraProps) {
 
 
                     <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
+                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 

@@ -123,7 +123,14 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                 setShowErrorAlert(true)
             }
         } else {
+
             //Insert nas Compras primeiro
+            //Trecho de código acrescentado hoje 01-09-2022
+            const comprasInsert = await dispatch(insertCompra({ data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+            if (!comprasInsert.payload) {
+                setShowErrorAlert(true)
+                return
+            }
             const resultDispatch = await dispatch(insertArmGeral({ equipamento_id: data.descricao_equipamento_id, quantidade_entrada: data.quantidade, data_aquisicao: data.data_aquisicao }))
             // const unwrapresultado = unwrapResult(resultDispatch)
             if (resultDispatch.meta.arg) {

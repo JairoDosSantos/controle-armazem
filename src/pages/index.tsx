@@ -38,10 +38,10 @@ const Home: NextPage = () => {
     })
 
 
-    const { user } = response.data
+    const { user, error } = response.data
+    console.log(error)
 
-    const status = response.status
-    if (status === 401) {
+    if (error) {
       // setShowHide('flex')
       setShowErrorAlert(true)
       setLoad(false)
@@ -119,6 +119,7 @@ const Home: NextPage = () => {
 
               <div className='flex space-x-3 justify-end'>
                 <button
+                  onClick={() => setLoad(false)}
                   type={'reset'}
                   className='bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded'>
                   Cancelar</button>

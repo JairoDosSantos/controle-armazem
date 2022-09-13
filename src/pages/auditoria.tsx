@@ -4,15 +4,16 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
+import { FaEdit, FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 
 import dynamic from "next/dynamic"
 import EditarModal from "../components/auditoria/EditModal"
-import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest } from "next"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { wrapper } from "../redux/store"
 import { fetchSaida } from "../redux/slices/auditoriaSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
+import { useRouter } from "next/router"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -48,6 +49,8 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
     const [load, setLoad] = useState(false)
+
+    const route = useRouter()
 
     const [filtroPorObra, setFiltroPorObra] = useState(false)
     const [filtroPorMovimentacoes, setFiltroPorMovimentacoes] = useState(false)
@@ -173,29 +176,27 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                             </div>
                             <div className=" flex gap-2 ">
                                 <div>
-                                    <label htmlFor="ferramenta" className="bg-white">Todas&nbsp;</label>
+                                    <label htmlFor="todas" className="bg-white">Todas&nbsp;</label>
                                     <input
                                         defaultChecked={true}
                                         onClick={() => setFiltroPorObra(false)}
                                         type={"radio"}
                                         name='classificacao'
-                                        id='ferramenta'
+                                        id='todas'
                                         className="cursor-pointer" />
                                 </div>
                                 <div>
-                                    <label htmlFor="material" className="bg-white">Filtrar por&nbsp;</label>
+                                    <label htmlFor="filtro" className="bg-white">Filtrar por&nbsp;</label>
                                     <input
                                         onClick={() => setFiltroPorObra(true)}
-
                                         type={"radio"}
                                         name='classificacao'
-                                        id='material'
+                                        id='filtro'
                                         className="cursor-pointer" />
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-5">
-                            {/**    <input type="search" placeholder="Pesquise pelo equipamento" className="w-full rounded shadow" /> */}
                             {
                                 filtroPorObra && (
                                     <div className="animate__animated animate__fadeIn w-full flex gap-4">
@@ -207,7 +208,6 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 <option
                                                     key={index}
                                                     value={obra.id}>{obra.obra_nome}</option>
-
                                             ))}
                                         </select>
                                         <input
@@ -219,11 +219,16 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                             }
                         </div>
                         <div className=" ml-auto flex gap-2">
-                            <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                onClick={() => route.push('/relatorio/auditoria/all')}
+                                className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
                                 <span>Imprimir tudo</span>
                             </button>
-                            <button className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                disabled={!(searchData || searchObra)}
+                                onClick={() => route.push(`/relatorio/auditoria/${searchObra}/${searchData}`)}
+                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>
@@ -264,24 +269,25 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                         <td className="w-1/5 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
                                                         <td className="w-1/5 text-center">{devolucao.data_retirada}</td>
                                                         <td className="w-1/5 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
-                                                        {/**    <td className="w-1/5 text-center flex justify-center items-center">
-                                                            <button
-                                                                onClick={() => handleEdit(devolucao)}
-                                                                className="hover:brightness-75"
-                                                                title="Editar">
-                                                                <FaEdit />
-                                                            </button>
-                                                        </td>
+                                                        {/**    
+                                                        *  <td className="w-1/5 text-center flex justify-center items-center">
+                                                                <button
+                                                                    onClick={() => handleEdit(devolucao)}
+                                                                    className="hover:brightness-75"
+                                                                    title="Editar">
+                                                                    <FaEdit />
+                                                                </button>
+                                                            </td>
 
-                                                 *   <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                                 */}
+                                                        *   <td className="w-1/5  flex justify-center items-center">
+                                                                <button
+                                                                    onClick={() => setShowQuestionAlert(true)}
+                                                                    className="hover:brightness-75"
+                                                                    title="Apagar">
+                                                                    <FaTrash />
+                                                                </button>
+                                                            </td>
+                                                        */}
                                                     </tr>
                                                 )
                                             }
@@ -296,24 +302,27 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     <td className="w-1/5 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
                                                     <td className="w-1/5 text-center ">{findAud.data_retirada}</td>
                                                     <td className="w-1/5 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
-                                                    {/**       <td className="w-1/5 text-center  flex justify-center items-center">
-                                                        <button
-                                                            onClick={() => handleEdit(findAud)}
-                                                            className="hover:brightness-75"
-                                                            title="Editar">
-                                                            <FaEdit />
-                                                        </button>
-                                                    </td>
-
-                                                * <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                                */}
+                                                    {
+                                                        /**      
+                                                        * <td className="w-1/5 text-center  flex justify-center items-center">
+                                                                <button
+                                                                    onClick={() => handleEdit(findAud)}
+                                                                    className="hover:brightness-75"
+                                                                    title="Editar">
+                                                                    <FaEdit />
+                                                                </button>
+                                                          </td>
+    
+                                                        * <td className="w-1/5  flex justify-center items-center">
+                                                                <button
+                                                                    onClick={() => setShowQuestionAlert(true)}
+                                                                    className="hover:brightness-75"
+                                                                    title="Apagar">
+                                                                    <FaTrash />
+                                                                </button>
+                                                          </td>
+                                                    */
+                                                    }
                                                 </tr>)
                                             }
                                         })

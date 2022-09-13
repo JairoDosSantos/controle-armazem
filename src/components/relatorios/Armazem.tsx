@@ -8,8 +8,8 @@ import {
     Image
 
 } from "@react-pdf/renderer";
+import moment from 'moment'
 
-import logo from '../../assets/noah.png'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     logo: {
         width: 74,
         height: 40,
-        borderWidth: 1,
     },
     assinaturas: {
         width: '100%',
@@ -152,7 +151,7 @@ type PosicaoArmazemProps = {
 // Create Document Component
 export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) {
 
-
+    const data = moment().format('l')
 
     return (
         <PDFViewer style={styles.viewer}>
@@ -161,14 +160,16 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                 {/*render a single page*/}
                 <Page size="A4" style={styles.page} wrap>
 
-
+                    {/**
+                        * <a href="https://imgbox.com/d3WKdgPQ" target="_blank"><img src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" alt="image host"/></a>
+                     */}
                     <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
+                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZEM DO DIA 12-09-2022</Text>
+                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZEM </Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -232,7 +233,7 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                     </View>
 
                     <View style={styles.rodape}>
-                        <Text>Luanda aos, 12-09-2022</Text>
+                        <Text>Luanda aos, {data}</Text>
                     </View>
 
 

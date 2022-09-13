@@ -8,7 +8,7 @@ import { FaEdit, FaPrint } from 'react-icons/fa'
 
 import Load from '../assets/load.gif'
 import EditarModal from "../components/compras/EditarModal"
-import Image from "next/image"
+
 
 import dynamic from "next/dynamic"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
@@ -17,10 +17,10 @@ import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import nookies from 'nookies'
+import { useRouter } from "next/router"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
-const RelatorioCompras = dynamic(() => import('../components/relatorios/Compras'), { ssr: false })
 
 
 
@@ -44,12 +44,11 @@ type CompraType = {
 type DuracaoType = {
     id: number;
     tempo: string;
-
 }
+
 type ClassificacaoType = {
     id: number;
     tipo: string;
-
 }
 
 type CompraProps = {
@@ -57,13 +56,14 @@ type CompraProps = {
     classificacao: ClassificacaoType[];
     duracao: DuracaoType[]
 }
+
 const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
     const [hideSideBar, setHideSideBar] = useState(false)
-    const [load, setLoad] = useState(false)
+    //const [load, setLoad] = useState(false)
 
     const [filtroTipo, setFiltroTipo] = useState(false)
-
+    const route = useRouter()
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
     const [showErrorAlert, setShowErrorAlert] = useState(false)
@@ -72,27 +72,43 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     const [searchByDate, setSearchByDate] = useState('')
 
     const [showEditModal, setShowEditModal] = useState(false)
-    const [emitirRelatorio, setEmitirRelatorio] = useState(false)
     const [compraObject, setCompraObject] = useState<CompraType>({} as CompraType)
 
+
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
         return duration as DuracaoType
     }
-
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
     const findClassificacao = (id: number) => {
         const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
     }
+
     let findedCompras: CompraType[] = []
+
     if (compras.length && filtroTipo) {
         if (searchByEquipamento && searchByDate === '') findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()))
         else if (searchByEquipamento === '' && searchByDate) findedCompras = compras.filter((compra) => compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
         else findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) && compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
     }
 
+    /**
+     * 
+     * @param compra 
+     */
     const handleEdit = (compra: CompraType) => {
+
         setCompraObject(compra)
         setShowEditModal(true)
     }
@@ -167,10 +183,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                 />
                 {
                     showEditModal && <EditarModal compraData={compraObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
-                    // <PdfViewer pageNumber={1} url='./text.pdf' width={200} />
                 }
                 <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
-
 
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
@@ -218,11 +232,16 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                             }
                         </div>
                         <div className=" ml-auto flex gap-2">
-                            <button className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                onClick={() => route.push(`/relatorio/compras/all`)}
+                                className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
                                 <span>Imprimir tudo</span>
                             </button>
-                            <button className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
+                            <button
+                                disabled={!(searchByEquipamento || searchByDate)}
+                                onClick={() => route.push(`/relatorio/compras/${searchByEquipamento === '' ? 'equipamento' : searchByEquipamento}/${searchByDate}`)}
+                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>
