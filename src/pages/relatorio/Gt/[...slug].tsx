@@ -7,7 +7,7 @@ import { fetchSaida } from '../../../redux/slices/auditoriaSlice'
 import { fetchObra } from '../../../redux/slices/obraSlice'
 import { useRouter } from 'next/router'
 import nookies from 'nookies'
-const RelatorioMovimentacoes = dynamic(() => import('../../../components/relatorios/Movimentacoes'), { ssr: false })
+const RelatorioMovimentacoes = dynamic(() => import('../../../components/relatorios/Gt'), { ssr: false })
 
 
 type EquipamentoType = {
@@ -38,7 +38,7 @@ type AuditoriaProps = {
 
 }
 
-const AlmoxarifadoRelatorio = ({ auditoria }: AuditoriaProps) => {
+const GuiaTransporte = ({ auditoria }: AuditoriaProps) => {
 
     let movimentacoesFiltradas: AuditoriaType[] = []
 
@@ -47,10 +47,8 @@ const AlmoxarifadoRelatorio = ({ auditoria }: AuditoriaProps) => {
 
     if (slug && slug[0] === 'all') movimentacoesFiltradas = auditoria
     else {
-        if (slug && auditoria) {
-            if (Number(slug[0]) !== 0 && slug[1] === '') movimentacoesFiltradas = auditoria.filter((saidaEntrada) => saidaEntrada.obra_id.id === Number(slug[0]))
-            else if (slug[1] && Number(slug[0]) === 0) movimentacoesFiltradas = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()))
-            else movimentacoesFiltradas = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()) && entradaSaida.obra_id.id === Number(slug[0]))
+        if (slug && auditoria.length) {
+            movimentacoesFiltradas = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()) && entradaSaida.obra_id.id === Number(slug[0]))
         }
     }
     console.log(slug)
@@ -95,4 +93,4 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
         }
 );
 
-export default AlmoxarifadoRelatorio
+export default GuiaTransporte

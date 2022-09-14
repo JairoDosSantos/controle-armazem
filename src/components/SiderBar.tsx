@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '../assets/noah.png'
 
-import { FaBuilding, FaTools, FaUser, FaClock, FaBookOpen, FaHome, FaShopify, FaArrowsAltH } from 'react-icons/fa'
+import { FaTools, FaBookOpen, FaHome, FaShopify, FaArrowsAltH, FaCarAlt } from 'react-icons/fa'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import api from '../services/api'
 import { useRouter } from 'next/router'
@@ -84,6 +84,10 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
                     <li className={`flex gap-2 items-center text-sm ${itemActive === 'devolucoes' && 'active'}`}>
                         <FaShopify className='text-gray-500 text-lg' />
                         <Link href='/compras'>Compras</Link>
+                    </li>
+                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'gt' && 'active'}`}>
+                        <FaCarAlt className='text-gray-500 text-lg' />
+                        <Link href='/GT'>Guia de Transporte</Link>
                     </li>
                     {/**
                      * <li className={`flex gap-2 items-center hidden text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>

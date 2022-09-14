@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     viewer: {
         width: window.innerWidth, //the pdf viewer will take up all of the width and height
         height: window.innerHeight,
-        zIndex: 0
+
     },
     cabecalho: {
         backgroundColor: '#D3D3D3',
@@ -193,7 +193,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
 
                     </View>
                     {
-                        auditoria.length && auditoria.map((mov, index) => (
+                        auditoria && auditoria.map((mov, index) => (
                             <View style={styles.corpo} key={index}>
 
                                 <View style={styles.section}>
