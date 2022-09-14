@@ -161,7 +161,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                         <div className=" ml-auto flex gap-2">
 
                             <button
-                                // disabled={!(searchData && searchObra)}
+                                disabled={!(searchData && searchObra)}
                                 onClick={() => route.push(`/relatorio/Gt/${searchObra}/${searchData}`)}
                                 className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
@@ -178,7 +178,6 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
                                     <th className='text-gray-600 font-bold w-1/4 '>ID</th>
                                     <th className='text-gray-600 font-bold w-1/4  '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/5 text-center '>Origem</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Centro de Custo</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Qtd.</th>
                                     <th className='text-gray-600 font-bold w-1/4 '>Data de saída</th>
@@ -191,7 +190,6 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-1/4  ">{findAud.id}</td>
                                             <td className="w-1/4  ">{findAud.equipamento_id.descricao}</td>
-                                            <td className="w-1/4  ">Armazem central</td>
                                             <td className="w-1/4  ">{findAud.obra_id.obra_nome}</td>
                                             <td className="w-1/4  ">{findAud.quantidade_retirada}</td>
                                             <td className="w-1/4  ">{findAud.data_retirada}</td>

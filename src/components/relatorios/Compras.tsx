@@ -154,7 +154,7 @@ export default function BasicDocument({ compras }: CompraProps) {
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE COMPRAS DE EQUIPAMENTOS DO DIA 12-09-2022</Text>
+                        <Text>RELATÓRIO DE COMPRAS DE EQUIPAMENTOS</Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -186,7 +186,10 @@ export default function BasicDocument({ compras }: CompraProps) {
                                 </View>
 
                                 <View style={styles.section}>
-                                    <Text>{compra.preco}</Text>
+                                    <Text>{compra.preco.toLocaleString('pt', {
+                                        style: 'currency',
+                                        currency: 'KWZ'
+                                    })}</Text>
                                 </View>
 
                                 <View style={styles.section}>
