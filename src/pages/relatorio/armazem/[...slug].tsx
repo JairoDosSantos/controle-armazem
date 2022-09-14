@@ -11,8 +11,6 @@ import nookies from 'nookies'
 const RelatorioArmazem = dynamic(() => import('../../../components/relatorios/Armazem'), { ssr: false })
 
 
-
-
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -40,10 +38,12 @@ type ClassificacaoType = {
 
 type PosicaoArmazemProps = {
     equipamentosARM: EquipamentosARMType[];
+    classificacao: ClassificacaoType[];
+    duracao: DuracaoType[]
 
 }
 
-const Armazem = ({ equipamentosARM }: PosicaoArmazemProps) => {
+const Armazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
 
     let armazemData: EquipamentosARMType[] = []
 
@@ -67,6 +67,8 @@ const Armazem = ({ equipamentosARM }: PosicaoArmazemProps) => {
         }
     }
 
+
+
     return (
 
         <div>
@@ -74,7 +76,7 @@ const Armazem = ({ equipamentosARM }: PosicaoArmazemProps) => {
                 <title>Relatório do Armazem</title>
             </Head>
 
-            <RelatorioArmazem equipamentosARM={armazemData} />
+            <RelatorioArmazem classificacao={classificacao} duracao={duracao} equipamentosARM={armazemData} />
 
         </div>
     )

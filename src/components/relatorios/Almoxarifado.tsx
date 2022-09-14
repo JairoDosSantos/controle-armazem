@@ -9,7 +9,7 @@ import {
 
 } from "@react-pdf/renderer";
 
-import logo from '../../assets/noah.png'
+import moment from 'moment'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -153,7 +153,7 @@ type AlmoxarifadoProps = {
 }
 // Create Document Component
 export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
-
+    const data = moment().format('l')
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -165,13 +165,15 @@ export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
                     <View style={styles.fotoTitulo}>
                         {/**
                        *   <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
-                       */}
+                       <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
                         <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
+                       */}
+                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO DO DIA 12-09-2022</Text>
+                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO</Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -247,7 +249,7 @@ export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
                     </View>
 
                     <View style={styles.rodape}>
-                        <Text>Luanda aos, 12-09-2022</Text>
+                        <Text>Luanda aos, {data}</Text>
                     </View>
 
 

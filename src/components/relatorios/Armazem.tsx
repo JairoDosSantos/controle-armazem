@@ -145,14 +145,25 @@ type ClassificacaoType = {
 
 type PosicaoArmazemProps = {
     equipamentosARM: EquipamentosARMType[];
-
+    duracao: DuracaoType[];
+    classificacao: ClassificacaoType[]
 }
 
 // Create Document Component
-export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) {
+export default function BasicDocument({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
 
     const data = moment().format('l')
+    //Funções
+    const findDuracao = (id: number) => {
+        const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
+        return duration as DuracaoType
+    }
+
+    const findClassificacao = (id: number) => {
+        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        return classification as ClassificacaoType
+    }
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -164,7 +175,7 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                         * <a href="https://imgbox.com/d3WKdgPQ" target="_blank"><img src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" alt="image host"/></a>
                      */}
                     <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
+                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 
@@ -181,15 +192,14 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                         <View style={styles.section}>
                             <Text>Classificação</Text>
                         </View>
+
                         <View style={styles.section}>
                             <Text>Tempo de duração</Text>
                         </View>
 
-
                         <View style={styles.section}>
                             <Text>Quantidade</Text>
                         </View>
-
 
                     </View>
 
@@ -201,25 +211,20 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                                     <Text>{armazem.equipamento_id.descricao}</Text>
                                 </View>
                                 <View style={styles.section}>
-                                    <Text>{armazem.equipamento_id.classificacao_id}</Text>
+                                    <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>
                                 </View>
 
                                 <View style={styles.section}>
-                                    <Text>{armazem.equipamento_id.duracao_id}</Text>
+                                    <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
                                 </View>
-
 
                                 <View style={styles.section}>
                                     <Text>{armazem.quantidade}</Text>
                                 </View>
 
-
-
                             </View>
                         ))
                     }
-
-
 
                     <View style={styles.assinaturas}>
                         <View>
@@ -228,7 +233,6 @@ export default function BasicDocument({ equipamentosARM }: PosicaoArmazemProps) 
                         <View>
                             <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
                         </View>
-
 
                     </View>
 

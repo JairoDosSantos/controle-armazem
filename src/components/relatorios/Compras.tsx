@@ -9,7 +9,7 @@ import {
 
 } from "@react-pdf/renderer";
 
-import logo from '../../assets/noah.png'
+import moment from 'moment'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -139,7 +139,7 @@ type CompraProps = {
 
 // Create Document Component
 export default function BasicDocument({ compras }: CompraProps) {
-
+    const data = moment().format('l')
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -149,7 +149,7 @@ export default function BasicDocument({ compras }: CompraProps) {
 
 
                     <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
+                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
                         <Text>NOAH CONSTUCTIONS</Text>
                     </View>
 
@@ -214,7 +214,7 @@ export default function BasicDocument({ compras }: CompraProps) {
                     </View>
 
                     <View style={styles.rodape}>
-                        <Text>Luanda aos, 12-09-2022</Text>
+                        <Text>Luanda aos, {data}</Text>
                     </View>
 
 
