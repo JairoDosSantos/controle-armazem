@@ -106,10 +106,10 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="posicao-armazem" hideSideBar={hideSideBar} />
-            <main className='flex-1 space-y-6'>
+            <SiderBar itemActive="posicao-armazem" />
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
                 <Head>
                     <title>SCA | Posição em armazem</title>
@@ -170,25 +170,25 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                 />
                 {showEditModal && <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} data={armazemObject} />}
-                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
-                        <div className="ml-auto flex gap-2 -mt-4">
-                            <div>
-                                <select
-                                    onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
-                                    className="rounded shadow cursor-pointer" >
-                                    <option value={0} className='text-gray-400'>Selecione a classificação</option>
-                                    {
-                                        (classificacao && classificacao.length) && classificacao.map((classific, index) => (
-                                            <option
-                                                key={index}
-                                                value={classific.id}>{classific.tipo}</option>
-                                        ))
-                                    }
-                                </select>
-                            </div>
+                        <div className="lg:ml-auto  flex gap-2 -mt-4">
+
+                            <select
+                                onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
+                                className="rounded shadow cursor-pointer w-full" >
+                                <option value={0} className='text-gray-400'>Selecione a classificação</option>
+                                {
+                                    (classificacao && classificacao.length) && classificacao.map((classific, index) => (
+                                        <option
+                                            key={index}
+                                            value={classific.id}>{classific.tipo}</option>
+                                    ))
+                                }
+                            </select>
+
                         </div>
                         <div className="flex gap-5">
                             <input
@@ -215,66 +215,68 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Relatório armazem geral</span>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
-                                    {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                    {/**   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                      <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    (equipamentosARM && equipamentosARM.length && findedEquipamento.length === 0) ? equipamentosARM.map((equipamento, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{equipamento.id}</td>
-                                            <td className="w-1/5 ">{equipamento.equipamento_id.descricao}</td>
-                                            <td className="w-1/5 ">{findClassificacao(equipamento.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/5 ">{findDuracao(equipamento.equipamento_id.duracao_id).tempo}</td>
 
-                                            <td className="w-1/5 ">{equipamento.quantidade}</td>
-                                            {/**    <td className="w-1/5 ">22-08-2022</td> */}
-                                            {
-                                                /**
-                                                 *  <td className="w-1/5  flex justify-center items-center">
+                </div>
+                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto'>
+                    <span className='font-semibold text-lg'>Relatório armazem geral</span>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-52'>Classificação</th>
+                                <th className='text-gray-600 font-bold w-44'>Tempo de duração</th>
+                                <th className='text-gray-600 font-bold w-40'>Quantidade</th>
+                                {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
+                                {/**   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
+                                      <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                (equipamentosARM && equipamentosARM.length && findedEquipamento.length === 0) ? equipamentosARM.map((equipamento, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{equipamento.id}</td>
+                                        <td className="w-72 ">{equipamento.equipamento_id.descricao}</td>
+                                        <td className="w-52 ">{findClassificacao(equipamento.equipamento_id.classificacao_id).tipo}</td>
+                                        <td className="w-44 ">{findDuracao(equipamento.equipamento_id.duracao_id).tempo}</td>
+
+                                        <td className="w-40 ">{equipamento.quantidade}</td>
+                                        {/**    <td className="w-1/5 ">22-08-2022</td> */}
+                                        {
+                                            /**
+                                             *  <td className="w-1/5  flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEdit(equipamento)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            <td className="w-1/5  flex justify-center items-center">
                                                     <button
-                                                        onClick={() => handleEdit(equipamento)}
+                                                        onClick={() => setShowQuestionAlert(true)}
                                                         className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
+                                                        title="Apagar">
+                                                        <FaTrash />
                                                     </button>
                                                 </td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                        <button
-                                                            onClick={() => setShowQuestionAlert(true)}
-                                                            className="hover:brightness-75"
-                                                            title="Apagar">
-                                                            <FaTrash />
-                                                        </button>
-                                                    </td>
-                                                */
-                                            }
-                                        </tr>
-                                    )) : findedEquipamento.map((finded, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{finded.id}</td>
-                                            <td className="w-1/5 ">{finded.equipamento_id.descricao}</td>
-                                            <td className="w-1/5 ">{findClassificacao(finded.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/5 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
-                                            <td className="w-1/5 ">{finded.quantidade}</td>
+                                            */
+                                        }
+                                    </tr>
+                                )) : findedEquipamento.map((finded, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{finded.id}</td>
+                                        <td className="w-72 ">{finded.equipamento_id.descricao}</td>
+                                        <td className="w-52 ">{findClassificacao(finded.equipamento_id.classificacao_id).tipo}</td>
+                                        <td className="w-44 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
+                                        <td className="w-40 ">{finded.quantidade}</td>
 
-                                            {
+                                        {
                                             /**
                                             *<td className="w-1/5  flex justify-center items-center">
                                                 <button
@@ -293,16 +295,14 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                                     </button>
                                                 </td>
                                           */}
-                                        </tr>
-                                    ))
+                                    </tr>
+                                ))
 
-                                }
+                            }
 
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-
 
             </main>
         </div>
@@ -325,10 +325,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
             const equipamentosARM = equipamentoARM.payload
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
+
             return {
                 props: {
                     equipamentosARM,

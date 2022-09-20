@@ -59,7 +59,6 @@ type CompraProps = {
 
 const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
-    const [hideSideBar, setHideSideBar] = useState(false)
     //const [load, setLoad] = useState(false)
 
     const [filtroTipo, setFiltroTipo] = useState(false)
@@ -114,14 +113,13 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     }
 
     return (
-        <div className='flex'>
+        <div className='flex overflow-x-hidden'>
             {/**    <RelatorioCompras compras={compras} /> */}
 
-            <SiderBar itemActive="devolucoes" hideSideBar={hideSideBar} />
+            <SiderBar itemActive="devolucoes" />
             <main className='flex-1 space-y-6'>
-
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
                 <Head>
                     <title>SCA | Compras</title>
@@ -184,12 +182,11 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                 {
                     showEditModal && <EditarModal compraData={compraObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
                 }
-                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
-
+                <div className='overflow-y-auto max-h-[85vh] max-w-4xl mx-auto'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
-                        <h2 className=" h-5 text-2xl font-semibold">Compras de Eq. do Armazem geral</h2>
-                        <div className="border w-1/4 border-gray-700 ml-4"></div>
-                        <div className="ml-auto flex gap-2 -mt-4">
+                        <h2 className=" h-5 text-2xl font-semibold">Compras de Equipamentos</h2>
+                        <div className="border w-1/5 border-gray-700 ml-4"></div>
+                        <div className="flex justify-end items-center gap-2 -mt-4">
                             <div>
                                 <label htmlFor="ferramenta" className="bg-white">Todas&nbsp;</label>
                                 <input
@@ -215,7 +212,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
                             {
                                 filtroTipo && (
-                                    <>
+                                    <div className="flex flex-col lg:flex-row gap-2 w-full">
                                         <input
                                             onChange={(event) => setSearchByEquipamento(event.target.value)}
                                             className="rounded shadow w-full lg:w-1/2 animate__animated animate__fadeIn"
@@ -227,11 +224,11 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             type="date"
                                             className="rounded shadow w-full lg:w-1/2 animate__animated animate__fadeIn"
                                         />
-                                    </>
+                                    </div>
                                 )
                             }
                         </div>
-                        <div className=" ml-auto flex gap-2">
+                        <div className=" flex justify-end gap-2">
                             <button
                                 onClick={() => route.push(`/relatorio/compras/all`)}
                                 className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
@@ -248,50 +245,53 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Relatório de Compras</span>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between items-center bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/4 '>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/4  '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Duração</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Qtd. comprada</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Preço</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Data de compra</th>
+                </div>
 
-                                    <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
-                                    {/**
+                {/** Relatório- tabela de compras */}
+                <div className=' mt-8 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-4xl bg-white rounded overflow-x-auto'>
+                    <span className='font-semibold text-lg'>Relatório de Compras</span>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between items-center bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16 '>ID</th>
+                                <th className='text-gray-600 font-bold w-72  '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-52 '>Classificação</th>
+                                <th className='text-gray-600 font-bold w-52 '>Duração</th>
+                                <th className='text-gray-600 font-bold w-40 '>Qtd. comprada</th>
+                                <th className='text-gray-600 font-bold w-40 '>Preço</th>
+                                <th className='text-gray-600 font-bold w-44 '>Data de compra</th>
+
+                                <th className='text-gray-600 font-bold w-16 '>Editar</th>
+                                {/**
                                      *  <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                              */}
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/4  ">{compra.id}</td>
-                                            <td className="w-1/4  ">{compra.equipamento_id.descricao}</td>
-                                            <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
-                                            <td className="w-1/4  ">{compra.quantidade_comprada}</td>
-                                            <td className="w-1/4  ">{compra.preco.toLocaleString('pt', {
-                                                style: 'currency',
-                                                currency: 'KWZ'
-                                            })}</td>
-                                            <td className="w-1/4  ">{compra.data_compra}</td>
-                                            <td className="w-1/4   flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEdit(compra)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            {/**
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16">{compra.id}</td>
+                                        <td className="w-72">{compra.equipamento_id.descricao}</td>
+                                        <td className="w-52">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                        <td className="w-52">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                        <td className="w-40">{compra.quantidade_comprada}</td>
+                                        <td className="w-40">{compra.preco.toLocaleString('pt', {
+                                            style: 'currency',
+                                            currency: 'KWZ'
+                                        })}</td>
+                                        <td className="w-44">{compra.data_compra}</td>
+                                        <td className="w-16 flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEdit(compra)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        {/**
                                              * <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
@@ -301,30 +301,30 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 </button>
                                             </td>
                                              */}
-                                        </tr>
-                                    )) : findedCompras.map((compra, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/4  ">{compra.id}</td>
-                                            <td className="w-1/4  ">{compra.equipamento_id.descricao}</td>
-                                            <td className="w-1/4  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
-                                            <td className="w-1/4  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
-                                            <td className="w-1/4  ">{compra.quantidade_comprada}</td>
-                                            <td className="w-1/4  ">{compra.preco.toLocaleString('pt', {
-                                                style: 'currency',
-                                                currency: 'KWZ'
-                                            })}</td>
-                                            <td className="w-1/4  ">{compra.data_compra}</td>
-                                            <td className="w-1/4   flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEdit(compra)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            {/**
+                                    </tr>
+                                )) : findedCompras.map((compra, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16  ">{compra.id}</td>
+                                        <td className="w-72  ">{compra.equipamento_id.descricao}</td>
+                                        <td className="w-52  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                        <td className="w-52  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                        <td className="w-40  ">{compra.quantidade_comprada}</td>
+                                        <td className="w-40  ">{compra.preco.toLocaleString('pt', {
+                                            style: 'currency',
+                                            currency: 'KWZ'
+                                        })}</td>
+                                        <td className="w-44  ">{compra.data_compra}</td>
+                                        <td className="w-16   flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEdit(compra)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        {/**
                                             *     <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
@@ -334,15 +334,13 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 </button>
                                             </td>
                                             */}
-                                        </tr>
-                                    ))
-                                }
+                                    </tr>
+                                ))
+                            }
 
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-
             </main>
 
         </div>
@@ -362,10 +360,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
             return {
                 props: {
                     compras,

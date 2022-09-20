@@ -46,8 +46,6 @@ type AuditoriaProps = {
 
 const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
-    const [hideSideBar, setHideSideBar] = useState(false)
-
 
     const route = useRouter()
 
@@ -69,10 +67,10 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="gt" hideSideBar={hideSideBar} />
-            <main className='flex-1 space-y-6'>
+            <SiderBar itemActive="gt" />
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
                 <Head>
                     <title>SCA | Guia de Transporte</title>
@@ -140,10 +138,10 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
                         <div className="flex gap-5">
 
-                            <div className="animate__animated animate__fadeIn w-full flex gap-4">
+                            <div className="animate__animated animate__fadeIn w-full flex flex-col lg:flex-row gap-4">
                                 <select
                                     onChange={(event) => setSearchObra(Number(event.target.value))}
-                                    className='rounded shadow w-1/2 cursor-pointer '>
+                                    className='rounded shadow w-full lg:w-1/2 cursor-pointer '>
                                     <option value="#" className='text-gray-400'>Selecione a Obra</option>
                                     {obras && obras.map((obra, index) => (
                                         <option
@@ -154,7 +152,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                                 <input
                                     onChange={(event) => setSearchData(event.target.value)}
                                     type="date"
-                                    className="rounded shadow w-1/2 cursor-pointer " />
+                                    className="rounded shadow w-full lg:w-1/2 cursor-pointer " />
                             </div>
 
                         </div>
@@ -170,17 +168,17 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
+                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto'>
                         <span className='font-semibold text-lg'>Guia de Transporte</span>
 
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/4 '>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/4  '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Centro de Custo</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Qtd.</th>
-                                    <th className='text-gray-600 font-bold w-1/4 '>Data de saída</th>
+                                    <th className='text-gray-600 font-bold w-16'>ID</th>
+                                    <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                    <th className='text-gray-600 font-bold w-52'>Centro de Custo</th>
+                                    <th className='text-gray-600 font-bold w-44'>Qtd.</th>
+                                    <th className='text-gray-600 font-bold w-40'>Data de saída</th>
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -188,11 +186,11 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                                     findedAuditoria.map((findAud, index) => (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/4  ">{findAud.id}</td>
-                                            <td className="w-1/4  ">{findAud.equipamento_id.descricao}</td>
-                                            <td className="w-1/4  ">{findAud.obra_id.obra_nome}</td>
-                                            <td className="w-1/4  ">{findAud.quantidade_retirada}</td>
-                                            <td className="w-1/4  ">{findAud.data_retirada}</td>
+                                            <td className="w-16">{findAud.id}</td>
+                                            <td className="w-72">{findAud.equipamento_id.descricao}</td>
+                                            <td className="w-52">{findAud.obra_id.obra_nome}</td>
+                                            <td className="w-44">{findAud.quantidade_retirada}</td>
+                                            <td className="w-40">{findAud.data_retirada}</td>
                                         </tr>
                                     ))
                                 }
@@ -219,10 +217,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const auditoria = auditoriaDispatch.payload
             const obras = obrasDispatch.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

@@ -78,7 +78,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
         }, 6500);
 
-        toast.success('Equipamento adicionado com sucesso! 😁', {
+        toast.success('Equipamento adicionado com sucesso!', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,
@@ -92,7 +92,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
     }
 
-    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+    const notifyError = () => toast.error('Erro ao efectuar a operação!', {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,

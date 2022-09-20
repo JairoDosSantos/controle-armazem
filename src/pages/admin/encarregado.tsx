@@ -8,17 +8,17 @@ const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 import nookies from 'nookies'
 
 //Componentes Internos
-import Header from '../components/Header'
-import SiderBar from '../components/SiderBar'
+import Header from '../../components/Header'
+import SiderBar from '../../components/SiderBar'
 
 //Imagens
-import Load from '../assets/load.gif'
-import EditarModal from '../components/encarregado/EditarModal'
+import Load from '../../assets/load.gif'
+import EditarModal from '../../components/encarregado/EditarModal'
 import Head from 'next/head'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { wrapper } from '../redux/store'
-import { deleteEncarregado, fetchEncarregados, insertEncarregado } from '../redux/slices/encarregadoSlice'
+import { wrapper } from '../../redux/store'
+import { deleteEncarregado, fetchEncarregados, insertEncarregado } from '../../redux/slices/encarregadoSlice'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 
@@ -81,14 +81,14 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
         }
     }
 
-    const filteredEncarregados = search && encarregados.length ? encarregados.filter((encarregado) => encarregado.nome.toLowerCase().includes(search.toLowerCase())) : []
+    const filteredEncarregados = search && encarregados ? encarregados.filter((encarregado) => encarregado.nome.toLowerCase().includes(search.toLowerCase())) : []
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="encarregado" hideSideBar={hideSideBar} />
+            <SiderBar itemActive="encarregado" />
             <main className='flex-1 space-y-6'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
 
                 <Head>
@@ -163,7 +163,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                         className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Cadastro de Encarregado</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
-                        <div className="flex gap-5">
+                        <div className="flex flex-col lg:flex-row gap-5">
                             <input
                                 {
                                 ...register('nome', {
@@ -171,7 +171,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                     minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                 })
                                 }
-                                type="text" placeholder="Nome do Encarregado" className="w-1/2 rounded shadow" />
+                                type="text" placeholder="Nome do Encarregado" className="w-full lg:w-1/2 rounded shadow" />
                             <input
                                 {
                                 ...register('telefone', {
@@ -180,7 +180,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                 })}
                                 type="number"
                                 placeholder="Telefone"
-                                className="w-1/2 rounded shadow" />
+                                className="w-full lg:w-1/2 rounded shadow" />
 
                         </div>
                         <div className="flex gap-2 justify-end">
@@ -188,7 +188,9 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                 type={'reset'}
                                 className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
                             </button>
-                            <button className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2" >
+                            <button
+                                disabled={!isValid}
+                                className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500" >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}
                                 <span>Salvar</span>
                             </button>
@@ -203,9 +205,9 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                             <input
                                 onChange={(e) => setSearch(e.target.value)}
                                 type="search"
-                                className="w-1/3 rounded shadow "
+                                className="w-full lg:w-1/3 rounded shadow "
                                 placeholder="Pesq. pelo nome do Encarregado" />
-                            <span className='font-semibold text-lg'>Lista de Encarregado</span>
+                            <span className='font-semibold text-lg hidden lg:flex'>Lista de Encarregado</span>
                         </div>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
@@ -290,16 +292,13 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            const cookie = nookies.get(context);
+            //  const cookie = nookies.get(context);
 
             const encarregadosDispatch: any = await store.dispatch(fetchEncarregados());
 
             const encarregados: any = encarregadosDispatch.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            //if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

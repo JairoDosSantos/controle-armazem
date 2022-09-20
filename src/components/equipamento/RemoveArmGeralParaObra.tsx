@@ -68,81 +68,87 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
-        data.descricao_equipamento = idEquipamento
-        const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
-        const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
+        try {
+            data.descricao_equipamento = idEquipamento
+            const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+            const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
 
-        if (equipamentoQuantidade.length > 0) {
+            if (equipamentoQuantidade.length > 0) {
 
-            const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
-            const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
+                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+                const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
 
-            if (almoxarifarioFinded && almoxarifarioFinded.length > 0) {
-                //Se a quantidade no armazem for maior ou igual a quantidade que se pretende, então faz-se a operação
-                if (Number(equipamentoQuantidade[0].quantidade) >= Number(data.quantidade)) {
+                if (almoxarifarioFinded && almoxarifarioFinded.length > 0) {
+                    //Se a quantidade no armazem for maior ou igual a quantidade que se pretende, então faz-se a operação
+                    if (Number(equipamentoQuantidade[0].quantidade) >= Number(data.quantidade)) {
 
-                    let qtdTotal = Number(almoxarifarioFinded[0].quantidade) + Number(data.quantidade)
+                        let qtdTotal = Number(almoxarifarioFinded[0].quantidade) + Number(data.quantidade)
 
 
-                    const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal }))
+                        const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal }))
 
-                    if (!almoxarifarioUpdate.meta.arg) {
-                        // notificar o erro
-                        notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
+                        if (!almoxarifarioUpdate.meta.arg) {
+                            // notificar o erro
+                            notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
+                            setLoad(false)
+                            return
+                        }
+
+                        let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+                        const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
+
+                        //se acontecer um erro ao retirar do armazem, visto que a quantidade já foi adicionada no almoxarifário então devemos retirar do almoxarifário
+                        if (!armQtdUpdate.meta.arg) {
+                            // notificar o erro
+                            let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+                            const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
+
+                            notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
+                            setLoad(false)
+                            return
+                        }
+                        //Se chegar até aquí, então sucesso. Devemos cadastrar agora no final em auditoría
+                    } else {
+
                         setLoad(false)
+                        notifyError('Estoque em armazem insuficiente! 😥')
                         return
                     }
 
-                    let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
-                    const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
-
-                    //se acontecer um erro ao retirar do armazem, visto que a quantidade já foi adicionada no almoxarifário então devemos retirar do almoxarifário
-                    if (!armQtdUpdate.meta.arg) {
-                        // notificar o erro
-                        let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
-                        const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
-
-                        notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
-                        setLoad(false)
-                        return
-                    }
-                    //Se chegar até aquí, então sucesso. Devemos cadastrar agora no final em auditoría
                 } else {
 
-                    setLoad(false)
-                    notifyError('Estoque em armazem insuficiente! 😥')
-                    return
-                }
-
-            } else {
-
-                const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
-                const almoxarifarioData = unwrapResult(almoxarifarioInsert)
+                    const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
+                    const almoxarifarioData = unwrapResult(almoxarifarioInsert)
 
 
-                if (almoxarifarioInsert.meta.arg) {
-                    let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
-                    const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
-                    if (!armQtdUpdate.meta.arg) {
-                        await dispatch(deleteAlmoxarifario(almoxarifarioData[0].id));
-                        setLoad(false)
-                        return
+                    if (almoxarifarioInsert.meta.arg) {
+                        let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+                        const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
+                        if (!armQtdUpdate.meta.arg) {
+                            await dispatch(deleteAlmoxarifario(almoxarifarioData[0].id));
+                            setLoad(false)
+                            return
+                        }
                     }
+
+
+
                 }
 
-
-
+                const auditoria = await dispatch(insertAuditoria({ data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+                if (auditoria.meta.arg) {
+                    // console.log('sucesso', auditoria.payload)
+                    //sucesso
+                    notifySuccess()
+                } else {
+                    notifyError('Erro insesperado. Contacte o admin. 🤔')
+                }
+                setLoad(false)
             }
-
-            const auditoria = await dispatch(insertAuditoria({ data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
-            if (auditoria.meta.arg) {
-                // console.log('sucesso', auditoria.payload)
-                //sucesso
-                notifySuccess()
-            } else {
-                notifyError('Erro insesperado. Contacte o admin. 🤔')
-            }
+        } catch (error) {
+            notifyError('Erro ao submeter o formulário. Contacte o admin. 🤔')
             setLoad(false)
+
         }
 
         //Primeiro deve-se 
@@ -156,11 +162,15 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
     }
 
     const getObras = async () => {
-        const resultDispatch = await dispatch(fetchObra())
+        try {
+            const resultDispatch = await dispatch(fetchObra())
 
-        const resultUnwrap = unwrapResult(resultDispatch)
+            const resultUnwrap = unwrapResult(resultDispatch)
 
-        if (resultUnwrap.length) setObras(resultUnwrap)
+            if (resultUnwrap.length) setObras(resultUnwrap)
+        } catch (error) {
+
+        }
     }
 
     function closeModal() {
@@ -179,7 +189,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
         }, 6500);
 
-        toast.success('Equipamento adicionado com sucesso! 😁', {
+        toast.success('Equipamento adicionado com sucesso!', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,

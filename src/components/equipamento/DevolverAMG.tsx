@@ -68,85 +68,94 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
+        try {
 
-        data.descricao_equipamento = idEquipamento;
-        const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
-        const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
+            data.descricao_equipamento = idEquipamento;
+            const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+            const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
 
-        if (equipamentoQuantidade.length) {
-            const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
-            const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
+            if (equipamentoQuantidade.length) {
+                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+                const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
 
-            if (almoxarifarioFinded.length <= 0) {
-                notifyError('Equipamento não existe no almoxarifário desta obra! 😥')
+                if (almoxarifarioFinded.length <= 0) {
+                    notifyError('Equipamento não existe no almoxarifário desta obra!')
+
+                    setLoad(false)
+                    return
+                }
+                if (data.quantidade > almoxarifarioFinded[0].quantidade) {
+                    notifyError('O almoxarifário não tem toda essa quantidade!')
+
+                    setLoad(false)
+                    return
+                }
+                let qtdTotalAlmo = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+                let qtdTotalAMG = Number(equipamentoQuantidade[0].quantidade) + Number(data.quantidade)
+
+                const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotalAlmo }))
+
+
+                if (!almoxarifarioUpdate.meta.arg) {
+                    // notificar o erro
+                    notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
+                    setLoad(false)
+                    return
+                }
+
+                const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalAMG }))
+
+                if (!armQtdUpdate.meta.arg) {
+                    // notificar o erro
+                    let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
+                    const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
+
+
+                    notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
+                    setLoad(false)
+                    return
+                }
+            } else {
 
                 setLoad(false)
-                return
-            }
-            if (data.quantidade > almoxarifarioFinded[0].quantidade) {
-                notifyError('O almoxarifário não tem toda essa quantidade! 😥')
 
-                setLoad(false)
-                return
-            }
-            let qtdTotalAlmo = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
-            let qtdTotalAMG = Number(equipamentoQuantidade[0].quantidade) + Number(data.quantidade)
-
-            const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotalAlmo }))
-
-
-            if (!almoxarifarioUpdate.meta.arg) {
-                // notificar o erro
-                notifyError('Erro inesperado ao transferir ao almoxarifário. Contacte o admin.! 😥')
-                setLoad(false)
+                notifyError('Equipamento não existe em armazem! 😥')
                 return
             }
 
-            const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalAMG }))
+            const fetchOneSaidaByDate = await dispatch(fetchOneSaida({ data_retirada: data.data_retirada, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+            const auditorias = unwrapResult(fetchOneSaidaByDate)
 
-            if (!armQtdUpdate.meta.arg) {
-                // notificar o erro
-                let qtdTotal1 = Number(almoxarifarioFinded[0].quantidade) - Number(data.quantidade)
-                const almoxarifarioUpdate1 = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal1 }))
+            //Vê bem esta actualização
+            let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
 
+            const auditoria = await dispatch(updateAuditoria({ ...auditorias[0], data_devolucao: data.data_devolucao, quantidade_devolvida: qtdAuditoria }))
+            if (auditoria.meta.arg) {
 
-                notifyError('Erro inesperado ao efectuar a transferência em armazem, contacte o admin. do sistema! 😥')
-                setLoad(false)
-                return
+                notifySuccess()
+                //sucesso
+            } else {
+                notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
             }
-        } else {
 
             setLoad(false)
-
-            notifyError('Equipamento não existe em armazem! 😥')
-            return
+        } catch (error) {
+            notifyError('Ocorreu um erro ao efectuar a submissão do formulário. Tente mais tarde!')
+            setLoad(false)
         }
-
-        const fetchOneSaidaByDate = await dispatch(fetchOneSaida({ data_retirada: data.data_retirada, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
-        const auditorias = unwrapResult(fetchOneSaidaByDate)
-
-        //Vê bem esta actualização
-        let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
-
-        const auditoria = await dispatch(updateAuditoria({ ...auditorias[0], data_devolucao: data.data_devolucao, quantidade_devolvida: qtdAuditoria }))
-        if (auditoria.meta.arg) {
-
-            notifySuccess()
-            //sucesso
-        } else {
-            notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
-        }
-
-        setLoad(false)
     }
 
 
     const getObras = async () => {
-        const resultDispatch = await dispatch(fetchObra())
+        try {
+            const resultDispatch = await dispatch(fetchObra())
 
-        const resultUnwrap = unwrapResult(resultDispatch)
+            const resultUnwrap = unwrapResult(resultDispatch)
 
-        if (resultUnwrap.length) setObras(resultUnwrap)
+            if (resultUnwrap.length) setObras(resultUnwrap)
+        } catch (error) {
+
+        }
     }
 
     useEffect(() => {
@@ -236,7 +245,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                             />
                                         </div>
                                         <form
-                                            className='flex flex-col gap-3 justify-center align-center w-[552px] mx-auto'
+                                            className='flex flex-col gap-3 justify-center align-center  mx-auto'
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem da Obra e adicionar a quantidade em stock do armazem geral  */}
@@ -245,11 +254,11 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                 <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
 
                                             </div>
-                                            <div className='flex gap-2 justify-center align-center'>
+                                            <div className='flex flex-col lg:flex-row gap-2 justify-center align-center'>
                                                 <select
                                                     {...register('obra_id')}
 
-                                                    className='rounded shadow w-1/2 cursor-pointer'>
+                                                    className='rounded shadow w-full lg:w-1/2 cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
                                                     {
                                                         obras.length && obras.map((obra, index) => {
@@ -264,7 +273,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                 <input
                                                     min={0}
                                                     type="number"
-                                                    className='rounded shadow w-1/2'
+                                                    className='rounded shadow w-full lg:w-1/2'
                                                     placeholder='Quantidade a devolver *'
                                                     {...register('quantidade', {
                                                         required: { message: "Por favor, introduza a quantidade a transferir.", value: true },

@@ -1,56 +1,42 @@
 import { useState } from "react"
-import Header from "../components/Header"
-import SiderBar from "../components/SiderBar"
+import Header from "../../components/Header"
+import SiderBar from "../../components/SiderBar"
 
 import { FaSave, FaEdit, FaTrash } from 'react-icons/fa'
 
-import Load from '../assets/load.gif'
+import Load from '../../assets/load.gif'
 import Image from "next/image"
-import EditarModal from "../components/obra/EditModal"
+import EditarModal from "../../components/duracao/EditarModal"
 import dynamic from "next/dynamic"
 import Head from "next/head"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useDispatch } from "react-redux"
-import { deleteObra, fetchObra, insertObra } from "../redux/slices/obraSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
 
-import { wrapper } from "../redux/store"
-import { fetchEncarregados } from "../redux/slices/encarregadoSlice"
+import { wrapper } from "../../redux/store"
 
 import nookies from 'nookies'
-import { supabase } from "../utils/supabaseClient"
+
 import { useRouter } from "next/router"
+import { deleteDuracao, fetchDuracao, insertDuracao } from "../../redux/slices/duracaoSlice.ts"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
-//Tipagem do formulário
-type FormValues = {
+
+type DuracaoType = {
     id: number
-    descricao: string;
-    encarregado: number;
-}
-type ObraType = {
-    id: number
-    obra_nome: string;
-    encarregado_id: EncarregadoType;
-    estado: 'Activa' | 'Inactiva' | 'Concluida'
+    tempo: string;
 }
 
-type EncarregadoType = {
-    id: number;
-    nome: string;
-    telefone: string
+
+type DuracaoProps = {
+    duracoes: DuracaoType[];
 }
 
-type ObraProps = {
-    obras: ObraType[];
-    encarregados: EncarregadoType[];
-}
+const Classificacao = ({ duracoes }: DuracaoProps) => {
 
-const Obra = ({ obras, encarregados }: ObraProps) => {
-
-    const [idObra, setIdObra] = useState(0)
+    const [idDuracao, setDuracao] = useState(0)
 
     const [search, setSearch] = useState('')
     const [hideSideBar, setHideSideBar] = useState(false)
@@ -62,17 +48,17 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
     const [showErrorAlert, setShowErrorAlert] = useState(false)
     const [showQuestionAlert, setShowQuestionAlert] = useState(false)
 
-    const [obraObject, setObraObject] = useState({} as ObraType)
+    const [duracaoObject, setDuracaoObject] = useState({} as DuracaoType)
 
-    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<DuracaoType>({ mode: 'onChange' });
 
     const dispatch = useDispatch<any>()
     const route = useRouter()
 
-    const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    const onSubmit: SubmitHandler<DuracaoType> = async (data) => {
         setLoad(true)
 
-        const resultDispatch = await dispatch(insertObra({ encarregado_id: data.encarregado, estado: 'Activa', obra_nome: data.descricao, id: data.id }))
+        const resultDispatch = await dispatch(insertDuracao({ tempo: data.tempo }))
         const dataResult = unwrapResult(resultDispatch)
 
         if (dataResult) {
@@ -84,14 +70,14 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
         reset()
     }
 
-    const filteredObras = (search && obras.length) ? obras.filter((obra) => obra.obra_nome.toLowerCase().includes(search.toLocaleLowerCase())) : [];
+    const filteredObras = (search && duracoes.length) ? duracoes.filter((duracao) => duracao.tempo.toLowerCase().includes(search.toLocaleLowerCase())) : [];
 
-    const handleEditObra = (obra: ObraType) => {
-        setObraObject(obra)
+    const handleEditarDuracao = (duracao: DuracaoType) => {
+        setDuracaoObject(duracao)
         setShowEditModal(true)
     }
     const handleDeleteObra = async () => {
-        const resultDispatch = await dispatch(deleteObra(idObra))
+        const resultDispatch = await dispatch(deleteDuracao(idDuracao))
 
         if (resultDispatch.payload) {
             setShowConfirmAlert(true)
@@ -103,20 +89,21 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
             {
                 showEditModal && (
                     <EditarModal
-                        obraObject={obraObject}
+                        duracaoObject={duracaoObject}
                         isOpen={showEditModal}
                         setIsOpen={setShowEditModal} />
                 )
+
             }
 
-            <SiderBar itemActive="obra" hideSideBar={hideSideBar} />
+            <SiderBar itemActive="duracao" />
             <main className='flex-1 space-y-6'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
 
                 <Head>
-                    <title>SCA | Obra</title>
+                    <title>SCA | Duração dos materiais</title>
                 </Head>
 
                 {/**Confirm alert**/}
@@ -181,45 +168,29 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
                         onSubmit={handleSubmit(onSubmit)}
                         className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-6 p-6 rounded mt-10 animate__animated animate__fadeIn">
-                        <h2 className="divide-x-2 h-5 text-2xl font-semibold">Cadastro de Obra</h2>
+                        <h2 className="divide-x-2 h-5 text-2xl font-semibold truncate py-7">Cadastro de Tempos  extimados para equipamentos</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="flex gap-5">
                             <input
-                                {...register('descricao', {
-                                    required: { message: "Por favor, introduza a descrição da Obra.", value: true },
+                                {...register('tempo', {
+                                    required: { message: "Por favor, introduza o tempo extimado.", value: true },
                                     minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                 })}
                                 type="text"
-                                placeholder="Obra"
-                                className="w-1/2 rounded shadow" />
-                            <select
-                                id="encarregado"
-                                {...register('encarregado', {
-                                    required: { message: "Por favor, introduza o nome do encarregado.", value: true },
-                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                })}
-                                className="w-1/2 rounded shadow cursor-pointer"
-                            >
-
-                                <option value='' className='text-gray-400' >Selecione o encarregado</option>
-                                {
-                                    encarregados && encarregados.length && encarregados.map((encarregado) =>
-                                    (<option
-                                        key={encarregado.id}
-                                        value={encarregado.id}>{encarregado.nome}
-                                    </option>)
-                                    )
-                                }
-                            </select>
-
+                                placeholder="Tempo de Duração"
+                                className="w-full rounded shadow" />
                         </div>
                         <div className="flex gap-2 justify-end">
                             <button
+                                title="Limpar formulário"
                                 onClick={() => reset()}
                                 type="button"
                                 className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
                             </button>
-                            <button className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2" >
+                            <button
+                                disabled={!isValid}
+                                title="Salvar o tempo extimado"
+                                className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500" >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}
                                 <span>Salvar</span>
                             </button>
@@ -231,17 +202,15 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                             <input
                                 onChange={(e) => setSearch(e.target.value)}
                                 type="search"
-                                className="w-1/4 rounded shadow "
-                                placeholder="Pesquise pelo nome da obra" />
-                            <span className='font-semibold text-lg'>Lista de Obras</span>
+                                className="w-full lg:w-1/3 rounded shadow "
+                                placeholder="Pesquise pelo tempo extimado" />
+                            <span className='font-semibold text-lg hidden lg:flex'>Lista de tempos extimados dos Equipamentos</span>
                         </div>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
                                     <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Obra</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Encarregado</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Estado</th>
+                                    <th className='text-gray-600 font-bold w-1/5 '>Tempo</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Editar</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
                                 </tr>
@@ -250,15 +219,13 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
                                 {
 
-                                    (obras && obras.length && search === '') ? obras.map((obra) => (
-                                        <tr key={obra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{obra.id}</td>
-                                            <td className="w-1/5 ">{obra.obra_nome}</td>
-                                            <td className="w-1/5 ">{obra.encarregado_id.nome}</td>
-                                            <td className="w-1/5 ">{obra.estado}</td>
+                                    (duracoes && duracoes.length && search === '') ? duracoes.map((duracao) => (
+                                        <tr key={duracao.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-1/5 ">{duracao.id}</td>
+                                            <td className="w-1/5 ">{duracao.tempo}</td>
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => handleEditObra(obra)}
+                                                    onClick={() => handleEditarDuracao(duracao)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
@@ -266,7 +233,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                                             </td>
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => { setShowQuestionAlert(true); setIdObra(obra.id) }}
+                                                    onClick={() => { setShowQuestionAlert(true); setDuracao(duracao.id) }}
                                                     className="hover:brightness-75"
                                                     title="Apagar">
                                                     <FaTrash />
@@ -276,12 +243,10 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                                     )) : filteredObras.map((filteredObra) => (
                                         <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-1/5 ">{filteredObra.id}</td>
-                                            <td className="w-1/5 ">{filteredObra.obra_nome}</td>
-                                            <td className="w-1/5 ">{filteredObra.encarregado_id.nome}</td>
-                                            <td className="w-1/5 ">{filteredObra.estado}</td>
+                                            <td className="w-1/5 ">{filteredObra.tempo}</td>
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => handleEditObra(filteredObra)}
+                                                    onClick={() => handleEditarDuracao(filteredObra)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
@@ -289,7 +254,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                                             </td>
                                             <td className="w-1/5  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => { setShowQuestionAlert(true); setIdObra(filteredObra.id) }}
+                                                    onClick={() => { setShowQuestionAlert(true); setDuracao(filteredObra.id) }}
                                                     className="hover:brightness-75"
                                                     title="Apagar">
                                                     <FaTrash />
@@ -313,23 +278,18 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            const cookie = nookies.get(context);
+            // const cookie = nookies.get(context);
 
-            const obrasDispatch: any = await (await store.dispatch(fetchObra()));
+            const duracoesDispatch: any = await store.dispatch(fetchDuracao());
 
-            const encarregadosDispatch: any = await store.dispatch(fetchEncarregados());
 
-            const obras = obrasDispatch.payload
-            const encarregados = encarregadosDispatch.payload
+            const duracoes = duracoesDispatch.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            //  if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
+
             return {
                 props: {
-                    obras,
-                    encarregados
+                    duracoes
                 },
             };
         }
@@ -337,4 +297,4 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
 
 
 
-export default Obra
+export default Classificacao

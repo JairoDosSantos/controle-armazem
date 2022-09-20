@@ -12,6 +12,7 @@ import almoxarifarioSlice from "./slices/almoxarifarioSlice"
 import obraSlice from "./slices/obraSlice"
 import auditoriaSlice from "./slices/auditoriaSlice"
 import compraSlice from "./slices/compraSlice"
+import usuario from "./slices/usuarioSlice"
 import geralSlice from "./slices/geralSlice"
 
 
@@ -27,6 +28,7 @@ const combineReducer = combineReducers({
     Auditoria: auditoriaSlice,
     Compra: compraSlice,
     geral: geralSlice,
+    usuario
 })
 
 export const store = () => configureStore({

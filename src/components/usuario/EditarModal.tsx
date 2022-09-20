@@ -1,74 +1,60 @@
-import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
+import { Dialog, Transition } from '@headlessui/react'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { useForm, SubmitHandler } from 'react-hook-form'
+import { FaSave } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
 
 //Imagens
 import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
-import Image from 'next/image'
-import { useDispatch } from 'react-redux'
-import { updateArmGeral } from '../../redux/slices/armGeralSlice'
-import { useRouter } from 'next/router'
-
-type EquipamentoType = {
-    id: number;
-    descricao: string;
-    duracao_id: number;
-    classificacao_id: number;
-    data: string
-}
-
-type EquipamentosARMType = {
-    id: number;
-    quantidade: number;
-    equipamento_id: EquipamentoType;
-    data_aquisicao: string
-}
+import { updateUsuarios } from '../../redux/slices/usuarioSlice'
 
 type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
-    data: EquipamentosARMType
+    usuarioData: UsuarioType
 }
 
 //Tipagem do formulário
-type FormValues = {
+type UsuarioType = {
     id: number;
-    descricao_equipamento: string;
-    quantidade: number;
-    classificacao_id: number;
-    tempo_duracao: string
+    nome: string;
+    permissao: string;
+    email: string;
+    password: string
 }
-const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
-    const dispatch = useDispatch<any>();
-    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
+const EditarModal = ({ isOpen, setIsOpen, usuarioData }: EditarModalProps) => {
+
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<UsuarioType>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
-    const route = useRouter();
+    const route = useRouter()
+    const dispatch = useDispatch<any>();
 
-    const onSubmit: SubmitHandler<FormValues> = async (arm) => {
+    const onSubmit: SubmitHandler<UsuarioType> = async (data) => {
 
         setLoad(true)
 
-        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
-
+        const resultDispatch = await dispatch(updateUsuarios({ id: usuarioData.id, nome: data.nome, permissao: data.permissao, email: data.email, password: data.password }));
         setLoad(false)
-        if (editEquipamentoDispatch.payload !== null) notifySuccess()
-        else notifyError()
-
+        if (resultDispatch.payload) {
+            notifySuccess()
+        } else {
+            notifyError()
+        }
     }
 
     function closeModal() {
         reset()
         setIsOpen(false)
     }
-
     const notifySuccess = () => {
 
         setTimeout(function () {
@@ -76,7 +62,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
             route.reload()
         }, 6500);
 
-        toast.success('Quantidade alterada com sucesso!', {
+        toast.success('Info. do usuário alterada com sucesso!', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,
@@ -85,7 +71,6 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
             draggable: true,
             progress: undefined
         })
-
     }
 
     const notifyError = () => toast.error('Erro ao efectuar a operação!', {
@@ -97,7 +82,6 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
         draggable: true,
         progress: undefined
     })
-
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
@@ -130,7 +114,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                         as="h3"
                                         className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
                                     >
-                                        Alterar informação do equipamento
+                                        Alterar informação do usuário
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>
@@ -152,33 +136,60 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
-                                                    readOnly={true}
                                                     type="text"
-                                                    className='rounded shadow w-full read-only:ring-0 read-only:border-0'
-                                                    placeholder='Descrição do equipamento *'
-                                                    {...register('descricao_equipamento')}
-                                                    defaultValue={data.equipamento_id.descricao}
+                                                    className='rounded shadow w-1/2'
+                                                    placeholder='Nome do usuário *'
+                                                    {...register('nome', {
+                                                        required: { message: "Por favor, introduza o nome do usuário.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    defaultValue={usuarioData.nome}
                                                 />
+                                                <input
+                                                    required
+                                                    type="email"
+                                                    className='rounded shadow w-1/2'
+                                                    placeholder='exemplo@gmail.com *'
+                                                    {...register('email', {
+                                                        required: { message: "Por favor, introduza o email do usuário.", value: true },
 
+                                                    })}
+                                                    defaultValue={usuarioData.email}
+                                                />
                                             </div>
-
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
-                                                    min={0}
-                                                    type="number"
-                                                    className='rounded shadow w-full'
-                                                    placeholder='Quantidade *'
-                                                    {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a número de telefone.", value: true },
-                                                        minLength: { message: "Quantidade insuficiente", value: 1 },
-                                                        min: { message: 'Quantidade insuficiente', value: 0 }
+                                                    type={'password'}
+                                                    className='rounded shadow w-1/2'
+                                                    placeholder='**********'
+                                                    {...register('nome', {
+                                                        required: { message: "Por favor, introduza a senha do usuário.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-
-                                                    defaultValue={data.quantidade}
+                                                    defaultValue={usuarioData.password}
                                                 />
+                                                <select
+                                                    id="permissao"
+                                                    {...register('permissao', {
+                                                        required: { message: "Por favor, introduza a permissão do usuário.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-1/2 rounded shadow cursor-pointer"
+                                                    defaultValue={usuarioData.permissao}
+                                                >
 
+                                                    <option value='' className='text-gray-400' >Selecione o encarregado</option>
 
+                                                    <option
+                                                        value='Administrador'>Administrador
+                                                    </option>
+                                                    <option
+                                                        value='Administrador'>normal
+                                                    </option>
+
+                                                </select>
                                             </div>
+
                                             <div className="mt-4 flex justify-end">
                                                 <button
                                                     disabled={!isValid}
@@ -201,14 +212,23 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                             <div className='text-red-700 mt-2 text-center'>
                                                 <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
                                                 <p className='text-sm'>
-                                                    {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
+                                                    {errors.nome && (errors.nome.message)}
                                                 </p>
                                                 <p className='text-sm'>
-                                                    {errors.quantidade && (errors.quantidade.message)}
+                                                    {errors.email && (errors.email.message)}
+                                                </p>
+                                                <p className='text-sm'>
+                                                    {errors.password && (errors.password.message)}
+                                                </p>
+                                                <p className='text-sm'>
+                                                    {errors.permissao && (errors.permissao.message)}
                                                 </p>
                                             </div>
                                         </form>
+
                                     </div>
+
+
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

@@ -91,7 +91,7 @@ const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
             route.reload()
         }, 6500);
 
-        toast.success('Quantidade alterada com sucesso! 😁', {
+        toast.success('Quantidade alterada com sucesso!', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,
@@ -105,7 +105,7 @@ const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
 
     }
 
-    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
+    const notifyError = () => toast.error('Erro ao efectuar a operação!', {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,

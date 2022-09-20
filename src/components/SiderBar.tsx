@@ -5,35 +5,40 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Logo from '../assets/noah.png'
 
-import { FaTools, FaBookOpen, FaHome, FaShopify, FaArrowsAltH, FaCarAlt } from 'react-icons/fa'
-import { AiFillCloseCircle } from 'react-icons/ai'
+import { FaTools, FaHome, FaShopify, FaArrowsAltH, FaCarAlt, FaSignOutAlt, FaUser, FaBuilding, FaListAlt, FaListOl, FaList, FaClock } from 'react-icons/fa'
+
 import api from '../services/api'
 import { useRouter } from 'next/router'
+import { useSelector } from "react-redux";
 
 type SiderBarProps = {
-
-    hideSideBar: boolean;
     itemActive: string
 }
 
 
 
-const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
+const SiderBar = ({ itemActive }: SiderBarProps) => {
+
     const router = useRouter()
+
+    const { showSideBar } = useSelector((state: any) => state.geral)
+
     const logOut = async () => {
 
-        /**
-         *  const response = await api.post('api/logout')
- 
-         if (response.data) {
-             router.push('/')
-         }
-         */
-        router.push('/sair')
+        try {
+            const response = await api.post('api/logout')
+
+            if (response.data) {
+                router.push('/')
+            }
+        } catch (error) {
+
+        }
+
     }
 
     return (
-        <aside className={`bg-white w-72 border-r min-h-screen ${!hideSideBar ? 'flex flex-col ' : 'hidden'} gap-4 px-6 py-6 text-center `}>
+        <aside className={` bg-white w-72 border-r min-h-screen ${showSideBar ? 'flex flex-col ' : 'hidden'} gap-4 px-6 py-6 text-center `}>
             <div className='flex flex-col justify-center items-center '>
                 <Image src={Logo} alt="NOAH Logo" width={100} height={35} objectFit={'contain'} />
                 {/**   <h3 className="font-bold mt-4 text-lg">S.C.A</h3> */}
@@ -41,54 +46,94 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
             <div className='mt-8 w-full'>
                 <ul className='max-w-full mx-auto px-2 space-y-6 text-left text-base'>
                     <li className='flex gap-2 items-center'>
-                        <span className='text-gray-400 font-bold cursor-default '>Painel de controlo</span>
-
+                        <span className='text-gray-400 font-bold cursor-default '>Painel de controle</span>
                     </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'painel-controlo' && 'active'}`}>
-                        <FaHome className='text-gray-500 text-lg ' />
-                        <Link href='/painel-controlo'>Painel de Controlo</Link>
-                    </li>
+                    {
+                        router.pathname.includes('/admin') ? (
+                            <>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'painel-controlo' && 'active'}`}>
+                                    <FaHome className='text-gray-500 text-lg ' />
+                                    <Link href='/admin'>Página Inicial</Link>
+                                </li>
+                            </>) : (
+                            <>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'painel-controlo' && 'active'}`}>
+                                    <FaHome className='text-gray-500 text-lg ' />
+                                    <Link href='/painel-controlo'>Página Inicial</Link>
+                                </li>
+                            </>
+                        )
+                    }
                     <li className='flex gap-2 items-center'>
                         <span className='text-gray-400 font-bold cursor-default '>Cadastros</span>
                     </li>
-                    {/**
-                   *   <li className={`flex gap-2 items-center text-sm ${itemActive === 'encarregado' && 'active'}`}>
+                    {
+                        (router.pathname.includes('/admin')) ? (
+                            <>
+                                <li
+                                    title='Gerir Encarregados'
+                                    className={`flex gap-2 items-center text-sm ${itemActive === 'encarregado' && 'active'}`}>
+                                    <FaUser className='text-gray-500 text-lg ' />
+                                    <Link href='/admin/encarregado'>Encarregado</Link>
+                                </li>
+                                <li
+                                    title='Gerir Encarregados'
+                                    className={`flex gap-2 items-center text-sm ${itemActive === 'usuario' && 'active'}`}>
+                                    <FaUser className='text-gray-500 text-lg ' />
+                                    <Link href='/admin/registrar-usuario'>Usuário</Link>
+                                </li>
+                                <li
+                                    title='Gerir Obras'
+                                    className={`flex gap-2 items-center text-sm ${itemActive === 'obra' && 'active'}`}>
+                                    <FaBuilding className='text-gray-500 text-lg' />
+                                    <Link href='/admin/obra'>Obra</Link>
+                                </li>
+                                <li
+                                    title='Gerir Classificações'
+                                    className={`flex gap-2 items-center text-sm ${itemActive === 'classificacao' && 'active'}`}>
+                                    <FaListAlt className='text-gray-500 text-lg' />
+                                    <Link href='/admin/classificacao'>Classificação</Link>
+                                </li>
+                                <li
+                                    title='Gerir Tempos dos equipamentos'
+                                    className={`flex gap-2 items-center text-sm ${itemActive === 'duracao' && 'active'}`}>
+                                    <FaClock className='text-gray-500 text-lg' />
+                                    <Link href='/admin/duracao'>Tempo de duração</Link>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'equipamento' && 'active'}`}>
+                                    <FaTools className='text-gray-500 text-lg' />
+                                    <Link href='/equipamento'>Equipamento</Link>
+                                </li>
+                                <li>
+                                    <span className='text-gray-400 font-bold cursor-default '>Relatórios</span>
+                                </li>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-armazem' && 'active'}`}>
+                                    <FaList className='text-gray-500 text-lg' />
+                                    <Link href='/posicao-armazem'>Armazem geral</Link>
+                                </li>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-obra' && 'active'}`}>
+                                    <FaListOl className='text-gray-500 text-lg' />
+                                    <Link href='/posicao-obra'>Almoxarifado</Link>
+                                </li>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
+                                    <FaArrowsAltH className='text-gray-500 text-lg' />
+                                    <Link href='/auditoria'>Movimentações</Link>
+                                </li>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'devolucoes' && 'active'}`}>
+                                    <FaShopify className='text-gray-500 text-lg' />
+                                    <Link href='/compras'>Compras</Link>
+                                </li>
+                                <li className={`flex gap-2 items-center text-sm ${itemActive === 'gt' && 'active'}`}>
+                                    <FaCarAlt className='text-gray-500 text-lg' />
+                                    <Link href='/GT'>Guia de Transporte</Link>
+                                </li>
+                            </>
+                        )
+                    }
 
-                        <FaUser className='text-gray-500 text-lg ' />
-                        <Link href='/encarregado'>Encarregado</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'obra' && 'active'}`}>
-                        <FaBuilding className='text-gray-500 text-lg' />
-                        <Link href='/obra'>Obra</Link>
-                    </li>
-                   */}
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'equipamento' && 'active'}`}>
-                        <FaTools className='text-gray-500 text-lg' />
-                        <Link href='/equipamento'>Equipamento</Link>
-                    </li>
-                    <li>
-                        <span className='text-gray-400 font-bold cursor-default '>Relatórios</span>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-armazem' && 'active'}`}>
-                        <FaBookOpen className='text-gray-500 text-lg' />
-                        <Link href='/posicao-armazem'>Armazem geral</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'posicao-obra' && 'active'}`}>
-                        <FaBookOpen className='text-gray-500 text-lg' />
-                        <Link href='/posicao-obra'>Almoxarifado</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'saidas' && 'active'}`}>
-                        <FaArrowsAltH className='text-gray-500 text-lg' />
-                        <Link href='/auditoria'>Movimentações</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'devolucoes' && 'active'}`}>
-                        <FaShopify className='text-gray-500 text-lg' />
-                        <Link href='/compras'>Compras</Link>
-                    </li>
-                    <li className={`flex gap-2 items-center text-sm ${itemActive === 'gt' && 'active'}`}>
-                        <FaCarAlt className='text-gray-500 text-lg' />
-                        <Link href='/GT'>Guia de Transporte</Link>
-                    </li>
                     {/**
                      * <li className={`flex gap-2 items-center hidden text-sm hover:brightness-75 relative ${itemActive === 'esgotar' && 'active'}`}>
                         <FaClock className='text-gray-500 text-lg' />
@@ -101,12 +146,12 @@ const SiderBar = ({ hideSideBar, itemActive }: SiderBarProps) => {
             </div>
             <div className='mt-8  max-w-full '>
 
-                <Link href='/'>
-                    <div className='flex gap-2 items-center text-sm  bg-white cursor-pointer'>
-                        <AiFillCloseCircle className='text-gray-500 text-lg' />
-                        <span onClick={logOut}>Terminar sessão</span>
-                    </div>
-                </Link>
+
+                <div className='flex gap-2 items-center text-sm  bg-white cursor-pointer'>
+                    <FaSignOutAlt className='text-gray-500 text-lg' />
+                    <span onClick={logOut}>Terminar sessão</span>
+                </div>
+
 
             </div>
         </aside>

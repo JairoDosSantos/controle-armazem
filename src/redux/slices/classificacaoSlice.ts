@@ -33,7 +33,7 @@ export const fetchClassificacao = createAsyncThunk('/classificacao/fetch', async
         return (error)
     }
 })
-export const insertClassificacao = createAsyncThunk('/classificacao/create', async ({ tipo }: ClassificacaoType) => {
+export const insertClassificacao = createAsyncThunk('/classificacao/create', async ({ tipo }: Omit<ClassificacaoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
@@ -63,7 +63,7 @@ export const updateClassificacao = createAsyncThunk('/classificacao/update', asy
     }
 })
 
-export const deleteClassificacao = createAsyncThunk('/classificacao/delete', async ({ id }: ClassificacaoType) => {
+export const deleteClassificacao = createAsyncThunk('/classificacao/delete', async (id: number) => {
     try {
 
         const { data, error } = await supabase

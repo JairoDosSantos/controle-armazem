@@ -5,25 +5,29 @@ export const geralSlice = createSlice({
     name: 'Search',
     initialState: {
         user: 'Nome do Usuário',
+        showSideBar: true
     },
     reducers: {
         updateUser: (state, action) => {
             state.user = action.payload.user
         },
-       /**
-        *  extraReducers: {
-            [HYDRATE]: (state, action) => {
-                return {
-                    ...state,
-                    ...action.payload.Search
-                }
-            }
+        hideSiderBar: (state, action) => {
+            state.showSideBar = action.payload.showSideBar
         }
-        */
+        /**
+         *  extraReducers: {
+             [HYDRATE]: (state, action) => {
+                 return {
+                     ...state,
+                     ...action.payload.Search
+                 }
+             }
+         }
+         */
     }
 })
 
 
-export const { updateUser } = geralSlice.actions;
+export const { updateUser, hideSiderBar } = geralSlice.actions;
 
 export default geralSlice.reducer;

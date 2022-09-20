@@ -1,14 +1,14 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import React, { useState } from 'react'
-import Header from '../components/Header'
-import PainelItem from '../components/Painel-Item'
-import SiderBar from '../components/SiderBar'
+import Header from '../../components/Header'
+import PainelItem from '../../components/Painel-Item'
+import SiderBar from '../../components/SiderBar'
 import nookies from 'nookies'
-import { wrapper } from '../redux/store'
-import { fetchObra, fetchObraActiva } from '../redux/slices/obraSlice'
-import { fetchEncarregados } from '../redux/slices/encarregadoSlice'
-import { fetchArmGeralByClassificcao, fetchEsgotar } from '../redux/slices/armGeralSlice'
-
+import { wrapper } from '../../redux/store'
+import { fetchObra, fetchObraActiva } from '../../redux/slices/obraSlice'
+import { fetchEncarregados } from '../../redux/slices/encarregadoSlice'
+import { fetchArmGeralByClassificcao, fetchEsgotar } from '../../redux/slices/armGeralSlice'
+import Head from 'next/head'
 
 type PainelProps = {
     totalObras: number;
@@ -20,9 +20,7 @@ type PainelProps = {
 
 }
 
-const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST, TotalFerramenta, TotalMateriais }: PainelProps) => {
-
-    const [hideSideBar, setHideSideBar] = useState(false)
+const Admin = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST, TotalFerramenta, TotalMateriais }: PainelProps) => {
 
     return (
         <div className='flex'>
@@ -30,6 +28,9 @@ const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST
             <main className='flex-1 space-y-6'>
                 <div>
                     <Header />
+                    <Head>
+                        <title>SCA | Administrador</title>
+                    </Head>
                 </div>
 
                 <div className='overflow-auto max-h-[85vh] overflow-hide-scroll-bar'>
@@ -42,51 +43,7 @@ const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST
                         <PainelItem icone='encarregado' quantidade={totalEncarregados} rodape='Total de Encarregados em obras' titulo='Encarregados' />
                         {/**      <PainelItem icone='ttl' quantidade={10} rodape='Stock de SOS atingido em armazem' titulo='A esgotar' /> */}
                     </div>
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl hidden overflow-x-auto  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>À esgotar</span>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">1</td>
-                                    <td className="w-1/5 ">Cimento Cola</td>
-                                    <td className="w-1/5 ">Material</td>
-                                    <td className="w-1/5 ">uso imediato</td>
-                                    <td className="w-1/5 ">2</td>
-                                    <td className="w-1/5 ">22-08-2022</td>
 
-                                </tr>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">2</td>
-                                    <td className="w-1/5 ">Martelo de burracha</td>
-                                    <td className="w-1/5 ">Ferramenta</td>
-                                    <td className="w-1/5 ">2 à 5 anos</td>
-                                    <td className="w-1/5 ">3</td>
-                                    <td className="w-1/5 ">22-08-2022</td>
-
-                                </tr>
-                                <tr className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                    <td className="w-1/5 ">3</td>
-                                    <td className="w-1/5 ">Capacete</td>
-                                    <td className="w-1/5 ">EPI</td>
-                                    <td className="w-1/5 ">0.5 à 1 ano</td>
-                                    <td className="w-1/5 ">5</td>
-                                    <td className="w-1/5 ">24-08-2022</td>
-
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
 
@@ -100,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            const cookie = nookies.get(context);
+            // const cookie = nookies.get(context);
 
             const obrasActivas: any = await (await store.dispatch(fetchObraActiva())).payload;
             const totalObras: any = await (await store.dispatch(fetchObra())).payload
@@ -118,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const TotalMateriais = TotalMaterial ? TotalMaterial.length : 0
 
 
-            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
+            // if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {
@@ -156,4 +113,4 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
 }
  */
 
-export default PainelControlo
+export default Admin

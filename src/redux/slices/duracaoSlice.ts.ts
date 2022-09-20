@@ -33,7 +33,7 @@ export const fetchDuracao = createAsyncThunk('/duracao/fetchAll', async () => {
         return (error)
     }
 })
-export const insertDuracao = createAsyncThunk('/duracao/create', async ({ tempo }: duracaoType) => {
+export const insertDuracao = createAsyncThunk('/duracao/create', async ({ tempo }: Omit<duracaoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
@@ -63,7 +63,7 @@ export const updateDuracao = createAsyncThunk('/duracao/update', async ({ id, te
     }
 })
 
-export const deleteDuracao = createAsyncThunk('/duracao/delete', async ({ id }: duracaoType) => {
+export const deleteDuracao = createAsyncThunk('/duracao/delete', async (id: number) => {
     try {
 
         const { data, error } = await supabase

@@ -99,10 +99,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const duracao = duracaoDispatch.payload
             const equipamentosARM = equipamentoARM.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                //If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

@@ -67,7 +67,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
     //const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
 
     let findedAuditoria: AuditoriaType[] = []
-    if (auditoria.length && filtroPorObra) {
+    if (auditoria && auditoria.length && filtroPorObra) {
         if (searchObra !== 0 && searchData === '') findedAuditoria = auditoria.filter((saidaEntrada) => saidaEntrada.obra_id.id === searchObra)
         else if (searchData && searchObra === 0) findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()))
         else findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()) && entradaSaida.obra_id.id === searchObra)
@@ -80,10 +80,10 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="saidas" hideSideBar={hideSideBar} />
-            <main className='flex-1 space-y-6'>
+            <SiderBar itemActive="saidas" />
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
                 <Head>
                     <title>SCA | Auditoría</title>
@@ -196,15 +196,15 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex gap-5">
+                        <div className="flex  gap-5">
                             {
                                 filtroPorObra && (
-                                    <div className="animate__animated animate__fadeIn w-full flex gap-4">
+                                    <div className="animate__animated animate__fadeIn w-full flex flex-col lg:flex-row gap-4">
                                         <select
                                             onChange={(event) => setSearchObra(Number(event.target.value))}
-                                            className='rounded shadow w-1/2 cursor-pointer '>
+                                            className='rounded shadow w-full lg:w-1/2 cursor-pointer '>
                                             <option value="#" className='text-gray-400'>Selecione a Obra</option>
-                                            {obras.length && obras.map((obra, index) => (
+                                            {obras?.map((obra, index) => (
                                                 <option
                                                     key={index}
                                                     value={obra.id}>{obra.obra_nome}</option>
@@ -213,7 +213,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                         <input
                                             onChange={(event) => setSearchData(event.target.value)}
                                             type="date"
-                                            className="rounded shadow w-1/2 cursor-pointer " />
+                                            className="rounded shadow w-full lg:w-1/2 cursor-pointer " />
                                     </div>
                                 )
                             }
@@ -235,20 +235,20 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
+                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto'>
                         <span className='font-semibold text-lg'>Relatório de {filtroPorMovimentacoes ? 'devoluções' : 'saídas'}</span>
                         {
                             filtroPorMovimentacoes ? (
                                 <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                                     <thead>
                                         <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>ID</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center '>Descrição</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>Obra</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>Qtd. levada</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>Qtd. devolvida</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>Data de aquisição</th>
-                                            <th className='text-gray-600 font-bold w-1/5 text-center'>Data devolução</th>
+                                            <th className='text-gray-600 font-bold w-16 text-center'>ID</th>
+                                            <th className='text-gray-600 font-bold w-72 text-center '>Descrição</th>
+                                            <th className='text-gray-600 font-bold w-52 text-center'>Obra</th>
+                                            <th className='text-gray-600 font-bold w-20 text-center'>Qtd. levada</th>
+                                            <th className='text-gray-600 font-bold w-24 text-center'>Qtd. devolvida</th>
+                                            <th className='text-gray-600 font-bold w-44 text-center'>Data de aquisição</th>
+                                            <th className='text-gray-600 font-bold w-44 text-center'>Data devolução</th>
                                             {/**
                                          *     <th className='text-gray-600 font-bold w-1/5 text-center'>Editar</th>
                                             <th className='text-gray-600 font-bold w-1/5 text-center'>Apagar</th>
@@ -262,13 +262,13 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 return (
                                                     <tr key={index}
                                                         className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                        <td className="w-1/5 text-center">{devolucao.id}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.equipamento_id.descricao}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.obra_id.obra_nome}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.quantidade_retirada}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.data_retirada}</td>
-                                                        <td className="w-1/5 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
+                                                        <td className="w-16 text-center">{devolucao.id}</td>
+                                                        <td className="w-72 text-center">{devolucao.equipamento_id.descricao}</td>
+                                                        <td className="w-52 text-center">{devolucao.obra_id.obra_nome}</td>
+                                                        <td className="w-20 text-center">{devolucao.quantidade_retirada}</td>
+                                                        <td className="w-20 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
+                                                        <td className="w-44 text-center">{devolucao.data_retirada}</td>
+                                                        <td className="w-44 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
                                                         {/**    
                                                         *  <td className="w-1/5 text-center flex justify-center items-center">
                                                                 <button
@@ -295,13 +295,13 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                             if (findAud.quantidade_devolvida) {
                                                 return (<tr key={index}
                                                     className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                    <td className="w-1/5 text-center ">{findAud.id}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.equipamento_id.descricao}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.obra_id.obra_nome}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.quantidade_retirada}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.data_retirada}</td>
-                                                    <td className="w-1/5 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
+                                                    <td className="w-16 text-center ">{findAud.id}</td>
+                                                    <td className="w-72 text-center ">{findAud.equipamento_id.descricao}</td>
+                                                    <td className="w-52 text-center ">{findAud.obra_id.obra_nome}</td>
+                                                    <td className="w-20 text-center ">{findAud.quantidade_retirada}</td>
+                                                    <td className="w-20 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
+                                                    <td className="w-44 text-center ">{findAud.data_retirada}</td>
+                                                    <td className="w-44 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
                                                     {
                                                         /**      
                                                         * <td className="w-1/5 text-center  flex justify-center items-center">
@@ -333,13 +333,13 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                 <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                                     <thead>
                                         <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                            <th className='text-gray-600 font-bold w-1/4 '>ID</th>
-                                            <th className='text-gray-600 font-bold w-1/4  '>Descrição</th>
-                                            <th className='text-gray-600 font-bold w-1/4 '>Obra</th>
-                                            <th className='text-gray-600 font-bold w-1/4 '>Quantidade tirada</th>
-                                            <th className='text-gray-600 font-bold w-1/4 '>Data de saída</th>
+                                            <th className='text-gray-600 font-bold w-16'>ID</th>
+                                            <th className='text-gray-600 font-bold w-72'>Descrição</th>
+                                            <th className='text-gray-600 font-bold w-52'>Obra</th>
+                                            <th className='text-gray-600 font-bold w-20'>Qtd. tirada</th>
+                                            <th className='text-gray-600 font-bold w-40 '>Data de saída</th>
 
-                                            <th className='text-gray-600 font-bold w-1/4 '>Editar</th>
+                                            <th className='text-gray-600 font-bold  w-20'>Editar</th>
                                             {/**
                                              * <th className='text-gray-600 font-bold w-1/4 '>Data de Compra</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
@@ -351,12 +351,12 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                             <tr
                                                 key={index}
                                                 className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/4  ">{saida.id}</td>
-                                                <td className="w-1/4  ">{saida.equipamento_id.descricao}</td>
-                                                <td className="w-1/4  ">{saida.obra_id.obra_nome}</td>
-                                                <td className="w-1/4  ">{saida.quantidade_retirada}</td>
-                                                <td className="w-1/4  ">{saida.data_retirada}</td>
-                                                <td className="w-1/4   flex justify-center items-center">
+                                                <td className="w-16  ">{saida.id}</td>
+                                                <td className="w-72  ">{saida.equipamento_id.descricao}</td>
+                                                <td className="w-52  ">{saida.obra_id.obra_nome}</td>
+                                                <td className="w-20  ">{saida.quantidade_retirada}</td>
+                                                <td className="w-40  ">{saida.data_retirada}</td>
+                                                <td className="w-20   flex justify-center items-center">
                                                     <button
                                                         onClick={() => handleEdit(saida)}
                                                         className="hover:brightness-75"
@@ -381,12 +381,12 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                         )) : findedAuditoria.map((findAud, index) => (
                                             <tr key={index}
                                                 className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/4  ">{findAud.id}</td>
-                                                <td className="w-1/4  ">{findAud.equipamento_id.descricao}</td>
-                                                <td className="w-1/4  ">{findAud.obra_id.obra_nome}</td>
-                                                <td className="w-1/4  ">{findAud.quantidade_retirada}</td>
-                                                <td className="w-1/4  ">{findAud.data_retirada}</td>
-                                                <td className="w-1/4   flex justify-center items-center">
+                                                <td className="w-16">{findAud.id}</td>
+                                                <td className="w-72">{findAud.equipamento_id.descricao}</td>
+                                                <td className="w-52">{findAud.obra_id.obra_nome}</td>
+                                                <td className="w-20">{findAud.quantidade_retirada}</td>
+                                                <td className="w-40">{findAud.data_retirada}</td>
+                                                <td className="w-20 flex justify-center items-center">
                                                     <button
                                                         onClick={() => handleEdit(findAud)}
                                                         className="hover:brightness-75"
@@ -439,10 +439,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const auditoria = auditoriaDispatch.payload
             const obras = obrasDispatch.payload
 
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

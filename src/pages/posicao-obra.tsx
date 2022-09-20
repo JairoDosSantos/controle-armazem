@@ -120,10 +120,10 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="posicao-obra" hideSideBar={hideSideBar} />
-            <main className='flex-1 space-y-6'>
+            <SiderBar itemActive="posicao-obra" />
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
 
                 <Head>
@@ -191,34 +191,34 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Posição Armazem por obra</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
-                        <div className="ml-auto flex gap-2 -mt-4">
-                            <div>
+                        <div className="lg:ml-auto flex gap-2 -mt-4">
 
-                                <select
-                                    onChange={(event) => setSearchClassificacao(Number(event.target.value))}
-                                    className="rounded shadow cursor-pointer" >
-                                    <option value={0}>Selecione a classificação</option>
-                                    {
-                                        (classificacao && classificacao.length) && classificacao.map((classific, index) => (
-                                            <option
-                                                key={index}
-                                                value={classific.id}> {classific.tipo}</option>
-                                        ))}
-                                </select>
-                            </div>
+
+                            <select
+                                onChange={(event) => setSearchClassificacao(Number(event.target.value))}
+                                className="rounded shadow cursor-pointer w-full" >
+                                <option value={0}>Selecione a classificação</option>
+                                {
+                                    (classificacao && classificacao.length) && classificacao.map((classific, index) => (
+                                        <option
+                                            key={index}
+                                            value={classific.id}> {classific.tipo}</option>
+                                    ))}
+                            </select>
+
 
                         </div>
-                        <div className="flex gap-5">
+                        <div className="flex flex-col lg:flex-row gap-5">
                             <input
                                 onChange={(event) => setSearch(event.target.value)}
                                 type="search"
                                 placeholder="Pesquise pelo equipamento"
-                                className="w-1/2 rounded shadow" />
+                                className="lg:w-1/2 w-full rounded shadow" />
                             {/** Lista apenas na tabela se no mínimo uma obra for selecionada, caso contrário a tabela deve ser vazia */}
                             <select
                                 onChange={(event) => setSearchByObraId(Number(event.target.value))}
                                 id="obra"
-                                className="w-1/2 rounded shadow cursor-pointer">
+                                className="lg:w-1/2 w-full rounded shadow cursor-pointer">
                                 <option value={0}>Selecione a obra</option>
                                 {
                                     (obras && obras.length) && obras.map((obr, index) => (
@@ -247,18 +247,18 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <span className='font-semibold text-lg'>Relatório almoxarifário</span>
+                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto'>
+                        <span className='font-semibold text-lg '>Relatório almoxarifário</span>
                         <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                             <thead>
 
                                 <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Tempo de duração</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Quantidade</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Obra</th>
+                                    <th className='text-gray-600 font-bold w-16'>ID</th>
+                                    <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                    <th className='text-gray-600 font-bold w-52'>Classificação</th>
+                                    <th className='text-gray-600 font-bold w-52'>Tempo de duração</th>
+                                    <th className='text-gray-600 font-bold w-20'>Quantidade</th>
+                                    <th className='text-gray-600 font-bold w-52'>Obra</th>
                                     {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
                                     {/**  <th className='text-gray-600 font-bold w-1/5'>Editar</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
@@ -270,14 +270,14 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{almoxarifario.id}</td>
-                                            <td className="w-1/5 ">{almoxarifario.equipamento_id.descricao}</td>
+                                            <td className="w-16 ">{almoxarifario.id}</td>
+                                            <td className="w-72 ">{almoxarifario.equipamento_id.descricao}</td>
 
-                                            <td className="w-1/5"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
+                                            <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-1/5 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
-                                            <td className="w-1/5 ">{almoxarifario.quantidade}</td>
-                                            <td className="w-1/5 ">{almoxarifario.obra_id.obra_nome}</td>
+                                            <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-20 ">{almoxarifario.quantidade}</td>
+                                            <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
                                             {/**   <td className="w-1/5 ">22-08-2022</td> */}
                                             {/**
                                              *    <td className="w-1/5  flex justify-center items-center">
@@ -299,14 +299,14 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{finded.id}</td>
-                                            <td className="w-1/5 ">{finded.equipamento_id.descricao}</td>
+                                            <td className="w-16 ">{finded.id}</td>
+                                            <td className="w-72 ">{finded.equipamento_id.descricao}</td>
 
-                                            <td className="w-1/5"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
+                                            <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-1/5 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
-                                            <td className="w-1/5 ">{finded.quantidade}</td>
-                                            <td className="w-1/5 ">{finded.obra_id.obra_nome}</td>
+                                            <td className="w-52 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-20 ">{finded.quantidade}</td>
+                                            <td className="w-52 ">{finded.obra_id.obra_nome}</td>
                                             {/**   <td className="w-1/5 ">22-08-2022</td> */}
                                             {/**
                                             *  <td className="w-1/5  flex justify-center items-center">
@@ -357,10 +357,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const duracao = duracaoDispatch.payload
             const almoxarifarios = almoxarifario.payload
             const obras = obra.payload
-            if (!cookie.USER_LOGGED_ARMAZEM) {
-                // If no user, redirect to index.
-                return { props: {}, redirect: { destination: '/', permanent: false } }
-            }
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
             return {
                 props: {
                     almoxarifarios,

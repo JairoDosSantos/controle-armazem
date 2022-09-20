@@ -9,21 +9,23 @@
     input,
     button,
     textarea,
-    label,body{
-        @apply font-roboto  text-xs bg-gray-50
+    label,
+    body {
+        @apply font-roboto text-xs bg-gray-50
     }
-  body{
-    @apply overflow-hide-scroll-bar
-  }
+
+    body {
+        @apply overflow-hide-scroll-bar
+    }
 }
 
 @layer components {
     .overflow-hide-scroll-bar::-webkit-scrollbar {
         display: none;
-        }
+    }
 
     .active {
-        @apply px-4 py-2 rounded bg-gray-300 font-bold
+        @apply px-4 py-2 rounded bg-gray-300 font-bold truncate
     }
 
 }

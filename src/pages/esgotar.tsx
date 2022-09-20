@@ -48,10 +48,10 @@ const Esgotar = ({ esgotar }: EsgotarProps) => {
 
     return (
         <div className='flex'>
-            <SiderBar itemActive="esgotar" hideSideBar={hideSideBar} />
+            <SiderBar itemActive="esgotar" />
             <main className='flex-1 space-y-6'>
                 <div>
-                    <Header hideSideBar={hideSideBar} setHideSideBar={setHideSideBar} />
+                    <Header />
                 </div>
                 <Head>
                     <title>SCA | À esgostar</title>

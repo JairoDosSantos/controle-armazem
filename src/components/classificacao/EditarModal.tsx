@@ -13,59 +13,60 @@ import LoadImage from '../../assets/load.gif';
 import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
 import { useDispatch } from 'react-redux'
-import { updateArmGeral } from '../../redux/slices/armGeralSlice'
+
 import { useRouter } from 'next/router'
-
-type EquipamentoType = {
-    id: number;
-    descricao: string;
-    duracao_id: number;
-    classificacao_id: number;
-    data: string
-}
-
-type EquipamentosARMType = {
-    id: number;
-    quantidade: number;
-    equipamento_id: EquipamentoType;
-    data_aquisicao: string
-}
+import { updateClassificacao } from '../../redux/slices/classificacaoSlice'
 
 type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
-    data: EquipamentosARMType
+    ClassificacaoObject: ClassificacaoType
 }
 
-//Tipagem do formulário
-type FormValues = {
+
+type ClassificacaoType = {
     id: number;
-    descricao_equipamento: string;
-    quantidade: number;
-    classificacao_id: number;
-    tempo_duracao: string
+    tipo: string;
 }
-const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
+
+const EditarModal = ({ isOpen, setIsOpen, ClassificacaoObject }: EditarModalProps) => {
+
+    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<ClassificacaoType>({ mode: 'onChange' });
+
+    const [load, setLoad] = useState(false)
+
+    //  const [classificacoes, setClassificacoes] = useState<ClassificacaoType>({} as ClassificacaoType)
 
     const dispatch = useDispatch<any>();
-    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
-    const [load, setLoad] = useState(false)
-    const route = useRouter();
 
-    const onSubmit: SubmitHandler<FormValues> = async (arm) => {
+    const route = useRouter()
 
+    /**
+     * useEffect(() => {
+        setClassificacoes(ClassificacaoObject)
+
+    }, [])
+     */
+
+
+    /**
+     * 
+     * @param data 
+     */
+    const onSubmit: SubmitHandler<ClassificacaoType> = async (data) => {
         setLoad(true)
-
-        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
-
+        const updateClassificacaoDispatch = await dispatch(updateClassificacao({ id: ClassificacaoObject.id, tipo: data.tipo }))
         setLoad(false)
-        if (editEquipamentoDispatch.payload !== null) notifySuccess()
-        else notifyError()
-
+        if (updateClassificacaoDispatch.payload) {
+            notifySuccess()
+        } else {
+            notifyError()
+        }
     }
 
     function closeModal() {
         reset()
+
         setIsOpen(false)
     }
 
@@ -76,7 +77,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
             route.reload()
         }, 6500);
 
-        toast.success('Quantidade alterada com sucesso!', {
+        toast.success('Classificação alterada com sucesso! 😁', {
             position: 'top-center',
             autoClose: 5000,
             hideProgressBar: false,
@@ -86,9 +87,11 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
             progress: undefined
         })
 
+
+
     }
 
-    const notifyError = () => toast.error('Erro ao efectuar a operação!', {
+    const notifyError = () => toast.error('Erro ao efectuar a operação! 😥', {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,
@@ -97,6 +100,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
         draggable: true,
         progress: undefined
     })
+
 
     return (
         <>
@@ -130,7 +134,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                         as="h3"
                                         className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
                                     >
-                                        Alterar informação do equipamento
+                                        Editar classificação
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>
@@ -152,33 +156,21 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
-                                                    readOnly={true}
                                                     type="text"
-                                                    className='rounded shadow w-full read-only:ring-0 read-only:border-0'
-                                                    placeholder='Descrição do equipamento *'
-                                                    {...register('descricao_equipamento')}
-                                                    defaultValue={data.equipamento_id.descricao}
-                                                />
-
-                                            </div>
-
-                                            <div className='flex gap-2 justify-center align-center'>
-                                                <input
-                                                    min={0}
-                                                    type="number"
                                                     className='rounded shadow w-full'
-                                                    placeholder='Quantidade *'
-                                                    {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a número de telefone.", value: true },
-                                                        minLength: { message: "Quantidade insuficiente", value: 1 },
-                                                        min: { message: 'Quantidade insuficiente', value: 0 }
+                                                    placeholder='Tipo de classificação *'
+                                                    {...register('tipo', {
+                                                        required: { message: "Por favor, introduza a classificação de equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-
-                                                    defaultValue={data.quantidade}
+                                                    defaultValue={ClassificacaoObject.tipo}
                                                 />
 
 
+
+
                                             </div>
+
                                             <div className="mt-4 flex justify-end">
                                                 <button
                                                     disabled={!isValid}
@@ -201,20 +193,22 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                             <div className='text-red-700 mt-2 text-center'>
                                                 <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
                                                 <p className='text-sm'>
-                                                    {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
+                                                    {errors.tipo && (errors.tipo.message)}
                                                 </p>
-                                                <p className='text-sm'>
-                                                    {errors.quantidade && (errors.quantidade.message)}
-                                                </p>
+
+
                                             </div>
                                         </form>
+
                                     </div>
+
+
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
                     </div>
-                </Dialog>
-            </Transition>
+                </Dialog >
+            </Transition >
         </>
     )
 }

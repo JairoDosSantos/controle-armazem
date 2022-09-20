@@ -32,38 +32,34 @@ const Home: NextPage = () => {
 
     setLoad(true)
 
-    const response = await api.post('api/login', {
-      email: email,
-      password: password
-    })
+    try {
+      const response = await api.post('api/login', {
+        email: email,
+        password: password
+      })
 
+      const { user, error } = response.data
 
-    const { user, error } = response.data
-    console.log(error)
-
-    if (error) {
-      // setShowHide('flex')
+      if (error) {
+        // setShowHide('flex')
+        setShowErrorAlert(true)
+        setLoad(false)
+        return
+      }
+      if (user) {
+        await dispatch(updateUser({ user: user.email }))
+        // setShowSuccess('flex')
+        setLoad(false)
+        router.push('/painel-controlo')
+      }
+    } catch (error) {
       setShowErrorAlert(true)
       setLoad(false)
-      return
     }
-    if (user) {
-      await dispatch(updateUser({ user: user.email }))
-      // setShowSuccess('flex')
-      setLoad(false)
-      router.push('/painel-controlo')
-
-    }
-
-
-
-
   };
 
-
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2 bg-gray-50">
+    <div className="flex min-h-screen flex-col items-center  justify-center space-y-8 py-2 bg-gray-50">
       <Head>
         <title>SCA | Login</title>
         <link rel="icon" href="/favicon.ico" />
@@ -85,8 +81,8 @@ const Home: NextPage = () => {
         confirmButtonColor="#4051ef"
 
       />
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center ">
-        <div className='shadow-md py-8 px-12 rounded w-[720px] bg-white animate__animated animate__fadeIn'>
+      <main className="flex w-full flex-1 flex-col items-center justify-center lg:px-20 text-center ">
+        <div className='shadow-md py-8 px-12 rounded  lg:w-[720px] bg-white animate__animated animate__fadeIn'>
 
           <div>
             <Image src={Logo} alt="NOAH Logo" width={100} height={35} objectFit={'contain'} />
@@ -96,7 +92,7 @@ const Home: NextPage = () => {
           </div>
 
 
-          <div className="mt-6 flex max-w-2xl flex-wrap items-center justify-around sm:w-2/3 mx-auto">
+          <div className="mt-6 flex max-w-2xl flex-wrap items-center justify-around sm:w-96 mx-auto">
             <form className='w-full flex flex-col gap-4' >
               <div className='flex flex-col justify-start space-y-4'>
                 <label htmlFor="E-mail" className='text-left font-semibold bg-white'>Email :</label>
@@ -138,15 +134,16 @@ const Home: NextPage = () => {
         </div>
       </main>
 
-      <footer className="flex h-24 w-full items-center justify-center border-t bg-white">
+      <footer className="flex h-24 w-full items-center justify-center border-t bg-white ">
         <span
-          className="flex items-center justify-center gap-2 text-lg select-none"
+          className="flex flex-col md:flex-row  items-center justify-center gap-2 text-lg select-none"
         >
           Sistema de Controle de Armazem{' '}
           <Image src={Logo} alt="NOAH Logo" width={100} height={25} objectFit={'contain'} />
         </span>
       </footer>
     </div>
+
   )
 }
 

@@ -1,27 +1,28 @@
-import { useEffect, useState } from 'react'
+
 import Image from "next/image"
 
 
 import User from '../assets/user.png'
 import { FaBars } from 'react-icons/fa'
 import { useSelector } from "react-redux";
+import { useDispatch } from 'react-redux';
+import { hideSiderBar } from '../redux/slices/geralSlice';
 
 
-type HeaderProps = {
-    setHideSideBar: (valor: boolean) => void;
-    hideSideBar: boolean
-}
+const Header = () => {
 
-const Header = ({ setHideSideBar, hideSideBar }: HeaderProps) => {
+    const dispatch = useDispatch()
 
+    const { user, showSideBar } = useSelector((state: any) => state.geral)
 
-
-    const { user } = useSelector((state: any) => state.geral)
+    const changeSideBarVisibility = () => {
+        dispatch(hideSiderBar({ showSideBar: !showSideBar }))
+    }
 
     return (
-        <header className=" bg-white p-5 flex justify-between shadow ">
+        <header className=" bg-white p-5 flex justify-between shadow">
             <div>
-                <span onClick={() => setHideSideBar(!hideSideBar)}>
+                <span onClick={changeSideBarVisibility}>
                     <FaBars className="text-lg cursor-pointer" />
                 </span>
             </div>
