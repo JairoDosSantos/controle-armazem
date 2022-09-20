@@ -98,7 +98,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
 
             <SiderBar itemActive="classificacao" />
 
-            <main className='flex-1 space-y-6'>
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -196,77 +196,78 @@ const Classificacao = ({ classificacao }: ObraProps) => {
                         </div>
                     </form>
 
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded'>
-                        <div className="flex justify-between items-center">
-                            <input
-                                onChange={(e) => setSearch(e.target.value)}
-                                type="search"
-                                className=" w-full lg:w-1/3 rounded shadow "
-                                placeholder="Pesquise pela classificação" />
-                            <span className='font-semibold text-lg hidden lg:flex'>Lista de Classificações</span>
-                        </div>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Tipo</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-
-                                {
-
-                                    (classificacao && classificacao.length && search === '') ? classificacao.map((classific) => (
-                                        <tr key={classific.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{classific.id}</td>
-                                            <td className="w-1/5 ">{classific.tipo}</td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEditarClassificacao(classific)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => { setShowQuestionAlert(true); setClassificacao(classific.id) }}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    )) : filteredObras.map((filteredObra) => (
-                                        <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{filteredObra.id}</td>
-                                            <td className="w-1/5 ">{filteredObra.tipo}</td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEditarClassificacao(filteredObra)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => { setShowQuestionAlert(true); setClassificacao(filteredObra.id) }}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                }
-
-
-                            </tbody>
-                        </table>
+                    
+                </div>
+                <div className='mt-4 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto'>
+                    <div className="flex justify-between items-center">
+                        <input
+                            onChange={(e) => setSearch(e.target.value)}
+                            type="search"
+                            className=" w-full lg:w-1/3 rounded shadow "
+                            placeholder="Pesquise pela classificação" />
+                        <span className='font-semibold text-lg hidden lg:flex'>Lista de Classificações</span>
                     </div>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-72 '>Tipo</th>
+                                <th className='text-gray-600 font-bold w-20'>Editar</th>
+                                <th className='text-gray-600 font-bold w-20'>Apagar</th>
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+
+                            {
+
+                                (classificacao && classificacao.length && search === '') ? classificacao.map((classific) => (
+                                    <tr key={classific.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{classific.id}</td>
+                                        <td className="w-72 ">{classific.tipo}</td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEditarClassificacao(classific)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => { setShowQuestionAlert(true); setClassificacao(classific.id) }}
+                                                className="hover:brightness-75"
+                                                title="Apagar">
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )) : filteredObras.map((filteredObra) => (
+                                    <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{filteredObra.id}</td>
+                                        <td className="w-72 ">{filteredObra.tipo}</td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEditarClassificacao(filteredObra)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => { setShowQuestionAlert(true); setClassificacao(filteredObra.id) }}
+                                                className="hover:brightness-75"
+                                                title="Apagar">
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+
+
+                        </tbody>
+                    </table>
                 </div>
             </main>
         </div>

@@ -86,7 +86,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
     return (
         <div className='flex'>
             <SiderBar itemActive="encarregado" />
-            <main className='flex-1 space-y-6'>
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -197,49 +197,78 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                         </div>
                     </form>
 
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded relative'>
-                        <div className='absolute top-32  left-[33rem] z-50'>
-                            {loadTable && (<Image src={Load} objectFit={"contain"} width={90} height={75} />)}
-                        </div>
-                        <div className='flex items-center justify-between'>
-                            <input
-                                onChange={(e) => setSearch(e.target.value)}
-                                type="search"
-                                className="w-full lg:w-1/3 rounded shadow "
-                                placeholder="Pesq. pelo nome do Encarregado" />
-                            <span className='font-semibold text-lg hidden lg:flex'>Lista de Encarregado</span>
-                        </div>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Nome</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Telefone</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    encarregados && encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
+
+                </div>
+                <div className='mt-4 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded relative overflow-x-auto'>
+                    <div className='absolute top-32  left-[33rem] z-50'>
+                        {loadTable && (<Image src={Load} objectFit={"contain"} width={90} height={75} />)}
+                    </div>
+                    <div className='flex items-center justify-between'>
+                        <input
+                            onChange={(e) => setSearch(e.target.value)}
+                            type="search"
+                            className="w-full lg:w-1/3 rounded shadow "
+                            placeholder="Pesq. pelo nome do Encarregado" />
+                        <span className='font-semibold text-lg hidden lg:flex'>Lista de Encarregado</span>
+                    </div>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-52 '>Nome</th>
+                                <th className='text-gray-600 font-bold w-52'>Telefone</th>
+                                <th className='text-gray-600 font-bold w-20'>Editar</th>
+                                <th className='text-gray-600 font-bold w-20'>Apagar</th>
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                encarregados && encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
+                                    <tr key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{encarregado.id}</td>
+                                        <td className="w-52 ">{encarregado.nome}</td>
+                                        <td className="w-52 ">{encarregado.telefone}</td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEditEncarregado(encarregado)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => {
+                                                    setShowQuestionAlert(true);
+                                                    setIdEncarregado(encarregado.id)
+                                                }}
+                                                className="hover:brightness-75"
+                                                title="Apagar">
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )) : filteredEncarregados.map((encarregadoFiltered, index) => {
+                                    return (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{encarregado.id}</td>
-                                            <td className="w-1/5 ">{encarregado.nome}</td>
-                                            <td className="w-1/5 ">{encarregado.telefone}</td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-16 ">{encarregadoFiltered.id}</td>
+                                            <td className="w-52 ">{encarregadoFiltered.nome}</td>
+                                            <td className="w-52 ">{encarregadoFiltered.telefone}</td>
+                                            <td className="w-20  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => handleEditEncarregado(encarregado)}
+                                                    onClick={() => handleEditEncarregado(encarregadoFiltered)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-20  flex justify-center items-center">
                                                 <button
                                                     onClick={() => {
                                                         setShowQuestionAlert(true);
-                                                        setIdEncarregado(encarregado.id)
+                                                        setIdEncarregado(encarregadoFiltered.id)
                                                     }}
                                                     className="hover:brightness-75"
                                                     title="Apagar">
@@ -247,41 +276,12 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                                 </button>
                                             </td>
                                         </tr>
-                                    )) : filteredEncarregados.map((encarregadoFiltered, index) => {
-                                        return (
-                                            <tr key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/5 ">{encarregadoFiltered.id}</td>
-                                                <td className="w-1/5 ">{encarregadoFiltered.nome}</td>
-                                                <td className="w-1/5 ">{encarregadoFiltered.telefone}</td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEditEncarregado(encarregadoFiltered)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowQuestionAlert(true);
-                                                            setIdEncarregado(encarregadoFiltered.id)
-                                                        }}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
                 </div>
-
 
             </main>
         </div>

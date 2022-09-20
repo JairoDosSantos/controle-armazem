@@ -110,7 +110,7 @@ const RegistrarUsuario = ({ usuarios }: UsuarioProps) => {
     return (
         <div className='flex'>
             <SiderBar itemActive="usuario" />
-            <main className='flex-1 space-y-6'>
+            <main className='flex-1 space-y-6 overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -253,51 +253,81 @@ const RegistrarUsuario = ({ usuarios }: UsuarioProps) => {
                         </div>
                     </form>
 
-                    <div className='mt-4 text-end px-4 py-2 max-w-6xl  mx-auto bg-white rounded relative'>
-                        <div className='absolute top-32  left-[33rem] z-50'>
-                            {loadTable && (<Image src={Load} objectFit={"contain"} width={90} height={75} />)}
-                        </div>
-                        <div className='flex items-center justify-between'>
-                            <input
-                                onChange={(e) => setSearch(e.target.value)}
-                                type="search"
-                                className="w-full lg:w-1/3 rounded shadow "
-                                placeholder="Pesq. pelo nome do usuário" />
-                            <span className='font-semibold text-lg hidden lg:flex'>Lista de Usuários do sistema</span>
-                        </div>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-1/5'>ID</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>Nome</th>
-                                    <th className='text-gray-600 font-bold w-1/5 '>E-mail</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Permissão</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    usuarios && usuarios.length && search === '' ? usuarios.map((usuario, index) => (
+
+                </div>
+                <div className='mt-4 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto relative'>
+                    <div className='absolute top-32  left-[33rem] z-50'>
+                        {loadTable && (<Image src={Load} objectFit={"contain"} width={90} height={75} />)}
+                    </div>
+                    <div className='flex items-center justify-between'>
+                        <input
+                            onChange={(e) => setSearch(e.target.value)}
+                            type="search"
+                            className="w-full lg:w-1/3 rounded shadow "
+                            placeholder="Pesq. pelo nome do usuário" />
+                        <span className='font-semibold text-lg hidden lg:flex'>Lista de Usuários do sistema</span>
+                    </div>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-52 '>Nome</th>
+                                <th className='text-gray-600 font-bold w-52 '>E-mail</th>
+                                <th className='text-gray-600 font-bold w-52'>Permissão</th>
+                                <th className='text-gray-600 font-bold w-20'>Editar</th>
+                                <th className='text-gray-600 font-bold w-20'>Apagar</th>
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                usuarios && usuarios.length && search === '' ? usuarios.map((usuario, index) => (
+                                    <tr key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{usuario.id}</td>
+                                        <td className="w-52 ">{usuario.nome}</td>
+                                        <td className="w-52 ">{usuario.email}</td>
+                                        <td className="w-52 ">{usuario.permissao}</td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => handleEditarUsuario(usuario)}
+                                                className="hover:brightness-75"
+                                                title="Editar">
+                                                <FaEdit />
+                                            </button>
+                                        </td>
+                                        <td className="w-20  flex justify-center items-center">
+                                            <button
+                                                onClick={() => {
+                                                    setShowQuestionAlert(true);
+                                                    setIdUsuario(usuario.id)
+                                                }}
+                                                className="hover:brightness-75"
+                                                title="Apagar">
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )) : usuariosFiltrados.map((usuarioFiltered, index) => {
+                                    return (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-1/5 ">{usuario.id}</td>
-                                            <td className="w-1/5 ">{usuario.nome}</td>
-                                            <td className="w-1/5 ">{usuario.email}</td>
-                                            <td className="w-1/5 ">{usuario.permissao}</td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-16 ">{usuarioFiltered.id}</td>
+                                            <td className="w-52 ">{usuarioFiltered.nome}</td>
+                                            <td className="w-52 ">{usuarioFiltered.email}</td>
+                                            <td className="w-52 ">{usuarioFiltered.permissao}</td>
+                                            <td className="w-20  flex justify-center items-center">
                                                 <button
-                                                    onClick={() => handleEditarUsuario(usuario)}
+                                                    onClick={() => handleEditarUsuario(usuarioFiltered)}
                                                     className="hover:brightness-75"
                                                     title="Editar">
                                                     <FaEdit />
                                                 </button>
                                             </td>
-                                            <td className="w-1/5  flex justify-center items-center">
+                                            <td className="w-20  flex justify-center items-center">
                                                 <button
                                                     onClick={() => {
                                                         setShowQuestionAlert(true);
-                                                        setIdUsuario(usuario.id)
+                                                        setIdUsuario(usuarioFiltered.id)
                                                     }}
                                                     className="hover:brightness-75"
                                                     title="Apagar">
@@ -305,42 +335,12 @@ const RegistrarUsuario = ({ usuarios }: UsuarioProps) => {
                                                 </button>
                                             </td>
                                         </tr>
-                                    )) : usuariosFiltrados.map((usuarioFiltered, index) => {
-                                        return (
-                                            <tr key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-1/5 ">{usuarioFiltered.id}</td>
-                                                <td className="w-1/5 ">{usuarioFiltered.nome}</td>
-                                                <td className="w-1/5 ">{usuarioFiltered.email}</td>
-                                                <td className="w-1/5 ">{usuarioFiltered.permissao}</td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEditarUsuario(usuarioFiltered)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowQuestionAlert(true);
-                                                            setIdUsuario(usuarioFiltered.id)
-                                                        }}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
                 </div>
-
             </main>
         </div>
     )
