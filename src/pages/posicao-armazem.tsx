@@ -170,7 +170,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                 />
                 {showEditModal && <EditarModal isOpen={showEditModal} setIsOpen={setShowEditModal} data={armazemObject} />}
-                <div className='overflow-auto max-h-[85vh] max-w-6xl mx-auto overflow-hide-scroll-bar'>
+                <div className='overflow-auto max-h-[85vh] max-w-4xl mx-auto overflow-hide-scroll-bar'>
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
