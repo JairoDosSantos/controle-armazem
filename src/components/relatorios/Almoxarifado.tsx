@@ -165,8 +165,8 @@ export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
                     <View style={styles.fotoTitulo}>
                         {/**
                        *   <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
-                       <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
-                        <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
+                           <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
+                           <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                        */}
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
                         <Text>NOAH CONSTUCTIONS</Text>

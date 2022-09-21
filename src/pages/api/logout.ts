@@ -8,7 +8,7 @@ export default async function logoutUser(req: NextApiRequest, res: NextApiRespon
 
     if (!error) nookies.destroy(ctx, 'USER_LOGGED_ARMAZEM', { path: '/' })
 
-    if (error) return res.status(401).json({ error: error.message });
+    if (error) return res.status(401).json({ result: false });
 
-    return res.status(200).json({ logout: true });
+    return res.status(200).json({ result: true });
 }

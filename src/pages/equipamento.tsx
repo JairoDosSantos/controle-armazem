@@ -340,7 +340,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
 
                 </div>
-                <div className=' mt-4 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded overflow-x-auto'>
+                <div className=' mt-4 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
                     <span className='font-semibold text-lg'>Lista de Equipamentos arm. geral</span>
                     <table className='table  w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>

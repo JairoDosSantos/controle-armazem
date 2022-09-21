@@ -26,11 +26,9 @@ const SiderBar = ({ itemActive }: SiderBarProps) => {
     const logOut = async () => {
 
         try {
-            const response = await api.post('api/logout')
 
-            if (response.data) {
-                router.push('/')
-            }
+            router.push('/sair')
+
         } catch (error) {
 
         }

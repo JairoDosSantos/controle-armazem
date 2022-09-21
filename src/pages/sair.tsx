@@ -1,11 +1,10 @@
-import { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import { GetServerSidePropsContext } from 'next'
 import React from 'react'
 import nookies from 'nookies'
 import { supabase } from '../utils/supabaseClient'
 import Head from 'next/head'
 
-import dynamic from 'next/dynamic'
-//const RelatorioCompras = dynamic(() => import('../components/relatorios/Testando'), { ssr: false })
+
 
 const Sair = () => {
     return (
@@ -13,9 +12,6 @@ const Sair = () => {
             <Head>
                 <title>Saindo ...</title>
             </Head>
-            {/**
-       *       <RelatorioCompras />
-       */}
         </div>
     )
 }

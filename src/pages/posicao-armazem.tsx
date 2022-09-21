@@ -217,7 +217,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
 
                 </div>
-                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto'>
+                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
                     <span className='font-semibold text-lg'>Relatório armazem geral</span>
                     <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>
