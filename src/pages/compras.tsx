@@ -1,5 +1,8 @@
 import { useState } from "react"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import Head from "next/head"
+import { useRouter } from "next/router"
+import dynamic from "next/dynamic"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
@@ -10,19 +13,16 @@ import Load from '../assets/load.gif'
 import EditarModal from "../components/compras/EditarModal"
 
 
-import dynamic from "next/dynamic"
-import { GetServerSideProps, GetServerSidePropsContext } from "next"
+import AES from 'crypto-js/aes';
+import { enc } from 'crypto-js';
+
 import { wrapper } from "../redux/store"
 import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import nookies from 'nookies'
-import { useRouter } from "next/router"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
-
-
-
 
 type EquipamentoType = {
     id: number;
@@ -73,6 +73,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     const [showEditModal, setShowEditModal] = useState(false)
     const [compraObject, setCompraObject] = useState<CompraType>({} as CompraType)
 
+    console.log(searchByDate)
 
     /**
      * 
@@ -112,12 +113,21 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
         setShowEditModal(true)
     }
 
+
+    const encriptSTR = (params: string) => {
+
+        const encriptedParams = AES.encrypt(params, 'AES-256-CBC').toString()
+
+        return encodeURIComponent(encriptedParams)
+
+    }
+
     return (
         <div className='flex overflow-x-hidden'>
             {/**    <RelatorioCompras compras={compras} /> */}
 
             <SiderBar itemActive="devolucoes" />
-            <main className='flex-1 space-y-6'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -235,9 +245,10 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                 <FaPrint />
                                 <span>Imprimir tudo</span>
                             </button>
+
                             <button
                                 disabled={!(searchByEquipamento || searchByDate)}
-                                onClick={() => route.push(`/relatorio/compras/${searchByEquipamento === '' ? 'equipamento' : searchByEquipamento}/${searchByDate}`)}
+                                onClick={() => route.push(`/relatorio/compras/${searchByEquipamento === '' ? encriptSTR('equipamento') : encriptSTR(searchByEquipamento)}/${searchByDate === '' ? '' : encriptSTR(searchByDate)}`)}
                                 className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
@@ -248,8 +259,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                 </div>
 
                 {/** Relatório- tabela de compras */}
-                <div className=' mt-8 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-4xl bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
-                    <span className='font-semibold text-lg'>Relatório de Compras</span>
+                <div className=' mt-8 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+
                     <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>
                             <tr className='flex justify-between items-center bg-gray-200 px-4 py-2 rounded'>
@@ -260,11 +271,10 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                 <th className='text-gray-600 font-bold w-40 '>Qtd. comprada</th>
                                 <th className='text-gray-600 font-bold w-40 '>Preço</th>
                                 <th className='text-gray-600 font-bold w-44 '>Data de compra</th>
-
                                 <th className='text-gray-600 font-bold w-16 '>Editar</th>
                                 {/**
                                      *  <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
-                             */}
+                                */}
                             </tr>
                         </thead>
                         <tbody className=''>
@@ -291,16 +301,19 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 <FaEdit />
                                             </button>
                                         </td>
-                                        {/**
-                                             * <td className="w-1/4   flex justify-center items-center">
-                                                <button
-                                                    onClick={() => setShowQuestionAlert(true)}
-                                                    className="hover:brightness-75"
-                                                    title="Apagar">
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
-                                             */}
+                                        {
+                                            /**
+                                             * 
+                                               <td className="w-1/4   flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => setShowQuestionAlert(true)}
+                                                        className="hover:brightness-75"
+                                                        title="Apagar">
+                                                        <FaTrash />
+                                                    </button>
+                                                </td>
+                                            */
+                                        }
                                     </tr>
                                 )) : findedCompras.map((compra, index) => (
                                     <tr

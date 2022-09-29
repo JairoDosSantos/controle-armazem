@@ -10,7 +10,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 
 type duracaoState = {
@@ -24,13 +25,17 @@ const initialState: duracaoState = {
 }
 
 
-export const fetchOneSaida = createAsyncThunk('/auditoria/fetchAll', async ({ data_retirada, equipamento_id, obra_id }: Omit<AuditoriaType, 'id' | 'quantidade_retirada' | 'data_devolucao' | 'quantidade_devolvida'>) => {
+export const fetchOneSaida = createAsyncThunk('/auditoria/fetchAll', async ({ data_retirada, equipamento_id, obra_id, estado }: Omit<AuditoriaType, 'id' | 'quantidade_retirada' | 'data_devolucao' | 'quantidade_devolvida'>) => {
     try {
 
         const { data, error } = await supabase
             .from('auditoria')
-            .select("id, equipamento_id,obra_id,data_retirada,quantidade_retirada,data_devolucao,quantidade_devolvida")
-            .match({ data_retirada, equipamento_id, obra_id })
+            .select("*")
+            .eq('data_retirada', data_retirada)
+            .eq('equipamento_id', equipamento_id)
+            .eq('obra_id', obra_id)
+            .eq('estado', estado)
+
         if (error) return error
         return data
 
@@ -44,7 +49,7 @@ export const fetchSaida = createAsyncThunk('/auditoria/fetchAll', async () => {
 
         const { data, error } = await supabase
             .from('auditoria')
-            .select("id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),obra_id(id,obra_nome,encarregado_id),data_retirada,quantidade_retirada,data_devolucao,quantidade_devolvida")
+            .select("id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),obra_id(id,obra_nome,encarregado_id),data_retirada,quantidade_retirada,data_devolucao,quantidade_devolvida,estado")
         if (error) return error
         return data
 
@@ -54,12 +59,12 @@ export const fetchSaida = createAsyncThunk('/auditoria/fetchAll', async () => {
 })
 
 
-export const insertAuditoria = createAsyncThunk('/auditoria/create', async ({ data_retirada, equipamento_id, obra_id, quantidade_retirada }: Omit<AuditoriaType, 'id' | 'data_devolucao' | 'quantidade_devolvida'>) => {
+export const insertAuditoria = createAsyncThunk('/auditoria/create', async ({ data_retirada, equipamento_id, obra_id, quantidade_retirada, estado }: Omit<AuditoriaType, 'id' | 'data_devolucao' | 'quantidade_devolvida'>) => {
     try {
 
         const { data, error } = await supabase
             .from('auditoria')
-            .insert({ data_retirada, equipamento_id, obra_id, quantidade_retirada })
+            .insert({ data_retirada, equipamento_id, obra_id, quantidade_retirada, estado })
             .single()
 
         return data
@@ -69,13 +74,13 @@ export const insertAuditoria = createAsyncThunk('/auditoria/create', async ({ da
     }
 })
 
-export const updateAuditoria = createAsyncThunk('/auditoria/update', async ({ data_devolucao, quantidade_devolvida, data_retirada, equipamento_id, obra_id, quantidade_retirada }: Omit<AuditoriaType, 'id'>) => {
+export const updateAuditoria = createAsyncThunk('/auditoria/update', async ({ data_devolucao, quantidade_devolvida, data_retirada, equipamento_id, obra_id, quantidade_retirada, estado }: Omit<AuditoriaType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('auditoria')
-            .update([{ data_devolucao, quantidade_devolvida, data_retirada, equipamento_id, obra_id, quantidade_retirada }])
-            .match({ data_retirada, equipamento_id, obra_id })
+            .update([{ data_devolucao, quantidade_devolvida, data_retirada, equipamento_id, obra_id, quantidade_retirada, estado }])
+            .match({ data_retirada, equipamento_id, obra_id, estado })
         if (error) return error
         return data
 

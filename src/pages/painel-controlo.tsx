@@ -27,7 +27,7 @@ const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST
     return (
         <div className='flex'>
             <SiderBar itemActive='painel-controlo' />
-            <main className='flex-1 space-y-6'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>

@@ -20,7 +20,7 @@ const Header = () => {
     }
 
     return (
-        <header className=" bg-white p-5 flex justify-between shadow">
+        <header className=" bg-white p-5 flex justify-between shadow z-50">
             <div>
                 <span onClick={changeSideBarVisibility}>
                     <FaBars className="text-lg cursor-pointer" />

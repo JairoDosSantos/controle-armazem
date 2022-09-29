@@ -53,7 +53,8 @@ type FormValues = {
     descricao_equipamento: number;
     quantidade: number;
     obra_id: number;
-    data_transferencia: string
+    data_transferencia: string;
+    estado: string
 }
 
 
@@ -70,12 +71,12 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
         setLoad(true)
         try {
             data.descricao_equipamento = idEquipamento
-            const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+            const getEquipamentosNoARM = await dispatch(fetchOne({ id: data.descricao_equipamento, estado: data.estado }))
             const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
 
             if (equipamentoQuantidade.length > 0) {
 
-                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, estado: data.estado }))
                 const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
 
                 if (almoxarifarioFinded && almoxarifarioFinded.length > 0) {
@@ -117,7 +118,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
                 } else {
 
-                    const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
+                    const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ estado: data.estado, data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
                     const almoxarifarioData = unwrapResult(almoxarifarioInsert)
 
 
@@ -135,7 +136,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
                 }
 
-                const auditoria = await dispatch(insertAuditoria({ data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+                const auditoria = await dispatch(insertAuditoria({ estado: data.estado, data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
                 if (auditoria.meta.arg) {
                     // console.log('sucesso', auditoria.payload)
                     //sucesso
@@ -277,7 +278,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                                                 <select
                                                     {...register('obra_id')}
 
-                                                    className='rounded shadow w-full cursor-pointer'>
+                                                    className='rounded shadow w-1/2 cursor-pointer'>
                                                     <option value="#" className='text-gray-300'>Selecione a Obra</option>
                                                     {
                                                         obras.length && obras.map((obra, index) => {
@@ -289,6 +290,17 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                                                         })
                                                     }
 
+                                                </select>
+                                                <select
+                                                    {...register('estado', {
+                                                        required: { message: "Por favor, introduza a Estado do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-1/2 rounded shadow cursor-pointer ">
+                                                    <option className='text-gray-400' value="">Selecione o estado</option>
+                                                    <option value="Novo">Novo</option>
+                                                    <option value="Avariado">{'Avariado(a)'}</option>
+                                                    <option value="Usado">Usado</option>
                                                 </select>
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>

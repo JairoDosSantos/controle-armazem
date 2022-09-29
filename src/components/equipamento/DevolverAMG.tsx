@@ -53,7 +53,8 @@ type FormValues = {
     quantidade: number;
     obra_id: number;
     data_devolucao: string;
-    data_retirada: string
+    data_retirada: string;
+    estado: string
 }
 
 const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
@@ -66,16 +67,32 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
 
     const dispatch = useDispatch<any>()
 
+    /**
+     * Método responsável por efectuar uma devolução ao armazem central
+     */
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
         try {
 
             data.descricao_equipamento = idEquipamento;
-            const getEquipamentosNoARM = await dispatch(fetchOne(data.descricao_equipamento))
+            const getEquipamentosNoARM = await dispatch(fetchOne({ id: data.descricao_equipamento, estado: data.estado }))
             const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
 
+            const fetchOneSaidaByDate = await dispatch(fetchOneSaida({ data_retirada: data.data_retirada, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, estado: data.estado }))
+            const auditorias = unwrapResult(fetchOneSaidaByDate)
+
+            if (auditorias.length <= 0) {
+                notifyError('Não há registro desta movimentação na base de dados!')
+
+                setLoad(false)
+                return
+            }
+
             if (equipamentoQuantidade.length) {
-                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
+
+
+
+                const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, estado: data.estado }))
                 const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
 
                 if (almoxarifarioFinded.length <= 0) {
@@ -123,8 +140,6 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                 return
             }
 
-            const fetchOneSaidaByDate = await dispatch(fetchOneSaida({ data_retirada: data.data_retirada, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id }))
-            const auditorias = unwrapResult(fetchOneSaidaByDate)
 
             //Vê bem esta actualização
             let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
@@ -137,7 +152,6 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
             } else {
                 notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
             }
-
             setLoad(false)
         } catch (error) {
             notifyError('Ocorreu um erro ao efectuar a submissão do formulário. Tente mais tarde!')
@@ -281,6 +295,20 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                         min: { message: 'Quantidade insuficiente', value: 1 }
                                                     })}
                                                 />
+                                            </div>
+
+                                            <div className='flex flex-col lg:flex-row gap-2 justify-center align-center'>
+                                                <select
+                                                    {...register('estado', {
+                                                        required: { message: "Por favor, introduza a Estado do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
+                                                    className="w-full rounded shadow cursor-pointer ">
+                                                    <option className='text-gray-400' value="">Selecione o estado</option>
+                                                    <option value="Novo">Novo</option>
+                                                    <option value="Avariado">{'Avariado(a)'}</option>
+                                                    <option value="Usado">Usado</option>
+                                                </select>
                                             </div>
 
                                             <div className='flex gap-2 justify-center align-center'>

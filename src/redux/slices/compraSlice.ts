@@ -8,7 +8,8 @@ type CompraType = {
     equipamento_id: number;
     preco: number;
     data_compra: string;
-    quantidade_comprada: number
+    quantidade_comprada: number;
+    estado: string
 }
 
 type compraState = {
@@ -35,12 +36,12 @@ export const fetchCompra = createAsyncThunk('/compra/fetchAll', async () => {
     }
 })
 
-export const insertCompra = createAsyncThunk('/compra/create', async ({ data_compra, equipamento_id, preco, quantidade_comprada }: Omit<CompraType, 'id'>) => {
+export const insertCompra = createAsyncThunk('/compra/create', async ({ data_compra, equipamento_id, preco, quantidade_comprada, estado }: Omit<CompraType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('compra')
-            .insert({ data_compra, equipamento_id, preco, quantidade_comprada })
+            .insert({ data_compra, equipamento_id, preco, quantidade_comprada, estado })
             .single()
         if (error) return false
         return true
@@ -50,12 +51,12 @@ export const insertCompra = createAsyncThunk('/compra/create', async ({ data_com
     }
 })
 
-export const updateCompra = createAsyncThunk('/compra/update', async ({ id, data_compra, equipamento_id, preco, quantidade_comprada }: CompraType) => {
+export const updateCompra = createAsyncThunk('/compra/update', async ({ id, data_compra, equipamento_id, preco, quantidade_comprada, estado }: CompraType) => {
     try {
 
         const { data, error } = await supabase
             .from('compra')
-            .update([{ data_compra, equipamento_id, preco, quantidade_comprada }])
+            .update([{ data_compra, equipamento_id, preco, quantidade_comprada, estado }])
             .match({ id })
 
         if (error) return null

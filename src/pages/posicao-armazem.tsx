@@ -31,7 +31,8 @@ type EquipamentosARMType = {
     id: number;
     quantidade: number;
     equipamento_id: EquipamentoType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 type DuracaoType = {
     id: number;
@@ -107,7 +108,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
     return (
         <div className='flex'>
             <SiderBar itemActive="posicao-armazem" />
-            <main className='flex-1 space-y-6 overflow-x-hidden'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -244,6 +245,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                         <td className="w-44 ">{findDuracao(equipamento.equipamento_id.duracao_id).tempo}</td>
 
                                         <td className="w-40 ">{equipamento.quantidade}</td>
+                                        <td className="w-40 ">{equipamento.estado}</td>
                                         {/**    <td className="w-1/5 ">22-08-2022</td> */}
                                         {
                                             /**
@@ -275,6 +277,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                         <td className="w-52 ">{findClassificacao(finded.equipamento_id.classificacao_id).tipo}</td>
                                         <td className="w-44 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
                                         <td className="w-40 ">{finded.quantidade}</td>
+                                        <td className="w-40 ">{finded.estado}</td>
 
                                         {
                                             /**

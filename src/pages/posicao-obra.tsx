@@ -49,7 +49,8 @@ type Almoxarifario = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     obra_id: ObraType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 type PosicaoObraProps = {
     almoxarifarios: Almoxarifario[];
@@ -121,7 +122,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
     return (
         <div className='flex'>
             <SiderBar itemActive="posicao-obra" />
-            <main className='flex-1 space-y-6 overflow-x-hidden'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -247,39 +248,43 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
-                        <span className='font-semibold text-lg '>Relatório almoxarifário</span>
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
 
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-16'>ID</th>
-                                    <th className='text-gray-600 font-bold w-72 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-52'>Classificação</th>
-                                    <th className='text-gray-600 font-bold w-52'>Tempo de duração</th>
-                                    <th className='text-gray-600 font-bold w-20'>Quantidade</th>
-                                    <th className='text-gray-600 font-bold w-52'>Obra</th>
-                                    {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                    {/**  <th className='text-gray-600 font-bold w-1/5'>Editar</th>
+                </div>
+                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                    <span className='font-semibold text-lg '>Relatório almoxarifário</span>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-52'>Classificação</th>
+                                <th className='text-gray-600 font-bold w-42'>Duração</th>
+                                <th className='text-gray-600 font-bold w-20'>Qtd</th>
+                                <th className='text-gray-600 font-bold w-52'>Obra</th>
+                                <th className='text-gray-600 font-bold w-40'>Estado</th>
+                                {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
+                                {/**  <th className='text-gray-600 font-bold w-1/5'>Editar</th>
                                     <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-16 ">{almoxarifario.id}</td>
-                                            <td className="w-72 ">{almoxarifario.equipamento_id.descricao}</td>
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{almoxarifario.id}</td>
+                                        <td className="w-72 ">{almoxarifario.equipamento_id.descricao}</td>
 
-                                            <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
+                                        <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
-                                            <td className="w-20 ">{almoxarifario.quantidade}</td>
-                                            <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
-                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                            {/**
+                                        <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
+                                        <td className="w-20 ">{almoxarifario.quantidade}</td>
+                                        <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
+                                        <td className="w-40 ">{almoxarifario.estado}</td>
+                                        {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                        {/**
                                              *    <td className="w-1/5  flex justify-center items-center">
                                                 <button onClick={() => handleEdit(almoxarifario)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
@@ -294,21 +299,22 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                                     </button>
                                                 </td>
                                              */}
-                                        </tr>
-                                    )) : findedEquipamento.map((finded, index) => (
-                                        <tr
-                                            key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-16 ">{finded.id}</td>
-                                            <td className="w-72 ">{finded.equipamento_id.descricao}</td>
+                                    </tr>
+                                )) : findedEquipamento.map((finded, index) => (
+                                    <tr
+                                        key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16 ">{finded.id}</td>
+                                        <td className="w-72 ">{finded.equipamento_id.descricao}</td>
 
-                                            <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
+                                        <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-52 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
-                                            <td className="w-20 ">{finded.quantidade}</td>
-                                            <td className="w-52 ">{finded.obra_id.obra_nome}</td>
-                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                            {/**
+                                        <td className="w-52 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
+                                        <td className="w-20 ">{finded.quantidade}</td>
+                                        <td className="w-52 ">{finded.obra_id.obra_nome}</td>
+                                        <td className="w-40 ">{finded.estado}</td>
+                                        {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                        {/**
                                             *  <td className="w-1/5  flex justify-center items-center">
                                                 <button onClick={() => handleEdit(finded)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
@@ -323,17 +329,15 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                                     </button>
                                                  </td>
                                             */}
-                                        </tr>
-                                    ))
-                                }
+                                    </tr>
+                                ))
+                            }
 
 
 
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
-
 
             </main >
         </div >

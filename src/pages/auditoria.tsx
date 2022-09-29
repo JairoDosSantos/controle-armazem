@@ -38,7 +38,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 type AuditoriaProps = {
     auditoria: AuditoriaType[];
@@ -47,8 +48,6 @@ type AuditoriaProps = {
 
 const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
-    const [hideSideBar, setHideSideBar] = useState(false)
-    const [load, setLoad] = useState(false)
 
     const route = useRouter()
 
@@ -81,7 +80,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
     return (
         <div className='flex'>
             <SiderBar itemActive="saidas" />
-            <main className='flex-1 space-y-6 overflow-x-hidden'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -235,41 +234,45 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
-                        <span className='font-semibold text-lg'>Relatório de {filtroPorMovimentacoes ? 'devoluções' : 'saídas'}</span>
-                        {
-                            filtroPorMovimentacoes ? (
-                                <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                                    <thead>
-                                        <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                            <th className='text-gray-600 font-bold w-16 text-center'>ID</th>
-                                            <th className='text-gray-600 font-bold w-72 text-center '>Descrição</th>
-                                            <th className='text-gray-600 font-bold w-52 text-center'>Obra</th>
-                                            <th className='text-gray-600 font-bold w-20 text-center'>Qtd. levada</th>
-                                            <th className='text-gray-600 font-bold w-24 text-center'>Qtd. devolvida</th>
-                                            <th className='text-gray-600 font-bold w-44 text-center'>Data de aquisição</th>
-                                            <th className='text-gray-600 font-bold w-44 text-center'>Data devolução</th>
-                                            {/**
+
+                </div >
+                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                    <span className='font-semibold text-lg'>Relatório de {filtroPorMovimentacoes ? 'devoluções' : 'saídas'}</span>
+                    {
+                        filtroPorMovimentacoes ? (
+                            <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                                <thead>
+                                    <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                        <th className='text-gray-600 font-bold w-16 text-center'>ID</th>
+                                        <th className='text-gray-600 font-bold w-72 text-center '>Descrição</th>
+                                        <th className='text-gray-600 font-bold w-52 text-center'>Obra</th>
+                                        <th className='text-gray-600 font-bold w-20 text-center'>Qtd. levada</th>
+                                        <th className='text-gray-600 font-bold w-20 text-center'>Qtd. devolvida</th>
+                                        <th className='text-gray-600 font-bold w-44 text-center'>Data de aquisição</th>
+                                        <th className='text-gray-600 font-bold w-40 text-center'>Estado</th>
+                                        <th className='text-gray-600 font-bold w-44 text-center'>Data devolução</th>
+                                        {/**
                                          *     <th className='text-gray-600 font-bold w-1/5 text-center'>Editar</th>
                                             <th className='text-gray-600 font-bold w-1/5 text-center'>Apagar</th>
                                          */}
-                                        </tr>
-                                    </thead>
-                                    <tbody className=''>
+                                    </tr>
+                                </thead>
+                                <tbody className=''>
 
-                                        {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((devolucao, index) => {
-                                            if (devolucao.data_devolucao) {
-                                                return (
-                                                    <tr key={index}
-                                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                        <td className="w-16 text-center">{devolucao.id}</td>
-                                                        <td className="w-72 text-center">{devolucao.equipamento_id.descricao}</td>
-                                                        <td className="w-52 text-center">{devolucao.obra_id.obra_nome}</td>
-                                                        <td className="w-20 text-center">{devolucao.quantidade_retirada}</td>
-                                                        <td className="w-20 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
-                                                        <td className="w-44 text-center">{devolucao.data_retirada}</td>
-                                                        <td className="w-44 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
-                                                        {/**    
+                                    {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((devolucao, index) => {
+                                        if (devolucao.data_devolucao) {
+                                            return (
+                                                <tr key={index}
+                                                    className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                    <td className="w-16 text-center">{devolucao.id}</td>
+                                                    <td className="w-72 text-center">{devolucao.equipamento_id.descricao}</td>
+                                                    <td className="w-52 text-center">{devolucao.obra_id.obra_nome}</td>
+                                                    <td className="w-20 text-center">{devolucao.quantidade_retirada}</td>
+                                                    <td className="w-20 text-center">{devolucao.quantidade_devolvida === 0 ? 'N/D' : devolucao.quantidade_devolvida}</td>
+                                                    <td className="w-44 text-center">{devolucao.data_retirada}</td>
+                                                    <td className="w-40 text-center">{devolucao.estado}</td>
+                                                    <td className="w-44 text-center">{devolucao.data_devolucao ?? 'N/D'}</td>
+                                                    {/**    
                                                         *  <td className="w-1/5 text-center flex justify-center items-center">
                                                                 <button
                                                                     onClick={() => handleEdit(devolucao)}
@@ -288,83 +291,86 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                                 </button>
                                                             </td>
                                                         */}
-                                                    </tr>
-                                                )
-                                            }
-                                        }) : findedAuditoria.map((findAud, index) => {
-                                            if (findAud.quantidade_devolvida) {
-                                                return (<tr key={index}
-                                                    className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                    <td className="w-16 text-center ">{findAud.id}</td>
-                                                    <td className="w-72 text-center ">{findAud.equipamento_id.descricao}</td>
-                                                    <td className="w-52 text-center ">{findAud.obra_id.obra_nome}</td>
-                                                    <td className="w-20 text-center ">{findAud.quantidade_retirada}</td>
-                                                    <td className="w-20 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
-                                                    <td className="w-44 text-center ">{findAud.data_retirada}</td>
-                                                    <td className="w-44 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
-                                                    {
-                                                        /**      
-                                                        * <td className="w-1/5 text-center  flex justify-center items-center">
-                                                                <button
-                                                                    onClick={() => handleEdit(findAud)}
-                                                                    className="hover:brightness-75"
-                                                                    title="Editar">
-                                                                    <FaEdit />
-                                                                </button>
-                                                          </td>
-    
-                                                        * <td className="w-1/5  flex justify-center items-center">
-                                                                <button
-                                                                    onClick={() => setShowQuestionAlert(true)}
-                                                                    className="hover:brightness-75"
-                                                                    title="Apagar">
-                                                                    <FaTrash />
-                                                                </button>
-                                                          </td>
-                                                    */
-                                                    }
-                                                </tr>)
-                                            }
-                                        })
+                                                </tr>
+                                            )
                                         }
-                                    </tbody>
-                                </table>
-                            ) : (
-                                <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                                    <thead>
-                                        <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                            <th className='text-gray-600 font-bold w-16'>ID</th>
-                                            <th className='text-gray-600 font-bold w-72'>Descrição</th>
-                                            <th className='text-gray-600 font-bold w-52'>Obra</th>
-                                            <th className='text-gray-600 font-bold w-20'>Qtd. tirada</th>
-                                            <th className='text-gray-600 font-bold w-40 '>Data de saída</th>
+                                    }) : findedAuditoria.map((findAud, index) => {
+                                        if (findAud.quantidade_devolvida) {
+                                            return (<tr key={index}
+                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                                <td className="w-16 text-center ">{findAud.id}</td>
+                                                <td className="w-72 text-center ">{findAud.equipamento_id.descricao}</td>
+                                                <td className="w-52 text-center ">{findAud.obra_id.obra_nome}</td>
+                                                <td className="w-20 text-center ">{findAud.quantidade_retirada}</td>
+                                                <td className="w-20 text-center ">{findAud.quantidade_devolvida === 0 ? 'N/D' : findAud.quantidade_devolvida}</td>
+                                                <td className="w-44 text-center ">{findAud.data_retirada}</td>
+                                                <td className="w-40 text-center ">{findAud.estado}</td>
+                                                <td className="w-44 text-center ">{findAud.data_devolucao ?? 'N/D'}</td>
+                                                {
+                                                    /**      
+                                                    * <td className="w-1/5 text-center  flex justify-center items-center">
+                                                            <button
+                                                                onClick={() => handleEdit(findAud)}
+                                                                className="hover:brightness-75"
+                                                                title="Editar">
+                                                                <FaEdit />
+                                                            </button>
+                                                      </td>
+ 
+                                                    * <td className="w-1/5  flex justify-center items-center">
+                                                            <button
+                                                                onClick={() => setShowQuestionAlert(true)}
+                                                                className="hover:brightness-75"
+                                                                title="Apagar">
+                                                                <FaTrash />
+                                                            </button>
+                                                      </td>
+                                                */
+                                                }
+                                            </tr>)
+                                        }
+                                    })
+                                    }
+                                </tbody>
+                            </table>
+                        ) : (
+                            <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                                <thead>
+                                    <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                        <th className='text-gray-600 font-bold w-16'>ID</th>
+                                        <th className='text-gray-600 font-bold w-72'>Descrição</th>
+                                        <th className='text-gray-600 font-bold w-52'>Obra</th>
+                                        <th className='text-gray-600 font-bold w-20'>Qtd. tirada</th>
+                                        <th className='text-gray-600 font-bold w-20 '>Estado</th>
+                                        <th className='text-gray-600 font-bold w-40 '>Data de saída</th>
 
-                                            <th className='text-gray-600 font-bold  w-20'>Editar</th>
-                                            {/**
+                                        <th className='text-gray-600 font-bold  w-20'>Editar</th>
+                                        {/**
                                              * <th className='text-gray-600 font-bold w-1/4 '>Data de Compra</th>
                                             <th className='text-gray-600 font-bold w-1/4 '>Apagar</th>
                                             */}
-                                        </tr>
-                                    </thead>
-                                    <tbody className=''>
-                                        {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((saida, index) => (
-                                            <tr
-                                                key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-16  ">{saida.id}</td>
-                                                <td className="w-72  ">{saida.equipamento_id.descricao}</td>
-                                                <td className="w-52  ">{saida.obra_id.obra_nome}</td>
-                                                <td className="w-20  ">{saida.quantidade_retirada}</td>
-                                                <td className="w-40  ">{saida.data_retirada}</td>
-                                                <td className="w-20   flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEdit(saida)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar saída">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                {/**
+                                    </tr>
+                                </thead>
+                                <tbody className=''>
+                                    {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((saida, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16  ">{saida.id}</td>
+                                            <td className="w-72  ">{saida.equipamento_id.descricao}</td>
+                                            <td className="w-52  ">{saida.obra_id.obra_nome}</td>
+                                            <td className="w-20  ">{saida.quantidade_retirada}</td>
+                                            <td className="w-20  ">{saida.estado}</td>
+                                            <td className="w-40  ">{saida.data_retirada}</td>
+                                            <td className="w-20   flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEdit(saida)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar saída">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            {/**
                                                 *  
                                                 * <td className="w-1/4  ">22-08-2022</td>
                                                 * 
@@ -377,24 +383,25 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     </button>
                                                 </td>
                                                 */}
-                                            </tr>
-                                        )) : findedAuditoria.map((findAud, index) => (
-                                            <tr key={index}
-                                                className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                                <td className="w-16">{findAud.id}</td>
-                                                <td className="w-72">{findAud.equipamento_id.descricao}</td>
-                                                <td className="w-52">{findAud.obra_id.obra_nome}</td>
-                                                <td className="w-20">{findAud.quantidade_retirada}</td>
-                                                <td className="w-40">{findAud.data_retirada}</td>
-                                                <td className="w-20 flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEdit(findAud)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar saída">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                {/**
+                                        </tr>
+                                    )) : findedAuditoria.map((findAud, index) => (
+                                        <tr key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16">{findAud.id}</td>
+                                            <td className="w-72">{findAud.equipamento_id.descricao}</td>
+                                            <td className="w-52">{findAud.obra_id.obra_nome}</td>
+                                            <td className="w-20">{findAud.quantidade_retirada}</td>
+                                            <td className="w-20">{findAud.estado}</td>
+                                            <td className="w-40">{findAud.data_retirada}</td>
+                                            <td className="w-20 flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEdit(findAud)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar saída">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            {/**
                                                  *    <td className="w-1/4  ">{findAud.data_devolucao ?? 'N/D'}</td>
                                                 *  
                                                 <td className="w-1/4   flex justify-center items-center">
@@ -406,20 +413,18 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                     </button>
                                                 </td>
                                                 */}
-                                            </tr>
-                                        ))
-                                        }
+                                        </tr>
+                                    ))
+                                    }
 
 
 
-                                    </tbody>
-                                </table>
-                            )
-                        }
+                                </tbody>
+                            </table>
+                        )
+                    }
 
-                    </div>
-                </div >
-
+                </div>
 
             </main >
         </div >

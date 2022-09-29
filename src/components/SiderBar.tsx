@@ -36,7 +36,7 @@ const SiderBar = ({ itemActive }: SiderBarProps) => {
     }
 
     return (
-        <aside className={` bg-white w-72 border-r min-h-screen ${showSideBar ? 'flex flex-col ' : 'hidden'} gap-4 px-6 py-6 text-center `}>
+        <aside className={` bg-white w-72 border-r h-screen min-h-screen ${showSideBar ? 'flex flex-col ' : 'hidden'} gap-4 px-6 py-6 text-center `}>
             <div className='flex flex-col justify-center items-center '>
                 <Image src={Logo} alt="NOAH Logo" width={100} height={35} objectFit={'contain'} />
                 {/**   <h3 className="font-bold mt-4 text-lg">S.C.A</h3> */}

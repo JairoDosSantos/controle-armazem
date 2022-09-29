@@ -68,7 +68,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
     return (
         <div className='flex'>
             <SiderBar itemActive="gt" />
-            <main className='flex-1 space-y-6 overflow-x-hidden'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -168,36 +168,37 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                         </div>
                     </div>
 
-                    <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
-                        <span className='font-semibold text-lg'>Guia de Transporte</span>
 
-                        <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
-                            <thead>
-                                <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
-                                    <th className='text-gray-600 font-bold w-16'>ID</th>
-                                    <th className='text-gray-600 font-bold w-72 '>Descrição</th>
-                                    <th className='text-gray-600 font-bold w-52'>Centro de Custo</th>
-                                    <th className='text-gray-600 font-bold w-44'>Qtd.</th>
-                                    <th className='text-gray-600 font-bold w-40'>Data de saída</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {
-                                    findedAuditoria.map((findAud, index) => (
-                                        <tr key={index}
-                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                            <td className="w-16">{findAud.id}</td>
-                                            <td className="w-72">{findAud.equipamento_id.descricao}</td>
-                                            <td className="w-52">{findAud.obra_id.obra_nome}</td>
-                                            <td className="w-44">{findAud.quantidade_retirada}</td>
-                                            <td className="w-40">{findAud.data_retirada}</td>
-                                        </tr>
-                                    ))
-                                }
+                </div>
+                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                    <span className='font-semibold text-lg'>Guia de Transporte</span>
 
-                            </tbody>
-                        </table>
-                    </div>
+                    <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
+                        <thead>
+                            <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
+                                <th className='text-gray-600 font-bold w-16'>ID</th>
+                                <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-52'>Centro de Custo</th>
+                                <th className='text-gray-600 font-bold w-44'>Qtd.</th>
+                                <th className='text-gray-600 font-bold w-40'>Data de saída</th>
+                            </tr>
+                        </thead>
+                        <tbody className=''>
+                            {
+                                findedAuditoria.map((findAud, index) => (
+                                    <tr key={index}
+                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                        <td className="w-16">{findAud.id}</td>
+                                        <td className="w-72">{findAud.equipamento_id.descricao}</td>
+                                        <td className="w-52">{findAud.obra_id.obra_nome}</td>
+                                        <td className="w-44">{findAud.quantidade_retirada}</td>
+                                        <td className="w-40">{findAud.data_retirada}</td>
+                                    </tr>
+                                ))
+                            }
+
+                        </tbody>
+                    </table>
                 </div>
             </main>
         </div>

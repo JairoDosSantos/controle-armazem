@@ -8,7 +8,8 @@ type ObraEquipamentoType = {
     obra_id: number;
     equipamento_id: number;
     data_aquisicao: string;
-    quantidade_a_levar: number
+    quantidade_a_levar: number;
+    estado: string
 }
 
 type ObraEquipamentoState = {
@@ -23,14 +24,15 @@ const initialState: ObraEquipamentoState = {
 
 
 
-export const fetchOneAlmoxarifario = createAsyncThunk('/almoxarifario/fetchOne', async ({ equipamento_id, obra_id }: Omit<ObraEquipamentoType, 'id' | 'data_aquisicao' | 'quantidade_a_levar'>) => {
+export const fetchOneAlmoxarifario = createAsyncThunk('/almoxarifario/fetchOne', async ({ equipamento_id, obra_id, estado }: Omit<ObraEquipamentoType, 'id' | 'data_aquisicao' | 'quantidade_a_levar'>) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .select("id,data_aquisicao,equipamento_id,obra_id,quantidade")
+            .select("id,data_aquisicao,equipamento_id,obra_id,quantidade,estado")
             .eq('equipamento_id', equipamento_id)
             .eq('obra_id', obra_id)
+            .eq('estado', estado)
 
         if (error) return null
         return data
@@ -45,7 +47,7 @@ export const fetchAlmoxarifario = createAsyncThunk('/almoxarifario/fetchAll', as
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .select("id,data_aquisicao,equipamento_id(id,descricao,classificacao_id,duracao_id),obra_id(obra_nome,id,estado),quantidade")
+            .select("id,data_aquisicao,equipamento_id(id,descricao,classificacao_id,duracao_id),obra_id(obra_nome,id,estado),quantidade,estado")
         if (error) return null
         return data
 
@@ -54,12 +56,12 @@ export const fetchAlmoxarifario = createAsyncThunk('/almoxarifario/fetchAll', as
     }
 })
 
-export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: Omit<ObraEquipamentoType, 'id'>) => {
+export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar, estado }: Omit<ObraEquipamentoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar })
+            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar, estado })
 
         if (error) return error
 
@@ -70,12 +72,12 @@ export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', 
     }
 })
 
-export const updateAlmoxarifario = createAsyncThunk('/almoxarifario/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar }: ObraEquipamentoType) => {
+export const updateAlmoxarifario = createAsyncThunk('/almoxarifario/update', async ({ id, data_aquisicao, equipamento_id, obra_id, quantidade_a_levar, estado }: ObraEquipamentoType) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .update([{ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar }])
+            .update([{ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar, estado }])
             .eq('id', id)
         if (error) return null
         return data

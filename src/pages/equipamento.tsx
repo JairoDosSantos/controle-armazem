@@ -41,7 +41,8 @@ type FormValues = {
     descricao_equipamento_id: number;
     quantidade: number;
     data_aquisicao: string;
-    preco: number
+    preco: number;
+    estado: string
 }
 type EquipamentoType = {
     id: number;
@@ -99,13 +100,13 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
         try {
             data.descricao_equipamento_id = idEquipamento;
 
-            const resultDispatch = await dispatch(fetchOne(data.descricao_equipamento_id))
+            const resultDispatch = await dispatch(fetchOne({ id: data.descricao_equipamento_id, estado: data.estado }))
             const equipamentoQuantidade = unwrapResult(resultDispatch);
 
             if (equipamentoQuantidade.length > 0) {
 
                 //Trecho de código acrescentado hoje 01-09-2022
-                const comprasInsert = await dispatch(insertCompra({ data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+                const comprasInsert = await dispatch(insertCompra({ estado: data.estado, data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
 
                 if (!comprasInsert.payload) {
                     setShowErrorAlert(true)
@@ -123,15 +124,14 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                     setShowErrorAlert(true)
                 }
             } else {
-
                 //Insert nas Compras primeiro
                 //Trecho de código acrescentado hoje 01-09-2022
-                const comprasInsert = await dispatch(insertCompra({ data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+                const comprasInsert = await dispatch(insertCompra({ estado: data.estado, data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
                 if (!comprasInsert.payload) {
                     setShowErrorAlert(true)
                     return
                 }
-                const resultDispatch = await dispatch(insertArmGeral({ equipamento_id: data.descricao_equipamento_id, quantidade_entrada: data.quantidade, data_aquisicao: data.data_aquisicao }))
+                const resultDispatch = await dispatch(insertArmGeral({ estado: data.estado, equipamento_id: data.descricao_equipamento_id, quantidade_entrada: data.quantidade, data_aquisicao: data.data_aquisicao }))
                 // const unwrapresultado = unwrapResult(resultDispatch)
                 if (resultDispatch.meta.arg) {
                     setShowConfirmAlert(true)
@@ -166,7 +166,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
         <div className='flex '>
 
             <SiderBar itemActive="equipamento" />
-            <main className='flex-1 space-y-6 overflow-x-hidden'>
+            <main className='flex-1 space-y-6 max-h-screen overflow-hide-scroll-bar overflow-x-hidden'>
                 <div>
                     <Header />
                 </div>
@@ -287,14 +287,26 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                         <div className="flex gap-3">
                             <input
                                 {...register('preco', {
-                                    required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                    required: { message: "Por favor, introduza o Preço do equipamento.", value: true },
                                     minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                 })}
                                 type="number"
                                 placeholder="Preço"
-                                className="w-full rounded shadow"
+                                className="w-1/2 rounded shadow"
                                 min={0}
                             />
+
+                            <select
+                                {...register('estado', {
+                                    required: { message: "Por favor, introduza a Estado do equipamento.", value: true },
+                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                })}
+                                className="w-1/2 rounded shadow cursor-pointer ">
+                                <option className='text-gray-400' value="">Selecione o estado</option>
+                                <option value="Novo">Novo</option>
+                                <option value="Avariado">{'Avariado(a)'}</option>
+                                <option value="Usado">Usado</option>
+                            </select>
                         </div>
 
                         <div className="flex gap-3">
