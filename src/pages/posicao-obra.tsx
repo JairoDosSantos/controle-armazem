@@ -280,9 +280,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                 <th className='text-gray-600 font-bold w-20'>Qtd</th>
                                 <th className='text-gray-600 font-bold w-52'>Obra</th>
                                 <th className='text-gray-600 font-bold w-40'>Estado</th>
-                                {/**<th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                {/**  <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                    <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
+
                             </tr>
                         </thead>
                         <tbody className=''>
@@ -301,22 +299,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             <td className="w-20 ">{almoxarifario.quantidade}</td>
                                             <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
                                             <td className="w-40 ">{almoxarifario.estado}</td>
-                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                            {/**
-                                             *    <td className="w-1/5  flex justify-center items-center">
-                                                <button onClick={() => handleEdit(almoxarifario)} className="hover:brightness-75" title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                           <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                             */}
+
                                         </tr>
                                     )) : findedEquipamento.map((finded, index) => (
                                         <tr
@@ -331,22 +314,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             <td className="w-20 ">{finded.quantidade}</td>
                                             <td className="w-52 ">{finded.obra_id.obra_nome}</td>
                                             <td className="w-40 ">{finded.estado}</td>
-                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                            {/**
-                                            *  <td className="w-1/5  flex justify-center items-center">
-                                                <button onClick={() => handleEdit(finded)} className="hover:brightness-75" title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                             <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                 </td>
-                                            */}
+
                                         </tr>
                                     ))
                             }

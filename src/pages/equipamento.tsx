@@ -8,7 +8,7 @@ import Load from '../assets/load.gif'
 
 //Componentes internos
 import Header from '../components/Header'
-import AddObra from '../components/equipamento/AddObra'
+//import AddObra from '../components/equipamento/AddObra'
 import DevolverAMG from '../components/equipamento/DevolverAMG'
 import EditarModal from '../components/equipamento/EditModal'
 import SiderBar from '../components/SiderBar'
@@ -81,7 +81,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     const [load, setLoad] = useState(false)
 
     const [isOpenRemove, setIsOpenRemove] = useState(false)
-    const [isOpenAddObra, setIsOpenAddObra] = useState(false)
+    //    const [isOpenAddObra, setIsOpenAddObra] = useState(false)
     const [isOpenRemoveObraAddAMG, setIsOpenRemoveObraAddAMG] = useState(false)
     const [isOpenAddNovoModal, setIsOpenAddNovoModal] = useState(false)
     const [armazemObject, setAmazemObject] = useState<ArmGeralType>({} as ArmGeralType)
@@ -244,7 +244,9 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                 setIsOpen={setIsOpenRemoveObraAddAMG} />)}
 
                             {/** Aqui o equipamento será cadastrado directamente ao armazem da obra */}
-                            <AddObra isOpen={isOpenAddObra} setIsOpen={setIsOpenAddObra} />
+                            {/**
+                        *      <AddObra isOpen={isOpenAddObra} setIsOpen={setIsOpenAddObra} />
+                        */}
                             <button
                                 onClick={() => setIsOpenRemove(true)}
                                 type="button"

@@ -108,7 +108,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const TotalHSSTs: any = await (await store.dispatch(fetchArmGeralByClassificcao(1))).payload
             const totalFerramentas: any = await (await store.dispatch(fetchArmGeralByClassificcao(4))).payload
             const TotalMaterial: any = await (await store.dispatch(fetchArmGeralByClassificcao(2))).payload
-            const esgotar = await store.dispatch(fetchEsgotar())
+            // const esgotar = await store.dispatch(fetchEsgotar())
             //   console.log(esgotar)
             const totalObrasActivas = obrasActivas ? obrasActivas.length : 0
             const totalObra = totalObras ? totalObras.length : 0

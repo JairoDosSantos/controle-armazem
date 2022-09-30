@@ -44,7 +44,8 @@ type CompraType = {
     equipamento_id: EquipamentoType;
     preco: number;
     data_compra: string;
-    quantidade_comprada: number
+    quantidade_comprada: number;
+    estado: string
 }
 
 const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
@@ -55,12 +56,11 @@ const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
     const dispatch = useDispatch<any>();
 
 
-
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
-        const retirar = await retirarARMG(compraData.quantidade_comprada, compraData.equipamento_id.id)
+        const retirar = await retirarARMG(compraData.quantidade_comprada, compraData.equipamento_id.id, compraData.estado)
         if (!retirar) { notifyError(); return }
-        const somar = await colocarARMG(data.quantidadeAlterada, compraData.equipamento_id.id)
+        const somar = await colocarARMG(data.quantidadeAlterada, compraData.equipamento_id.id, compraData.estado)
         if (!somar) { notifyError(); return }
         // data_compra, equipamento_id, id, preco
         const resultDispatch = await dispatch(updateCompra({ ...compraData, equipamento_id: compraData.equipamento_id.id, quantidade_comprada: data.quantidadeAlterada }));
@@ -73,9 +73,9 @@ const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
 
     }
 
-    const retirarARMG = async (quantidade: number, equipamento_id: number) => {
+    const retirarARMG = async (quantidade: number, equipamento_id: number, estado: string) => {
 
-        const dispatchFetchARMG = await dispatch(fetchOne(equipamento_id))
+        const dispatchFetchARMG = await dispatch(fetchOne({ estado, id: equipamento_id }))
 
         const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
 
@@ -94,9 +94,9 @@ const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
         return true
     }
 
-    const colocarARMG = async (quantidade: number, equipamento_id: number) => {
+    const colocarARMG = async (quantidade: number, equipamento_id: number, estado: string) => {
 
-        const dispatchFetchARMG = await dispatch(fetchOne(equipamento_id))
+        const dispatchFetchARMG = await dispatch(fetchOne({ id: equipamento_id, estado }))
         const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
         let newQTD = Number(ARMUNWRAP[0].quantidade) + Number(quantidade)
         console.log('Resultado QTD TOTAL SUBTRAIDA', ARMUNWRAP[0])

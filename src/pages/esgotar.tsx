@@ -5,10 +5,8 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaPrint, FaEdit, FaTrash } from 'react-icons/fa'
+import { FaPrint } from 'react-icons/fa'
 
-import Load from '../assets/load.gif'
-import Image from "next/image"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { wrapper } from "../redux/store"
 import { fetchEsgotar } from "../redux/slices/armGeralSlice"
@@ -34,12 +32,6 @@ type EsgotarProps = {
 }
 
 const Esgotar = ({ esgotar }: EsgotarProps) => {
-
-    console.log(esgotar)
-
-    const [hideSideBar, setHideSideBar] = useState(false)
-    const [load, setLoad] = useState(false)
-
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)

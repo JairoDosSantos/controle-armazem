@@ -53,8 +53,6 @@ type PosicaoArmazemProps = {
 
 const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
 
-    const [hideSideBar, setHideSideBar] = useState(false)
-    const [load, setLoad] = useState(false)
     const route = useRouter()
 
     //Estados dos sweetAlerts
@@ -240,9 +238,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                 <th className='text-gray-600 font-bold w-44'>Tempo de duração</th>
                                 <th className='text-gray-600 font-bold w-40'>Quantidade</th>
                                 <th className='text-gray-600 font-bold w-40'>Estado</th>
-                                {/**  <th className='text-gray-600 font-bold w-1/5'>Data de Compra</th> */}
-                                {/**   <th className='text-gray-600 font-bold w-1/5'>Editar</th>
-                                      <th className='text-gray-600 font-bold w-1/5'>Apagar</th> */}
                             </tr>
                         </thead>
                         <tbody className=''>
@@ -259,27 +254,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                                             <td className="w-40 ">{equipamento.quantidade}</td>
                                             <td className="w-40 ">{equipamento.estado}</td>
-                                            {/**    <td className="w-1/5 ">22-08-2022</td> */}
-                                            {
-                                                /**
-                                                 *  <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => handleEdit(equipamento)}
-                                                        className="hover:brightness-75"
-                                                        title="Editar">
-                                                        <FaEdit />
-                                                    </button>
-                                                </td>
-                                                <td className="w-1/5  flex justify-center items-center">
-                                                        <button
-                                                            onClick={() => setShowQuestionAlert(true)}
-                                                            className="hover:brightness-75"
-                                                            title="Apagar">
-                                                            <FaTrash />
-                                                        </button>
-                                                    </td>
-                                                */
-                                            }
+
                                         </tr>
                                     )) : findedEquipamento.map((finded, index) => (
                                         <tr
@@ -291,26 +266,6 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                             <td className="w-44 ">{findDuracao(finded.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-40 ">{finded.quantidade}</td>
                                             <td className="w-40 ">{finded.estado}</td>
-
-                                            {
-                                            /**
-                                            *<td className="w-1/5  flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleEdit(finded)}
-                                                    className="hover:brightness-75"
-                                                    title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                            </td>
-                                            <td className="w-1/5  flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                          */}
                                         </tr>
                                     ))
 

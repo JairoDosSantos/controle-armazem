@@ -166,9 +166,6 @@ const EditarModal = ({ isOpen, setIsOpen, ClassificacaoObject }: EditarModalProp
                                                     defaultValue={ClassificacaoObject.tipo}
                                                 />
 
-
-
-
                                             </div>
 
                                             <div className="mt-4 flex justify-end">
@@ -196,12 +193,10 @@ const EditarModal = ({ isOpen, setIsOpen, ClassificacaoObject }: EditarModalProp
                                                     {errors.tipo && (errors.tipo.message)}
                                                 </p>
 
-
                                             </div>
                                         </form>
 
                                     </div>
-
 
                                 </Dialog.Panel>
                             </Transition.Child>

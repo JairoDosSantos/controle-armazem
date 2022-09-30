@@ -196,7 +196,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
                         </div>
                     </form>
 
-                    
+
                 </div>
                 <div className='mt-4 text-end px-4 py-2 max-w-sm lg:max-w-6xl  mx-auto bg-white rounded overflow-x-auto'>
                     <div className="flex justify-between items-center">
@@ -278,14 +278,14 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            //   const cookie = nookies.get(context);
+            const cookie = nookies.get(context);
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             const classificacoesDispatch: any = await store.dispatch(fetchClassificacao());
 
 
             const classificacao = classificacoesDispatch.payload
 
-            //   if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

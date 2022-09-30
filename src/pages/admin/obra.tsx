@@ -19,9 +19,9 @@ import { wrapper } from "../../redux/store"
 import { fetchEncarregados } from "../../redux/slices/encarregadoSlice"
 
 import nookies from 'nookies'
-import { supabase } from "../../utils/supabaseClient"
+
 import { useRouter } from "next/router"
-import { useSelector } from "react-redux"
+
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -310,8 +310,6 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                                     </tr>
                                 ))
                             }
-
-
                         </tbody>
                     </table>
                 </div>
@@ -324,7 +322,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            //  const cookie = nookies.get(context);
+            const cookie = nookies.get(context);
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             const obrasDispatch: any = await (await store.dispatch(fetchObra()));
 
@@ -333,7 +332,6 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const obras = obrasDispatch.payload
             const encarregados = encarregadosDispatch.payload
 
-            //  if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             return {
                 props: {

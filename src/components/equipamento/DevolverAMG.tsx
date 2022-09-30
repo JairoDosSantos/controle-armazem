@@ -294,7 +294,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                     className='rounded shadow w-full lg:w-1/2'
                                                     placeholder='Quantidade a devolver *'
                                                     {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a quantidade a transferir.", value: true },
+                                                        required: { message: "Por favor, introduza a quantidade a devolver.", value: true },
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },
                                                         min: { message: 'Quantidade insuficiente', value: 1 }
                                                     })}

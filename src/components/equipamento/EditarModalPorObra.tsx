@@ -50,7 +50,8 @@ type Almoxarifario = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     obra_id: ObraType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
 
@@ -238,10 +239,7 @@ const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
                                                 </p>
                                             </div>
                                         </form>
-
                                     </div>
-
-
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

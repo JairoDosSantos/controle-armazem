@@ -211,13 +211,9 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                         <View style={styles.section}>
                             <Text>Tempo de duração</Text>
                         </View>
-
-
                         <View style={styles.section}>
                             <Text>Quantidade</Text>
                         </View>
-
-
                     </View>
 
                     {

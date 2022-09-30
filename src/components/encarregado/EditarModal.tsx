@@ -198,10 +198,7 @@ const EditarModal = ({ isOpen, setIsOpen, encarregadoData }: EditarModalProps) =
 
                                             </div>
                                         </form>
-
                                     </div>
-
-
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

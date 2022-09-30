@@ -350,8 +350,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
-            // const cookie = nookies.get(context);
-            //if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
+            const cookie = nookies.get(context);
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
             const usuariosDispatch: any = await store.dispatch(fetchUsuarios());
 

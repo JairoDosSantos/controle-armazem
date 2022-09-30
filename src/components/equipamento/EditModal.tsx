@@ -28,7 +28,8 @@ type EquipamentosARMType = {
     id: number;
     quantidade: number;
     equipamento_id: EquipamentoType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 
 type EditarModalProps = {
@@ -169,7 +170,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
                                                     className='rounded shadow w-full'
                                                     placeholder='Quantidade *'
                                                     {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a número de telefone.", value: true },
+                                                        required: { message: "Por favor, introduza a quantidade.", value: true },
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },
                                                         min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}

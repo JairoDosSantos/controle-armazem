@@ -40,7 +40,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 
 type EditarModalProps = {
@@ -70,12 +71,12 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
         if (data.data_devolucao) { notifyError('Não pode alterar a saída, visto que já há uma devolução para esta saída.'); setLoad(false); return }
 
         //1º  Buscar o equipamento no armazem e no almoxarifado
-        const buscaARMDispatch = await dispatch(fetchOne(data.equipamento_id.id));
+        const buscaARMDispatch = await dispatch(fetchOne({ id: data.equipamento_id.id, estado: data.estado }));
         const ARMunwrap = unwrapResult(buscaARMDispatch);
 
         if (!ARMunwrap.length) { notifyError('Armazem não encontrado'); setLoad(false); return }
 
-        const buscarAlmoxarifado = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id }))
+        const buscarAlmoxarifado = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id, estado: data.estado }))
         const AlmoxarifadoUnwrap = unwrapResult(buscarAlmoxarifado);
 
         if (!AlmoxarifadoUnwrap.length) { notifyError('Almoxarifado não encontrado'); setLoad(false); return }
@@ -102,7 +103,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
         //const auditoriaUnwrap = unwrapResult(auditoriaFetched)
 
-        const auditoriaUpdate = await dispatch(updateAuditoria({ data_devolucao: data.data_devolucao, data_retirada: data.data_retirada, equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id, quantidade_devolvida: data.quantidade_devolvida, quantidade_retirada: arm.quantidade }))
+        const auditoriaUpdate = await dispatch(updateAuditoria({ estado: data.estado, data_devolucao: data.data_devolucao, data_retirada: data.data_retirada, equipamento_id: data.equipamento_id.id, obra_id: data.obra_id.id, quantidade_devolvida: data.quantidade_devolvida, quantidade_retirada: arm.quantidade }))
         if (auditoriaUpdate.payload === null) { notifyError('Erro ao efectuar a alteração na auditoria, mas  no almoxarifado foi alterado e no armazem geral também.'); setLoad(false); return }
         //7º Fim
 
@@ -214,16 +215,17 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
                                             <div className='flex gap-2 justify-center align-center'>
                                                 <input
+                                                    readOnly={data.quantidade_devolvida > 0 ? true : false}
                                                     min={0}
                                                     type="number"
-                                                    className='rounded shadow w-full'
+                                                    className='rounded shadow w-full read-only:cursor-not-allowed'
                                                     placeholder='Quantidade *'
                                                     {...register('quantidade', {
-                                                        required: { message: "Por favor, introduza a número de telefone.", value: true },
+                                                        required: { message: "Por favor, introduza a quantidade da saída.", value: true },
                                                         minLength: { message: "Quantidade insuficiente", value: 1 },
                                                         min: { message: 'Quantidade insuficiente', value: 0 }
                                                     })}
-
+                                                    title={data.quantidade_devolvida > 0 ? 'Equipamento já devolvido. Já não é possivel alterar a qtd.' : 'Editar a quantidade retirada'}
                                                     defaultValue={data.quantidade_retirada}
                                                 />
 
