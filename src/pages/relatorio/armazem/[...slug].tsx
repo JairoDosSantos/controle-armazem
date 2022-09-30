@@ -6,7 +6,8 @@ import { wrapper } from '../../../redux/store'
 import { fetchClassificacao } from '../../../redux/slices/classificacaoSlice'
 import { fetchDuracao } from '../../../redux/slices/duracaoSlice.ts'
 import { fetchArmGeral } from '../../../redux/slices/armGeralSlice'
-import { useRouter } from 'next/router'
+import AES from 'crypto-js/aes';
+import { enc } from 'crypto-js';
 import nookies from 'nookies'
 const RelatorioArmazem = dynamic(() => import('../../../components/relatorios/Armazem'), { ssr: false })
 
@@ -23,7 +24,8 @@ type EquipamentosARMType = {
     id: number;
     quantidade: number;
     equipamento_id: EquipamentoType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 type DuracaoType = {
     id: number;
@@ -37,37 +39,13 @@ type ClassificacaoType = {
 }
 
 type PosicaoArmazemProps = {
-    equipamentosARM: EquipamentosARMType[];
+    armazemData: EquipamentosARMType[];
     classificacao: ClassificacaoType[];
     duracao: DuracaoType[]
 
 }
 
-const Armazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
-
-    let armazemData: EquipamentosARMType[] = []
-
-    const { query } = useRouter();
-
-    const { slug } = query
-
-    if (slug?.length === 1 && slug[0] === 'all') armazemData = equipamentosARM
-
-    else {
-
-        if (slug && equipamentosARM) {
-            if (slug[0] !== 'equipamento' && Number(slug[1]) === 0) {
-                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()))
-            } else if (Number(slug[1]) !== 0 && slug[0] === 'equipamento') {
-                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.classificacao_id === Number(slug[1]))
-            } else if (slug[0] !== 'equipamento' && Number(slug[1]) !== 0) {
-                armazemData = equipamentosARM.filter((equipamento) => equipamento.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()) && equipamento.equipamento_id.classificacao_id === Number(slug[1]))
-            }
-
-        }
-    }
-
-
+const Armazem = ({ armazemData, classificacao, duracao }: PosicaoArmazemProps) => {
 
     return (
 
@@ -86,6 +64,13 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     (store) =>
         async (context: GetServerSidePropsContext) => {
 
+
+            const decriptedSTR = (params: string) => {
+
+                const decodedStr = decodeURIComponent(params);
+                return AES.decrypt(decodedStr, 'AES-256-CBC').toString(enc.Utf8);
+            }
+
             const cookie = nookies.get(context);
 
             //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
@@ -101,9 +86,33 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
 
             if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
+
+            let armazemData = []
+
+            //const { query } = useRouter();
+
+            const slug = context.params?.slug
+
+            if (slug?.length === 1 && slug[0] === 'all') armazemData = equipamentosARM
+
+            else {
+
+                if (slug && equipamentosARM) {
+                    const URLdesencriptada = decriptedSTR(slug[0])
+                    if (URLdesencriptada !== 'equipamento' && Number(slug[1]) === 0) {
+                        armazemData = equipamentosARM.filter((equipamento: EquipamentosARMType) => equipamento.equipamento_id.descricao.toLowerCase().includes(URLdesencriptada.toLowerCase()))
+                    } else if (Number(slug[1]) !== 0 && URLdesencriptada === 'equipamento') {
+                        armazemData = equipamentosARM.filter((equipamento: EquipamentosARMType) => equipamento.equipamento_id.classificacao_id === Number(slug[1]))
+                    } else if (URLdesencriptada !== 'equipamento' && Number(slug[1]) !== 0) {
+                        armazemData = equipamentosARM.filter((equipamento: EquipamentosARMType) => equipamento.equipamento_id.descricao.toLowerCase().includes(URLdesencriptada.toLowerCase()) && equipamento.equipamento_id.classificacao_id === Number(slug[1]))
+                    }
+
+                }
+            }
+
             return {
                 props: {
-                    equipamentosARM,
+                    armazemData,
                     classificacao,
                     duracao
                 },

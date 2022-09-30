@@ -270,10 +270,14 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                             </div>
                                             <div className='flex flex-col lg:flex-row gap-2 justify-center align-center'>
                                                 <select
-                                                    {...register('obra_id')}
+                                                    {...register('obra_id',
+                                                        {
+                                                            required: { message: "Por favor, selecione o almoxarifado.", value: true },
+                                                            min: { message: 'Quantidade insuficiente', value: 1 }
+                                                        })}
 
                                                     className='rounded shadow w-full lg:w-1/2 cursor-pointer'>
-                                                    <option value="#" className='text-gray-300'>Selecione a Obra</option>
+                                                    <option value={0} className='text-gray-300'>Selecione a Obra</option>
                                                     {
                                                         obras.length && obras.map((obra, index) => {
                                                             if (obra.estado === 'Activa') {
@@ -301,7 +305,6 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                 <select
                                                     {...register('estado', {
                                                         required: { message: "Por favor, introduza a Estado do equipamento.", value: true },
-                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                     className="w-full rounded shadow cursor-pointer ">
                                                     <option className='text-gray-400' value="">Selecione o estado</option>
@@ -358,7 +361,9 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                 </button>
                                             </div>
                                             <div className='text-red-700 mt-2 text-center'>
-                                                <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
+                                                {!(errors.descricao_equipamento || errors.obra_id || errors.quantidade) && (
+                                                    <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
+                                                )}
                                                 <p className='text-sm'>
                                                     {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
                                                 </p>

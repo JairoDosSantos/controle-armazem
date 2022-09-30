@@ -164,7 +164,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 type AuditoriaProps = {
     auditoria: AuditoriaType[];
@@ -173,7 +174,7 @@ type AuditoriaProps = {
 // Create Document Component
 
 export default function BasicDocument({ auditoria }: AuditoriaProps) {
-    const data = moment().format('l')
+    const data = moment().format("DD/MM/yyyy")
     const ano = (new Date()).getFullYear()
     return (
         <PDFViewer style={styles.viewer} >
@@ -238,7 +239,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             </View>
 
                             <View style={styles.section}>
-                                <Text>exemplo</Text>
+                                <Text></Text>
                             </View>
 
                         </View>
@@ -253,7 +254,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>DESCRIÇÃO</Text>
                         </View>
-
+                        <View style={styles.section}>
+                            <Text style={styles.textoTitulo}>Estado</Text>
+                        </View>
                         <View style={styles.section}>
                             <Text>CENTRO DE CUSTO</Text>
                         </View>
@@ -275,7 +278,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                                 <View style={styles.section}>
                                     <Text>{mov.equipamento_id.descricao}</Text>
                                 </View>
-
+                                <View style={styles.section}>
+                                    <Text>{mov.estado}</Text>
+                                </View>
                                 <View style={styles.section}>
                                     <Text>{mov.obra_id.obra_nome}</Text>
                                 </View>

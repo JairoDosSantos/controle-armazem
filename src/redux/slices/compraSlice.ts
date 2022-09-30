@@ -27,7 +27,7 @@ export const fetchCompra = createAsyncThunk('/compra/fetchAll', async () => {
 
         const { data, error } = await supabase
             .from('compra')
-            .select("id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),data_compra,quantidade_comprada,preco")
+            .select("id, equipamento_id(id,descricao,duracao_id,classificacao_id,stock_emergencia),data_compra,quantidade_comprada,preco,estado")
         if (error) return error
         return data
 

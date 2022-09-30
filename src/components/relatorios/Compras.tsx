@@ -130,7 +130,8 @@ type CompraType = {
     equipamento_id: EquipamentoType;
     preco: number;
     data_compra: string;
-    quantidade_comprada: number
+    quantidade_comprada: number;
+    estado: string
 }
 
 type CompraProps = {
@@ -139,7 +140,7 @@ type CompraProps = {
 
 // Create Document Component
 export default function BasicDocument({ compras }: CompraProps) {
-    const data = moment().format('l')
+    const data = moment().format("DD/MM/yyyy")
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -164,6 +165,10 @@ export default function BasicDocument({ compras }: CompraProps) {
                         </View>
 
                         <View style={styles.section}>
+                            <Text style={styles.textoTitulo}>Estado</Text>
+                        </View>
+
+                        <View style={styles.section}>
                             <Text>Preço</Text>
                         </View>
 
@@ -184,7 +189,9 @@ export default function BasicDocument({ compras }: CompraProps) {
                                 <View style={styles.section}>
                                     <Text>{compra.equipamento_id.descricao}</Text>
                                 </View>
-
+                                <View style={styles.section}>
+                                    <Text>{compra.estado}</Text>
+                                </View>
                                 <View style={styles.section}>
                                     <Text>{compra.preco.toLocaleString('pt', {
                                         style: 'currency',

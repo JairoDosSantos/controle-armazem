@@ -170,7 +170,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
                                                 <select
                                                     {...register('classificacao_id', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        required: { message: "Por favor, introduza a classificação do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                     className="w-full rounded shadow cursor-pointer" >
@@ -190,7 +190,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
                                                 <select
                                                     {...register('tempo_duracao', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        required: { message: "Por favor, introduza a durabilidade do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                     className="w-1/2 rounded shadow cursor-pointer" >
@@ -210,7 +210,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                                     min={0}
                                                     className="w-1/2 rounded shadow"
                                                     {...register('stock_emergencia', {
-                                                        required: { message: "Por favor, introduza a descrição do equipamento.", value: true },
+                                                        required: { message: "Por favor, introduza o Stock de emergência.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
@@ -235,7 +235,12 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                                 </button>
                                             </div>
                                             <div className='text-red-700 mt-2 text-center'>
-                                                <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
+                                                {
+                                                    !(errors.descricao_equipamento || errors.tempo_duracao || errors.stock_emergencia || errors.classificacao_id) && (
+                                                        <p className='text-sm '>Os campos com * o seu preenchimento é de carácter obrigatório.</p>
+                                                    )
+
+                                                }
                                                 <p className='text-sm'>
                                                     {errors.descricao_equipamento && (errors.descricao_equipamento.message)}
                                                 </p>

@@ -9,12 +9,12 @@ import SiderBar from "../components/SiderBar"
 
 import { FaEdit, FaPrint } from 'react-icons/fa'
 
-import Load from '../assets/load.gif'
+//import Load from '../assets/load.gif'
 import EditarModal from "../components/compras/EditarModal"
 
 
 import AES from 'crypto-js/aes';
-import { enc } from 'crypto-js';
+//import { enc } from 'crypto-js';
 
 import { wrapper } from "../redux/store"
 import { fetchCompra } from "../redux/slices/compraSlice"
@@ -38,7 +38,8 @@ type CompraType = {
     equipamento_id: EquipamentoType;
     preco: number;
     data_compra: string;
-    quantidade_comprada: number
+    quantidade_comprada: number;
+    estado: string
 }
 
 type DuracaoType = {
@@ -73,7 +74,6 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     const [showEditModal, setShowEditModal] = useState(false)
     const [compraObject, setCompraObject] = useState<CompraType>({} as CompraType)
 
-    console.log(searchByDate)
 
     /**
      * 
@@ -269,6 +269,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                 <th className='text-gray-600 font-bold w-52 '>Classificação</th>
                                 <th className='text-gray-600 font-bold w-52 '>Duração</th>
                                 <th className='text-gray-600 font-bold w-40 '>Qtd. comprada</th>
+                                <th className='text-gray-600 font-bold w-40 '>Estado</th>
                                 <th className='text-gray-600 font-bold w-40 '>Preço</th>
                                 <th className='text-gray-600 font-bold w-44 '>Data de compra</th>
                                 <th className='text-gray-600 font-bold w-16 '>Editar</th>
@@ -279,65 +280,71 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                         </thead>
                         <tbody className=''>
                             {
-                                compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
-                                    <tr
-                                        key={index}
-                                        className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-16">{compra.id}</td>
-                                        <td className="w-72">{compra.equipamento_id.descricao}</td>
-                                        <td className="w-52">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
-                                        <td className="w-52">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
-                                        <td className="w-40">{compra.quantidade_comprada}</td>
-                                        <td className="w-40">{compra.preco.toLocaleString('pt', {
-                                            style: 'currency',
-                                            currency: 'KWZ'
-                                        })}</td>
-                                        <td className="w-44">{compra.data_compra}</td>
-                                        <td className="w-16 flex justify-center items-center">
-                                            <button
-                                                onClick={() => handleEdit(compra)}
-                                                className="hover:brightness-75"
-                                                title="Editar">
-                                                <FaEdit />
-                                            </button>
-                                        </td>
-                                        {
-                                            /**
-                                             * 
-                                               <td className="w-1/4   flex justify-center items-center">
-                                                    <button
-                                                        onClick={() => setShowQuestionAlert(true)}
-                                                        className="hover:brightness-75"
-                                                        title="Apagar">
-                                                        <FaTrash />
-                                                    </button>
-                                                </td>
-                                            */
-                                        }
-                                    </tr>
-                                )) : findedCompras.map((compra, index) => (
-                                    <tr
-                                        key={index}
-                                        className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-16  ">{compra.id}</td>
-                                        <td className="w-72  ">{compra.equipamento_id.descricao}</td>
-                                        <td className="w-52  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
-                                        <td className="w-52  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
-                                        <td className="w-40  ">{compra.quantidade_comprada}</td>
-                                        <td className="w-40  ">{compra.preco.toLocaleString('pt', {
-                                            style: 'currency',
-                                            currency: 'KWZ'
-                                        })}</td>
-                                        <td className="w-44  ">{compra.data_compra}</td>
-                                        <td className="w-16   flex justify-center items-center">
-                                            <button
-                                                onClick={() => handleEdit(compra)}
-                                                className="hover:brightness-75"
-                                                title="Editar">
-                                                <FaEdit />
-                                            </button>
-                                        </td>
-                                        {/**
+                                ((searchByEquipamento || searchByDate) && !findedCompras.length) ? <tr>
+                                    <td className="w-full text-center py-6 font-bold ">... Compra não encontrada</td>
+                                </tr> :
+
+                                    compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16">{compra.id}</td>
+                                            <td className="w-72">{compra.equipamento_id.descricao}</td>
+                                            <td className="w-52">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-52">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                            <td className="w-40">{compra.quantidade_comprada}</td>
+                                            <td className="w-40">{compra.estado}</td>
+                                            <td className="w-40">{compra.preco.toLocaleString('pt', {
+                                                style: 'currency',
+                                                currency: 'KWZ'
+                                            })}</td>
+                                            <td className="w-44">{compra.data_compra}</td>
+                                            <td className="w-16 flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEdit(compra)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            {
+                                                /**
+                                                 * 
+                                                   <td className="w-1/4   flex justify-center items-center">
+                                                        <button
+                                                            onClick={() => setShowQuestionAlert(true)}
+                                                            className="hover:brightness-75"
+                                                            title="Apagar">
+                                                            <FaTrash />
+                                                        </button>
+                                                    </td>
+                                                */
+                                            }
+                                        </tr>
+                                    )) : findedCompras.map((compra, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16  ">{compra.id}</td>
+                                            <td className="w-72  ">{compra.equipamento_id.descricao}</td>
+                                            <td className="w-52  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-52  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
+                                            <td className="w-40  ">{compra.quantidade_comprada}</td>
+                                            <td className="w-40  ">{compra.estado}</td>
+                                            <td className="w-40  ">{compra.preco.toLocaleString('pt', {
+                                                style: 'currency',
+                                                currency: 'KWZ'
+                                            })}</td>
+                                            <td className="w-44  ">{compra.data_compra}</td>
+                                            <td className="w-16   flex justify-center items-center">
+                                                <button
+                                                    onClick={() => handleEdit(compra)}
+                                                    className="hover:brightness-75"
+                                                    title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                            </td>
+                                            {/**
                                             *     <td className="w-1/4   flex justify-center items-center">
                                                 <button
                                                     onClick={() => setShowQuestionAlert(true)}
@@ -347,8 +354,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 </button>
                                             </td>
                                             */}
-                                    </tr>
-                                ))
+                                        </tr>
+                                    ))
                             }
 
                         </tbody>

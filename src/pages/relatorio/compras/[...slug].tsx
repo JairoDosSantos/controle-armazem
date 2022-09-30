@@ -31,7 +31,8 @@ type CompraType = {
     equipamento_id: EquipamentoType;
     preco: number;
     data_compra: string;
-    quantidade_comprada: number
+    quantidade_comprada: number;
+    estado: string
 }
 
 
@@ -40,47 +41,6 @@ type ComprasProps = {
 }
 
 const Relatorio = ({ compras }: ComprasProps) => {
-
-    let comprasFiltradas: CompraType[] = [];
-
-    const route = useRouter()
-
-    const { slug } = route.query
-    const [getDate, setDate] = useState('')
-    const [getEquipamento, setEquipamento] = useState('')
-
-    const decriptedSTR = (params: string) => {
-
-        const decodedStr = decodeURIComponent(params);
-        return AES.decrypt(decodedStr, 'AES-256-CBC').toString(enc.Utf8);
-
-    }
-    {
-        /**
-         *  useEffect(() => {
-            if (slug?.length === 1) {
-                setEquipamento(decriptedSTR(slug[0]))
-    
-            } else if (slug && slug.length > 1) {
-                setEquipamento(decriptedSTR(slug[0]))
-                setDate(decriptedSTR(slug[1]))
-            }
-        }, [])
-    
-    
-        if (slug?.length === 1 && decriptedSTR(slug[0]) === 'all') comprasFiltradas = compras
-        else {
-    
-    
-            if (slug?.length && compras) {
-                if (decriptedSTR(slug[0]) !== 'equipamento' && decriptedSTR(slug[1]) === '') comprasFiltradas = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(decriptedSTR(slug[0]).toLowerCase()))
-                else if (decriptedSTR(slug[0]) === 'equipamento' && decriptedSTR(slug[1])) comprasFiltradas = compras.filter((compra) => compra.data_compra.toLowerCase().includes(decriptedSTR(slug[1]).toLowerCase()))
-                else comprasFiltradas = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(decriptedSTR(slug[0]).toLowerCase()) && compra.data_compra.toLowerCase().includes(decriptedSTR(slug[1]).toLowerCase()))
-            }
-        }
-         */
-    }
-
 
     return (
         <div>
@@ -109,6 +69,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             }
             const compraDispatch: any = await store.dispatch(fetchCompra());
             const compras = compraDispatch.payload
+
             const slug = context.params?.slug
 
 

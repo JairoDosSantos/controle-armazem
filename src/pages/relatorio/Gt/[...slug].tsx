@@ -31,27 +31,16 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 type AuditoriaProps = {
-    auditoria: AuditoriaType[];
+    movimentacoesFiltradas: AuditoriaType[];
 
 }
 
-const GuiaTransporte = ({ auditoria }: AuditoriaProps) => {
+const GuiaTransporte = ({ movimentacoesFiltradas }: AuditoriaProps) => {
 
-    let movimentacoesFiltradas: AuditoriaType[] = []
-
-    const route = useRouter();
-    const { slug } = route.query
-
-    if (slug && slug[0] === 'all') movimentacoesFiltradas = auditoria
-    else {
-        if (slug && auditoria.length) {
-            movimentacoesFiltradas = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()) && entradaSaida.obra_id.id === Number(slug[0]))
-        }
-    }
-    console.log(slug)
     return (
         <div>
             <Head>
@@ -76,18 +65,27 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
 
 
             const auditoria = auditoriaDispatch.payload
-            const obras = obrasDispatch.payload
+            // const obras = obrasDispatch.payload
 
             if (!cookie.USER_LOGGED_ARMAZEM) {
                 // If no user, redirect to index.
                 return { props: {}, redirect: { destination: '/', permanent: false } }
             }
+            let movimentacoesFiltradas = []
 
+
+            const slug = context.params?.slug
+
+            if (slug && slug[0] === 'all') movimentacoesFiltradas = auditoria
+            else {
+                if (slug && auditoria.length) {
+                    movimentacoesFiltradas = auditoria.filter((entradaSaida: AuditoriaType) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()) && entradaSaida.obra_id.id === Number(slug[0]))
+                }
+            }
 
             return {
                 props: {
-                    auditoria,
-                    obras
+                    movimentacoesFiltradas
                 },
             };
         }

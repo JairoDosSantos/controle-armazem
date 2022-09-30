@@ -137,7 +137,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 type AuditoriaProps = {
     auditoria: AuditoriaType[];
@@ -146,7 +147,7 @@ type AuditoriaProps = {
 // Create Document Component
 
 export default function BasicDocument({ auditoria }: AuditoriaProps) {
-    const data = moment().format('l')
+    const data = moment().format("DD/MM/yyyy")
     return (
         <PDFViewer style={styles.viewer} >
             {/* Start of the document*/}
@@ -167,6 +168,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
 
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>Descrição</Text>
+                        </View>
+                        <View style={styles.section}>
+                            <Text style={styles.textoTitulo}>Estado</Text>
                         </View>
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>Almoxarifado</Text>
@@ -200,6 +204,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                                     <Text>{mov.equipamento_id.descricao}</Text>
                                 </View>
 
+                                <View style={styles.section}>
+                                    <Text>{mov.estado}</Text>
+                                </View>
                                 <View style={styles.section}>
                                     <Text>{mov.obra_id.obra_nome}</Text>
                                 </View>

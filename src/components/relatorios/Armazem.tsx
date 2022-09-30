@@ -130,7 +130,8 @@ type EquipamentosARMType = {
     id: number;
     quantidade: number;
     equipamento_id: EquipamentoType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 type DuracaoType = {
     id: number;
@@ -152,7 +153,7 @@ type PosicaoArmazemProps = {
 // Create Document Component
 export default function BasicDocument({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
 
-    const data = moment().format('l')
+    const data = moment().format("DD/MM/yyyy")
     //Funções
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
@@ -188,7 +189,9 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>Descrição</Text>
                         </View>
-
+                        <View style={styles.section}>
+                            <Text style={styles.textoTitulo}>Estado</Text>
+                        </View>
                         <View style={styles.section}>
                             <Text>Classificação</Text>
                         </View>
@@ -209,6 +212,9 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
 
                                 <View style={styles.section}>
                                     <Text>{armazem.equipamento_id.descricao}</Text>
+                                </View>
+                                <View style={styles.section}>
+                                    <Text>{armazem.estado}</Text>
                                 </View>
                                 <View style={styles.section}>
                                     <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>

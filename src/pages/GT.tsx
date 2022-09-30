@@ -37,7 +37,8 @@ type AuditoriaType = {
     data_retirada: string;
     quantidade_retirada: number;
     data_devolucao: string;
-    quantidade_devolvida: number
+    quantidade_devolvida: number;
+    estado: string
 }
 type AuditoriaProps = {
     auditoria: AuditoriaType[];
@@ -178,6 +179,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                             <tr className='flex justify-between bg-gray-200 px-4 py-2 rounded'>
                                 <th className='text-gray-600 font-bold w-16'>ID</th>
                                 <th className='text-gray-600 font-bold w-72 '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-40 '>Estado</th>
                                 <th className='text-gray-600 font-bold w-52'>Centro de Custo</th>
                                 <th className='text-gray-600 font-bold w-44'>Qtd.</th>
                                 <th className='text-gray-600 font-bold w-40'>Data de saída</th>
@@ -185,16 +187,18 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                         </thead>
                         <tbody className=''>
                             {
-                                findedAuditoria.map((findAud, index) => (
-                                    <tr key={index}
-                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-16">{findAud.id}</td>
-                                        <td className="w-72">{findAud.equipamento_id.descricao}</td>
-                                        <td className="w-52">{findAud.obra_id.obra_nome}</td>
-                                        <td className="w-44">{findAud.quantidade_retirada}</td>
-                                        <td className="w-40">{findAud.data_retirada}</td>
-                                    </tr>
-                                ))
+                                ((searchData || searchObra) && findedAuditoria.length === 0) ? <tr><td className="p-4 font-bold">... G.T. não localizada</td></tr> :
+                                    findedAuditoria.map((findAud, index) => (
+                                        <tr key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16">{findAud.id}</td>
+                                            <td className="w-72">{findAud.equipamento_id.descricao}</td>
+                                            <td className="w-40">{findAud.estado}</td>
+                                            <td className="w-52">{findAud.obra_id.obra_nome}</td>
+                                            <td className="w-44">{findAud.quantidade_retirada}</td>
+                                            <td className="w-40">{findAud.data_retirada}</td>
+                                        </tr>
+                                    ))
                             }
 
                         </tbody>

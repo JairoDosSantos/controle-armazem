@@ -7,8 +7,11 @@ import { fetchClassificacao } from '../../../redux/slices/classificacaoSlice'
 import { fetchDuracao } from '../../../redux/slices/duracaoSlice.ts'
 import { fetchAlmoxarifario } from '../../../redux/slices/almoxarifarioSlice'
 import { fetchObra } from '../../../redux/slices/obraSlice'
-import { useRouter } from 'next/router'
+
 import nookies from 'nookies'
+import AES from 'crypto-js/aes';
+import { enc } from 'crypto-js';
+
 const RelatorioAlmoxarifado = dynamic(() => import('../../../components/relatorios/Almoxarifado'), { ssr: false })
 
 
@@ -40,56 +43,34 @@ type Almoxarifario = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     obra_id: ObraType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 
 type AlmoxarifadoProps = {
-    almoxarifados: Almoxarifario[]
+    almoxarifadoFiltrados: Almoxarifario[];
+    duracao: DuracaoType[];
+    classificacao: ClassificacaoType[]
 }
 
-const Relatorio = ({ almoxarifados }: AlmoxarifadoProps) => {
+const Relatorio = ({ almoxarifadoFiltrados, duracao, classificacao }: AlmoxarifadoProps) => {
 
-    let almoxarifadoFiltrados: Almoxarifario[] = []
+    // console.log('Almoxarifado', almoxarifadoFiltrados)
+    // let almoxarifadoFiltrados: Almoxarifario[] = []
+    /**
+     * const route = useRouter();
 
-    const route = useRouter();
+        const { slug } = route.query;
+     */
 
-    const { slug } = route.query;
 
-    if (slug?.length === 1 && slug[0] === 'all') almoxarifadoFiltrados = almoxarifados
-    else {
-        if (slug && almoxarifados) {
-            if (slug[0] !== 'equipamento' && Number(slug[1]) === 0 && Number(slug[2]) === 0) {
-
-                almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()))
-            }
-            else if
-
-                (Number(slug[2]) !== 0 && slug[0] === 'equipamento' && Number(slug[1]) === 0) {
-                almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === Number(slug[2]))
-            }
-
-            else if (Number(slug[1]) !== 0 && slug[0] === 'equipamento' && Number(slug[2]) === 0) {
-                almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.obra_id.id === Number(slug[1]))
-            }
-            else if (Number(slug[1]) !== 0 && slug[0] !== 'equipamento' && Number(slug[2]) === 0) {
-                almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.obra_id.id === Number(slug[1]) && almoxarifario.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()))
-            }
-            else if
-
-                (Number(slug[2]) !== 0 && slug[0] !== 'equipamento' && Number(slug[1]) === 0) {
-                almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === Number(slug[2]) && almoxarifario.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()))
-            }
-            else { almoxarifadoFiltrados = almoxarifados.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(slug[0].toLowerCase()) && almoxarifario.obra_id.id === (Number(slug[1])) && almoxarifario.equipamento_id.classificacao_id === Number(slug[2])) }
-
-        }
-    }
     return (
         <div>
             <Head>
                 <title>Relatório de Almoxarifado</title>
             </Head>
-            <RelatorioAlmoxarifado almoxarifados={almoxarifadoFiltrados} />
 
+            <RelatorioAlmoxarifado almoxarifadoFiltrados={almoxarifadoFiltrados} duracao={duracao} classificacao={classificacao} />
         </div>
     )
 }
@@ -97,9 +78,15 @@ const Relatorio = ({ almoxarifados }: AlmoxarifadoProps) => {
 export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(
     (store) =>
         async (context: GetServerSidePropsContext) => {
-
+            let almoxarifadoFiltrados = []
             const cookie = nookies.get(context);
 
+            const slug = context.params?.slug
+            const decriptedSTR = (params: string) => {
+
+                const decodedStr = decodeURIComponent(params);
+                return AES.decrypt(decodedStr, 'AES-256-CBC').toString(enc.Utf8);
+            }
             //const equipamentoDispatch = await store.dispatch(fetchEquipamento());
             const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
             const duracaoDispatch: any = await store.dispatch(fetchDuracao());
@@ -118,12 +105,42 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
                 return { props: {}, redirect: { destination: '/', permanent: false } }
             }
 
+            if (slug?.length === 1 && slug[0] === 'all') almoxarifadoFiltrados = almoxarifarios
+            else {
+                if (slug && almoxarifarios) {
+                    const descriptografado = decriptedSTR(slug[0])
+                    if (descriptografado !== 'equipamento' && Number(slug[1]) === 0 && Number(slug[2]) === 0) {
+
+                        almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(descriptografado.toLowerCase()))
+                    }
+                    else if
+
+                        (Number(slug[2]) !== 0 && descriptografado === 'equipamento' && Number(slug[1]) === 0) {
+                        almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.equipamento_id.classificacao_id === Number(slug[2]))
+                    }
+
+                    else if (Number(slug[1]) !== 0 && descriptografado === 'equipamento' && Number(slug[2]) === 0) {
+                        almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.obra_id.id === Number(slug[1]))
+                    }
+                    else if (Number(slug[1]) !== 0 && descriptografado !== 'equipamento' && Number(slug[2]) === 0) {
+                        almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.obra_id.id === Number(slug[1]) && almoxarifario.equipamento_id.descricao.toLowerCase().includes(descriptografado.toLowerCase()))
+                    }
+                    else if
+
+                        (Number(slug[2]) !== 0 && descriptografado !== 'equipamento' && Number(slug[1]) === 0) {
+                        almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.equipamento_id.classificacao_id === Number(slug[2]) && almoxarifario.equipamento_id.descricao.toLowerCase().includes(descriptografado.toLowerCase()))
+                    }
+                    else { almoxarifadoFiltrados = almoxarifarios.filter((almoxarifario: Almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(descriptografado.toLowerCase()) && almoxarifario.obra_id.id === (Number(slug[1])) && almoxarifario.equipamento_id.classificacao_id === Number(slug[2])) }
+
+                }
+            }
+
+
             return {
                 props: {
-                    almoxarifarios,
+                    almoxarifadoFiltrados,
                     classificacao,
-                    duracao,
-                    obras
+                    duracao
                 },
             };
         }

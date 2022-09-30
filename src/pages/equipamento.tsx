@@ -65,7 +65,8 @@ type ArmGeralType = {
     id: number;
     equipamento_id: EquipamentoType;
     quantidade: number;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 
 type EquipamentoProps = {
@@ -359,6 +360,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             <tr className='flex items-center justify-between bg-gray-200 px-2 py-2 rounded'>
                                 <th className='text-gray-600 font-bold w-16  '>ID</th>
                                 <th className='text-gray-600 font-bold w-72  '>Descrição</th>
+                                <th className='text-gray-600 font-bold w-40  '>Estado</th>
                                 <th className='text-gray-600 font-bold w-52  '>Classificação</th>
                                 <th className='text-gray-600 font-bold w-44  '>Tempo de duração</th>
                                 <th className='text-gray-600 font-bold w-20  '>Quantidade</th>
@@ -382,6 +384,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                         className='flex justify-between border shadow-md mt-4 px-4 py-2' >
                                         <td className="w-16">{arm.id}</td>
                                         <td className="w-72">{arm.equipamento_id.descricao}</td>
+                                        <td className="w-40">{arm.estado}</td>
                                         <td className="w-52"> {findClassificacao(arm.equipamento_id.classificacao_id).tipo} </td>
                                         <td className="w-44"> {findDuracao(arm.equipamento_id.duracao_id).tempo} </td>
                                         <td className="w-20">{arm.quantidade}</td>

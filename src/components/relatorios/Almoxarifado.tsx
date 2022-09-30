@@ -145,15 +145,32 @@ type Almoxarifario = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     obra_id: ObraType;
-    data_aquisicao: string
+    data_aquisicao: string;
+    estado: string
 }
 
 type AlmoxarifadoProps = {
-    almoxarifados: Almoxarifario[]
+    almoxarifadoFiltrados: Almoxarifario[];
+    duracao: DuracaoType[];
+    classificacao: ClassificacaoType[]
 }
 // Create Document Component
-export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
-    const data = moment().format('l')
+export default function BasicDocument({ almoxarifadoFiltrados, classificacao, duracao }: AlmoxarifadoProps) {
+    const data = moment().format("DD/MM/yyyy")
+
+
+    const findDuracao = (id: number) => {
+        const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
+
+        return duration as DuracaoType
+    }
+
+    const findClassificacao = (id: number) => {
+        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        return classification as ClassificacaoType
+    }
+
+
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -181,7 +198,9 @@ export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>Descrição</Text>
                         </View>
-
+                        <View style={styles.section}>
+                            <Text style={styles.textoTitulo}>Estado</Text>
+                        </View>
                         <View style={styles.section}>
                             <Text style={styles.textoTitulo}>Almoxarifado</Text>
                         </View>
@@ -202,33 +221,42 @@ export default function BasicDocument({ almoxarifados }: AlmoxarifadoProps) {
                     </View>
 
                     {
-                        almoxarifados && almoxarifados.map((almoxarifado, index) => (
-                            <View style={styles.corpo} key={index}>
+                        almoxarifadoFiltrados && almoxarifadoFiltrados.map((almoxarifado, index) => {
 
-                                <View style={styles.section}>
-                                    <Text>{almoxarifado.equipamento_id.descricao}</Text>
+                            if (almoxarifado.quantidade > 0) return (
+
+                                <View style={styles.corpo} key={index}>
+
+                                    <View style={styles.section}>
+                                        <Text>{almoxarifado.equipamento_id.descricao}</Text>
+                                    </View>
+                                    <View style={styles.section}>
+                                        <Text>{almoxarifado.estado}</Text>
+                                    </View>
+
+                                    <View style={styles.section}>
+                                        <Text>{almoxarifado.obra_id.obra_nome}</Text>
+                                    </View>
+
+                                    <View style={styles.section}>
+                                        <Text>{findClassificacao(almoxarifado.equipamento_id.classificacao_id).tipo}</Text>
+                                    </View>
+
+                                    <View style={styles.section}>
+                                        <Text>{findDuracao(almoxarifado.equipamento_id.duracao_id).tempo}</Text>
+                                    </View>
+
+
+                                    <View style={styles.section}>
+                                        <Text>{almoxarifado.quantidade}</Text>
+                                    </View>
+
                                 </View>
 
+                            )
 
-                                <View style={styles.section}>
-                                    <Text>{almoxarifado.obra_id.obra_nome}</Text>
-                                </View>
-
-                                <View style={styles.section}>
-                                    <Text>{almoxarifado.equipamento_id.classificacao_id}</Text>
-                                </View>
-
-                                <View style={styles.section}>
-                                    <Text>{almoxarifado.equipamento_id.duracao_id}</Text>
-                                </View>
-
-
-                                <View style={styles.section}>
-                                    <Text>{almoxarifado.quantidade}</Text>
-                                </View>
-
-                            </View>
-                        ))
+                        }
+                        )
                     }
 
 

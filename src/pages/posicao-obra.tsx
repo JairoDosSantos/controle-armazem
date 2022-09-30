@@ -4,7 +4,7 @@ import Head from "next/head"
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaTrash, FaPrint } from 'react-icons/fa'
+import { FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 //Imagens
 //import Load from '../assets/load.gif'
@@ -18,7 +18,7 @@ import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchAlmoxarifario } from "../redux/slices/almoxarifarioSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
 import { useRouter } from "next/router"
-
+import AES from 'crypto-js/aes';
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type DuracaoType = {
@@ -114,9 +114,26 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
         else { findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
+    /**
+     * 
+     * @param equipamentoObra 
+     * 
+     * Função para editar um equipamento em almoxarifado
+     */
     const handleEdit = (equipamentoObra: Almoxarifario) => {
         setAlmoxarifarioObject(equipamentoObra)
         setShowEditModal(true)
+    }
+
+    /**
+     * Função para criptografar uma string
+     */
+    const encriptSTR = (params: string) => {
+
+        const encriptedParams = AES.encrypt(params, 'AES-256-CBC').toString()
+
+        return encodeURIComponent(encriptedParams)
+
     }
 
     return (
@@ -240,7 +257,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                             </button>
                             <button
                                 disabled={!(search || searchByObraId || searchClassificacao)}
-                                onClick={() => route.push(`/relatorio/almoxarifado/${search === '' ? 'equipamento' : search}/${searchByObraId}/${searchClassificacao}`)}
+                                onClick={() => route.push(`/relatorio/almoxarifado/${search === '' ? encriptSTR('equipamento') : encriptSTR(search)}/${searchByObraId}/${searchClassificacao}`)}
                                 className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
                                 <FaPrint />
                                 <span>Imprimir</span>
@@ -270,21 +287,22 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </thead>
                         <tbody className=''>
                             {
-                                (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
-                                    <tr
-                                        key={index}
-                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-16 ">{almoxarifario.id}</td>
-                                        <td className="w-72 ">{almoxarifario.equipamento_id.descricao}</td>
+                                ((search || searchByObraId || searchClassificacao) && !findedEquipamento.length) ? <tr><td className="text-center font-bold py-4">... Equipamento não encontrado</td></tr> :
+                                    (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16 ">{almoxarifario.id}</td>
+                                            <td className="w-72 ">{almoxarifario.equipamento_id.descricao}</td>
 
-                                        <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
+                                            <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
 
-                                        <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
-                                        <td className="w-20 ">{almoxarifario.quantidade}</td>
-                                        <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
-                                        <td className="w-40 ">{almoxarifario.estado}</td>
-                                        {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                        {/**
+                                            <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-20 ">{almoxarifario.quantidade}</td>
+                                            <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
+                                            <td className="w-40 ">{almoxarifario.estado}</td>
+                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                            {/**
                                              *    <td className="w-1/5  flex justify-center items-center">
                                                 <button onClick={() => handleEdit(almoxarifario)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
@@ -299,22 +317,22 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                                     </button>
                                                 </td>
                                              */}
-                                    </tr>
-                                )) : findedEquipamento.map((finded, index) => (
-                                    <tr
-                                        key={index}
-                                        className='flex justify-between border shadow-md mt-4 px-4 py-2'>
-                                        <td className="w-16 ">{finded.id}</td>
-                                        <td className="w-72 ">{finded.equipamento_id.descricao}</td>
+                                        </tr>
+                                    )) : findedEquipamento.map((finded, index) => (
+                                        <tr
+                                            key={index}
+                                            className='flex justify-between border shadow-md mt-4 px-4 py-2'>
+                                            <td className="w-16 ">{finded.id}</td>
+                                            <td className="w-72 ">{finded.equipamento_id.descricao}</td>
 
-                                        <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
+                                            <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
 
-                                        <td className="w-52 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
-                                        <td className="w-20 ">{finded.quantidade}</td>
-                                        <td className="w-52 ">{finded.obra_id.obra_nome}</td>
-                                        <td className="w-40 ">{finded.estado}</td>
-                                        {/**   <td className="w-1/5 ">22-08-2022</td> */}
-                                        {/**
+                                            <td className="w-42 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-20 ">{finded.quantidade}</td>
+                                            <td className="w-52 ">{finded.obra_id.obra_nome}</td>
+                                            <td className="w-40 ">{finded.estado}</td>
+                                            {/**   <td className="w-1/5 ">22-08-2022</td> */}
+                                            {/**
                                             *  <td className="w-1/5  flex justify-center items-center">
                                                 <button onClick={() => handleEdit(finded)} className="hover:brightness-75" title="Editar">
                                                     <FaEdit />
@@ -329,8 +347,8 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                                     </button>
                                                  </td>
                                             */}
-                                    </tr>
-                                ))
+                                        </tr>
+                                    ))
                             }
 
 
