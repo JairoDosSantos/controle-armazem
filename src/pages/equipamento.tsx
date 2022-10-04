@@ -32,6 +32,7 @@ import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
 import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
 import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
 import { insertCompra } from '../redux/slices/compraSlice'
+import ReactPaginate from 'react-paginate'
 
 
 
@@ -79,6 +80,15 @@ type EquipamentoProps = {
 const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: EquipamentoProps) => {
 
     const [load, setLoad] = useState(false)
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 2;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentPageData: ArmGeralType[] = []
+
 
     const [isOpenRemove, setIsOpenRemove] = useState(false)
     //    const [isOpenAddObra, setIsOpenAddObra] = useState(false)
@@ -148,6 +158,16 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
             setLoad(false)
         }
     }
+
+
+
+    currentPageData = armazem
+        .slice(offset, offset + PER_PAGE)
+
+    pageCount = Math.ceil(armazem.length / PER_PAGE);
+
+
+
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
@@ -162,6 +182,10 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     const handleEdit = (armazem: ArmGeralType) => {
         setAmazemObject(armazem)
         setShowEditModal(true)
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
     return (
         <div className='flex '>
@@ -379,7 +403,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                         </thead>
                         <tbody >
 
-                            {armazem && armazem.map((arm, index) => {
+                            {currentPageData?.map((arm, index) => {
                                 if (index < 5) {
                                     return <tr
                                         key={index}
@@ -418,6 +442,20 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
                         </tbody>
                     </table>
+
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main >
         </div >

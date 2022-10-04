@@ -19,6 +19,9 @@ import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import { useRouter } from "next/router"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 import AES from 'crypto-js/aes';
+import ReactPaginate from 'react-paginate'
+
+
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -54,6 +57,15 @@ type PosicaoArmazemProps = {
 const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
 
     const route = useRouter()
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 3;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentPageData: EquipamentosARMType[] = []
+    let currentFilteredData: EquipamentosARMType[] = []
 
     //Estados dos sweetAlerts
     const [showConfirmAlert, setShowConfirmAlert] = useState(false)
@@ -95,12 +107,22 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
     }
 
-    const handleEdit = (armazem: EquipamentosARMType) => {
 
+    if (findedEquipamento.length) {
+        currentFilteredData = findedEquipamento
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(findedEquipamento.length / PER_PAGE);
+    } else {
+        currentPageData = equipamentosARM
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(equipamentosARM.length / PER_PAGE);
+    }
+
+    const handleEdit = (armazem: EquipamentosARMType) => {
         setArmazemObject(armazem);
         setShowEditModal(true)
-
-
     }
 
     /**
@@ -112,6 +134,10 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
         return encodeURIComponent(encriptedParams)
 
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
 
     return (
@@ -243,7 +269,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                         <tbody className=''>
                             {
                                 ((search || searchByClassificacao) && findedEquipamento.length === 0) ? <tr><td className="p-3 font-bold ">... Equipamento não encontrado</td></tr> :
-                                    (equipamentosARM && equipamentosARM.length && findedEquipamento.length === 0) ? equipamentosARM.map((equipamento, index) => (
+                                    (equipamentosARM && equipamentosARM.length && findedEquipamento.length === 0) ? currentPageData?.map((equipamento, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -256,7 +282,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                             <td className="w-40 ">{equipamento.estado}</td>
 
                                         </tr>
-                                    )) : findedEquipamento.map((finded, index) => (
+                                    )) : currentFilteredData?.map((finded, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -273,6 +299,20 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                         </tbody>
                     </table>
+
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
 
             </main>

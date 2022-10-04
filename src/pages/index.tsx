@@ -53,6 +53,7 @@ const Home: NextPage = () => {
         router.push('/painel-controlo')
       }
     } catch (error) {
+      console.log(error)
       setShowErrorAlert(true)
       setLoad(false)
     }

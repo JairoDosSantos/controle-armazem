@@ -20,7 +20,7 @@ import { fetchObra } from "../redux/slices/obraSlice"
 import { useRouter } from "next/router"
 import AES from 'crypto-js/aes';
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
-
+import ReactPaginate from 'react-paginate'
 type DuracaoType = {
     id: number;
     tempo: string;
@@ -61,8 +61,14 @@ type PosicaoObraProps = {
 
 const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoObraProps) => {
 
-    const [hideSideBar, setHideSideBar] = useState(false)
-    const [load, setLoad] = useState(false)
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 3;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentPageData: Almoxarifario[] = []
+    let currentFilteredData: Almoxarifario[] = []
+
     const route = useRouter()
 
     //Estados dos sweetAlerts
@@ -114,6 +120,20 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
         else { findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
+
+    if (findedEquipamento.length) {
+        currentFilteredData = findedEquipamento
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(findedEquipamento.length / PER_PAGE);
+    } else {
+        currentPageData = almoxarifarios
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(almoxarifarios.length / PER_PAGE);
+    }
+
+
     /**
      * 
      * @param equipamentoObra 
@@ -136,6 +156,9 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
     }
 
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
+    }
     return (
         <div className='flex'>
             <SiderBar itemActive="posicao-obra" />
@@ -286,7 +309,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         <tbody className=''>
                             {
                                 ((search || searchByObraId || searchClassificacao) && !findedEquipamento.length) ? <tr><td className="text-center font-bold py-4">... Equipamento não encontrado</td></tr> :
-                                    (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? almoxarifarios.map((almoxarifario, index) => (
+                                    (almoxarifarios && almoxarifarios.length && search === '' && searchByObraId === 0 && searchClassificacao === 0) ? currentPageData?.map((almoxarifario, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -301,7 +324,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             <td className="w-40 ">{almoxarifario.estado}</td>
 
                                         </tr>
-                                    )) : findedEquipamento.map((finded, index) => (
+                                    )) : currentFilteredData?.map((finded, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -323,6 +346,19 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
 
             </main >

@@ -7,7 +7,8 @@ import nookies from 'nookies'
 import { wrapper } from '../redux/store'
 import { fetchObra, fetchObraActiva } from '../redux/slices/obraSlice'
 import { fetchEncarregados } from '../redux/slices/encarregadoSlice'
-import { fetchArmGeralByClassificcao, fetchEsgotar } from '../redux/slices/armGeralSlice'
+import { fetchArmGeralByClassificcao } from '../redux/slices/armGeralSlice'
+
 
 
 type PainelProps = {
@@ -17,12 +18,9 @@ type PainelProps = {
     TotalHSST: number;
     TotalFerramenta: number;
     TotalMateriais: number
-
 }
 
 const PainelControlo = ({ obrasActivas, totalObras, totalEncarregados, TotalHSST, TotalFerramenta, TotalMateriais }: PainelProps) => {
-
-    const [hideSideBar, setHideSideBar] = useState(false)
 
     return (
         <div className='flex'>
@@ -118,8 +116,16 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const TotalMateriais = TotalMaterial ? TotalMaterial.length : 0
 
 
-            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
 
+            if (!cookie.USER_LOGGED_ARMAZEM) return { props: {}, redirect: { destination: '/', permanent: false } }
+            /**
+             *  if (cookie.USER_LOGGED_ARMAZEM) {
+                            const userEmail = JSON.parse(cookie.USER_LOGGED_ARMAZEM).email
+            
+                            await store.dispatch(updateUser(JSON.parse(cookie.USER_LOGGED_ARMAZEM).email))
+                        }
+                        console.log(JSON.parse(cookie.USER_LOGGED_ARMAZEM))
+             */
             return {
                 props: {
                     obrasActivas: totalObrasActivas,

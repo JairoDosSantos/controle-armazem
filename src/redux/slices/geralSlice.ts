@@ -14,16 +14,15 @@ export const geralSlice = createSlice({
         hideSiderBar: (state, action) => {
             state.showSideBar = action.payload.showSideBar
         }
-        /**
-         *  extraReducers: {
-             [HYDRATE]: (state, action) => {
-                 return {
-                     ...state,
-                     ...action.payload.Search
-                 }
-             }
-         }
-         */
+
+    },
+    extraReducers: {
+        [HYDRATE]: (state, action) => {
+            return {
+                ...state,
+                ...action.payload.auth,
+            };
+        },
     }
 })
 

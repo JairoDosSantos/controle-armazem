@@ -20,12 +20,32 @@
 }
 
 @layer components {
+
     .overflow-hide-scroll-bar::-webkit-scrollbar {
         display: none;
     }
 
     .active {
         @apply px-4 py-2 rounded bg-gray-300 font-bold truncate
+    }
+
+    .pagination {
+        @apply flex space-x-4 w-fit mx-auto mt-2 shadow-sm p-4 rounded-sm
+    }
+
+    .pagination__link {
+        @apply rounded-full 
+    }
+    .pagination__link:hover, .pagination__link--active:hover,.pagination__link--disabled:hover{
+        @apply brightness-75 transform transition-all
+    }
+
+    .pagination__link--active {
+        @apply flex items-center justify-center rounded-full text-sky-700 
+    }
+
+    .pagination__link--disabled {
+        @apply flex items-center justify-center rounded-full text-blue-700 
     }
 
 }

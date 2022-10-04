@@ -21,7 +21,7 @@ import { fetchCompra } from "../redux/slices/compraSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import nookies from 'nookies'
-
+import ReactPaginate from 'react-paginate'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -61,6 +61,13 @@ type CompraProps = {
 const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
     //const [load, setLoad] = useState(false)
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 3;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentPageData: CompraType[] = []
+    let currentFilteredData: CompraType[] = []
 
     const [filtroTipo, setFiltroTipo] = useState(false)
     const route = useRouter()
@@ -103,6 +110,19 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
         else findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) && compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
     }
 
+
+    if (findedCompras.length) {
+        currentFilteredData = findedCompras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(findedCompras.length / PER_PAGE);
+    } else {
+        currentPageData = compras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(compras.length / PER_PAGE);
+    }
+
     /**
      * 
      * @param compra 
@@ -120,6 +140,10 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
         return encodeURIComponent(encriptedParams)
 
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
 
     return (
@@ -284,7 +308,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                     <td className="w-full text-center py-6 font-bold ">... Compra não encontrada</td>
                                 </tr> :
 
-                                    compras && compras.length && !findedCompras.length ? compras.map((compra, index) => (
+                                    compras && compras.length && !findedCompras.length ? currentPageData?.map((compra, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
@@ -321,7 +345,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                                 */
                                             }
                                         </tr>
-                                    )) : findedCompras.map((compra, index) => (
+                                    )) : currentFilteredData?.map((compra, index) => (
                                         <tr
                                             key={index}
                                             className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
@@ -360,6 +384,20 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
                         </tbody>
                     </table>
+
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main>
 

@@ -14,7 +14,7 @@ import { wrapper } from "../redux/store"
 import { fetchSaida } from "../redux/slices/auditoriaSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
 import { useRouter } from "next/router"
-
+import ReactPaginate from 'react-paginate'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -49,6 +49,14 @@ type AuditoriaProps = {
 const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 3;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentPageData: AuditoriaType[] = []
+    let currentFilteredData: AuditoriaType[] = []
+
     const route = useRouter()
 
     const [filtroPorObra, setFiltroPorObra] = useState(false)
@@ -72,9 +80,25 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
         else findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()) && entradaSaida.obra_id.id === searchObra)
     }
 
+    if (findedAuditoria.length) {
+        currentFilteredData = findedAuditoria
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(findedAuditoria.length / PER_PAGE);
+    } else {
+        currentPageData = auditoria
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(auditoria.length / PER_PAGE);
+    }
+
     const handleEdit = (saida: AuditoriaType) => {
         setAuditoriaObject(saida)
         setShowEditModal(true)
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
 
     return (
@@ -262,7 +286,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
                                         {
 
-                                            auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((devolucao, index) => {
+                                            auditoria && auditoria.length && !findedAuditoria.length ? currentPageData?.map((devolucao, index) => {
                                                 if (devolucao.data_devolucao) {
                                                     return (
                                                         <tr key={index}
@@ -297,7 +321,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                         </tr>
                                                     )
                                                 }
-                                            }) : findedAuditoria.map((findAud, index) => {
+                                            }) : currentFilteredData?.map((findAud, index) => {
                                                 if (findAud.quantidade_devolvida) {
                                                     return (<tr key={index}
                                                         className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -355,7 +379,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                         </tr>
                                     </thead>
                                     <tbody className=''>
-                                        {auditoria && auditoria.length && !findedAuditoria.length ? auditoria.map((saida, index) => (
+                                        {auditoria && auditoria.length && !findedAuditoria.length ? currentPageData?.map((saida, index) => (
                                             <tr
                                                 key={index}
                                                 className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -387,7 +411,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                                 </td>
                                                 */}
                                             </tr>
-                                        )) : findedAuditoria.map((findAud, index) => (
+                                        )) : currentFilteredData?.map((findAud, index) => (
                                             <tr key={index}
                                                 className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                                 <td className="w-16">{findAud.id}</td>
@@ -426,7 +450,19 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                 </table>
                             )
                     }
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
 
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
 
             </main >

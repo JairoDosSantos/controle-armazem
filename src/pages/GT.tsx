@@ -13,7 +13,7 @@ import { wrapper } from "../redux/store"
 import { fetchSaida } from "../redux/slices/auditoriaSlice"
 import { fetchObra } from "../redux/slices/obraSlice"
 import { useRouter } from "next/router"
-
+import ReactPaginate from 'react-paginate'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -47,6 +47,12 @@ type AuditoriaProps = {
 
 const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 3;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+
+    let currentFilteredData: AuditoriaType[] = []
 
     const route = useRouter()
 
@@ -64,6 +70,17 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
         if (searchObra !== 0 && searchData === '') findedAuditoria = auditoria.filter((saidaEntrada) => saidaEntrada.obra_id.id === searchObra)
         else if (searchData && searchObra === 0) findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()))
         else findedAuditoria = auditoria.filter((entradaSaida) => entradaSaida.data_retirada.toLowerCase().includes(searchData.toLowerCase()) && entradaSaida.obra_id.id === searchObra)
+    }
+
+
+    currentFilteredData = findedAuditoria
+        .slice(offset, offset + PER_PAGE)
+
+    pageCount = Math.ceil(findedAuditoria.length / PER_PAGE);
+
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
 
     return (
@@ -188,7 +205,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
                         <tbody className=''>
                             {
                                 ((searchData || searchObra) && findedAuditoria.length === 0) ? <tr><td className="p-4 font-bold">... G.T. não localizada</td></tr> :
-                                    findedAuditoria.map((findAud, index) => (
+                                    currentFilteredData?.map((findAud, index) => (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-16">{findAud.id}</td>
@@ -203,6 +220,19 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main>
         </div>
