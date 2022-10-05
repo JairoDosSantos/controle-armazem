@@ -44,7 +44,7 @@ const GuiaTransporte = ({ movimentacoesFiltradas }: AuditoriaProps) => {
     return (
         <div>
             <Head>
-                <title>Relatório de Movimentações</title>
+                <title> Guia de transporte</title>
             </Head>
 
             <RelatorioMovimentacoes auditoria={movimentacoesFiltradas} />

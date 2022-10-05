@@ -58,16 +58,21 @@ const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
-        const retirar = await retirarARMG(compraData.quantidade_comprada, compraData.equipamento_id.id, compraData.estado)
-        if (!retirar) { notifyError(); return }
-        const somar = await colocarARMG(data.quantidadeAlterada, compraData.equipamento_id.id, compraData.estado)
-        if (!somar) { notifyError(); return }
-        // data_compra, equipamento_id, id, preco
-        const resultDispatch = await dispatch(updateCompra({ ...compraData, equipamento_id: compraData.equipamento_id.id, quantidade_comprada: data.quantidadeAlterada }));
-        setLoad(false)
-        if (resultDispatch.payload !== null) {
-            notifySuccess()
-        } else {
+        try {
+            const retirar = await retirarARMG(compraData.quantidade_comprada, compraData.equipamento_id.id, compraData.estado)
+            if (!retirar) { notifyError(); return }
+            const somar = await colocarARMG(data.quantidadeAlterada, compraData.equipamento_id.id, compraData.estado)
+            if (!somar) { notifyError(); return }
+            // data_compra, equipamento_id, id, preco
+            const resultDispatch = await dispatch(updateCompra({ ...compraData, equipamento_id: compraData.equipamento_id.id, quantidade_comprada: data.quantidadeAlterada }));
+            setLoad(false)
+            if (resultDispatch.payload !== null) {
+                notifySuccess()
+            } else {
+                notifyError()
+            }
+        } catch (error) {
+            setLoad(false)
             notifyError()
         }
 
@@ -75,37 +80,42 @@ const EditarModal = ({ isOpen, setIsOpen, compraData }: EditarModalProps) => {
 
     const retirarARMG = async (quantidade: number, equipamento_id: number, estado: string) => {
 
-        const dispatchFetchARMG = await dispatch(fetchOne({ estado, id: equipamento_id }))
+        try {
+            const dispatchFetchARMG = await dispatch(fetchOne({ estado, id: equipamento_id }))
 
-        const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
+            const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
 
-        if (Number(ARMUNWRAP[0].quantidade) < Number(quantidade)) return false
+            if (Number(ARMUNWRAP[0].quantidade) < Number(quantidade)) return false
 
-        console.log('Resultado QTD TOTAL ORIGINAL', ARMUNWRAP[0])
 
-        let newQTD = Number(ARMUNWRAP[0].quantidade) - Number(quantidade)
+            let newQTD = Number(ARMUNWRAP[0].quantidade) - Number(quantidade)
 
-        console.log('SUBTRAÇÃO', newQTD)
 
-        const dispatchUpdateARMG = await dispatch(updateArmGeral({ ...ARMUNWRAP[0], equipamento_id, quantidade_entrada: newQTD }))
+            const dispatchUpdateARMG = await dispatch(updateArmGeral({ ...ARMUNWRAP[0], equipamento_id, quantidade_entrada: newQTD }))
 
-        if (dispatchUpdateARMG.payload === null) return false
+            if (dispatchUpdateARMG.payload === null) return false
 
-        return true
+            return true
+        } catch (error) {
+            notifyError()
+        }
     }
 
     const colocarARMG = async (quantidade: number, equipamento_id: number, estado: string) => {
 
-        const dispatchFetchARMG = await dispatch(fetchOne({ id: equipamento_id, estado }))
-        const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
-        let newQTD = Number(ARMUNWRAP[0].quantidade) + Number(quantidade)
-        console.log('Resultado QTD TOTAL SUBTRAIDA', ARMUNWRAP[0])
-        console.log('SOMA', newQTD)
-        const dispatchUpdateARMG = await dispatch(updateArmGeral({ ...ARMUNWRAP[0], equipamento_id, quantidade_entrada: newQTD }))
+        try {
+            const dispatchFetchARMG = await dispatch(fetchOne({ id: equipamento_id, estado }))
+            const ARMUNWRAP = unwrapResult(dispatchFetchARMG)
+            let newQTD = Number(ARMUNWRAP[0].quantidade) + Number(quantidade)
 
-        if (dispatchUpdateARMG.payload === null) return false
+            const dispatchUpdateARMG = await dispatch(updateArmGeral({ ...ARMUNWRAP[0], equipamento_id, quantidade_entrada: newQTD }))
 
-        return true
+            if (dispatchUpdateARMG.payload === null) return false
+
+            return true
+        } catch (error) {
+            notifyError()
+        }
     }
 
 

@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: '45px'
     },
     assinaturaIndividual: {
-        paddingVertical: 10,
+        paddingBottom: 20,
         paddingHorizontal: 25,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        borderTop: 1
+        borderBottom: 1
     },
     textoTitulo: {
         fontWeight: 'bold'

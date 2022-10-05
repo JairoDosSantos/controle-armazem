@@ -100,7 +100,12 @@ const styles = StyleSheet.create({
         height: 40,
     },
     divisaoAssinatura: {
-        marginTop: 75
+        marginTop: 75,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+
     },
 
     assinaturas: {
@@ -110,17 +115,41 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: '10px',
-        paddingHorizontal: '20px',
-        marginVertical: 20
+        paddingHorizontal: '10px',
+
+
+    },
+    assinaturas1: {
+        width: '50%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontSize: '10px',
+
+    },
+    assinaturaIndividual1: {
+        width: '50%',
+        borderBottom: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        paddingBottom: 20,
+        marginBottom: 15
+
     },
     assinaturaIndividual: {
-        paddingVertical: 20,
+        paddingVertical: 30,
         paddingHorizontal: 25,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        borderBottom: 1
+        borderBottom: 1,
+        textAlign: 'center',
+
     },
     textoTitulo: {
         fontWeight: 'bold'
@@ -179,7 +208,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
     return (
         <PDFViewer style={styles.viewer} >
             {/* Start of the document*/}
-            <Document title="Relatório de Movimentações">
+            <Document title="Guia de Transporte">
                 {/*render a single page*/}
                 <Page size="A4" style={styles.page} >
 
@@ -199,7 +228,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>GUIA DE TRANSPORTE Nº {`${auditoria.length} / ${ano}`}</Text>
+                        <Text>GUIA DE TRANSPORTE Nº {`${auditoria[0].id} / ${ano}`}</Text>
                     </View>
                     <View style={{ border: 1, padding: 4, marginBottom: 10 }}>
                         <View style={styles.cabecalhoPrincipal}>
@@ -215,10 +244,6 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             </View>
                             <View style={styles.section}>
                                 <Text>Endereço Casa</Text>
-                            </View>
-
-                            <View style={styles.section}>
-                                <Text>Descrição do Extra</Text>
                             </View>
 
                         </View>
@@ -238,10 +263,6 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                                 <Text>{auditoria.length && auditoria[0].obra_id.obra_nome}</Text>
                             </View>
 
-                            <View style={styles.section}>
-                                <Text></Text>
-                            </View>
-
                         </View>
                     </View>
 
@@ -255,7 +276,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             <Text style={styles.textoTitulo}>DESCRIÇÃO</Text>
                         </View>
                         <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Estado</Text>
+                            <Text style={styles.textoTitulo}>ESTADO</Text>
                         </View>
                         <View style={styles.section}>
                             <Text>CENTRO DE CUSTO</Text>
@@ -294,35 +315,15 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                     }
 
                     <View style={styles.divisaoAssinatura}>
-                        <View style={styles.assinaturas}>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
-                            </View>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
-                            </View>
+                        <View style={styles.assinaturas1}>
+                            <Text style={styles.assinaturaIndividual1}>Responsável do armazem</Text>
+                            <Text style={styles.assinaturaIndividual1}>Assinatura Transporte</Text>
+                            <Text style={styles.assinaturaIndividual1}>Assinatura Conferente</Text>
                         </View>
-                        <View style={styles.assinaturas}>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Assinatura Transporte</Text>
-                            </View>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Assinatura Segurança</Text>
-                            </View>
-                        </View>
-                        <View style={styles.assinaturas}>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Assinatura Conferente</Text>
-                            </View>
-
-                            <View>
-                                <Text style={styles.assinaturaIndividual}>Assinatura Solicitante</Text>
-                            </View>
+                        <View style={styles.assinaturas1}>
+                            <Text style={styles.assinaturaIndividual1}>Director NOAH</Text>
+                            <Text style={styles.assinaturaIndividual1}>Assinatura Segurança</Text>
+                            <Text style={styles.assinaturaIndividual1}>Assinatura Solicitante</Text>
                         </View>
                     </View>
 

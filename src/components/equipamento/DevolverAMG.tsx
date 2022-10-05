@@ -311,6 +311,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                                     <option value="Novo">Novo</option>
                                                     <option value="Avariado">{'Avariado(a)'}</option>
                                                     <option value="Usado">Usado</option>
+                                                    <option value="Vazia">{'Vazio(a)'}</option>
                                                 </select>
                                             </div>
 

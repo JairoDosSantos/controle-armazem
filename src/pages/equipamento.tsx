@@ -333,6 +333,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                 <option value="Novo">Novo</option>
                                 <option value="Avariado">{'Avariado(a)'}</option>
                                 <option value="Usado">Usado</option>
+                                <option value="Vazia">{'Vazio(a)'}</option>
                             </select>
                         </div>
 

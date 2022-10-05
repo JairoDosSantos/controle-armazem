@@ -303,6 +303,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                                                     <option value="Novo">Novo</option>
                                                     <option value="Avariado">{'Avariado(a)'}</option>
                                                     <option value="Usado">Usado</option>
+                                                    <option value="Vazia">{'Vazio(a)'}</option>
                                                 </select>
                                             </div>
                                             <div className='flex gap-2 justify-center align-center'>
