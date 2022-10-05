@@ -35,14 +35,14 @@ class MyDocument extends Document {
 
                     <meta name="twitter:card" content="summary" />
                     <meta name="twitter:url" content="https://controle-armazem.vercel.app/" />
-                    <meta name="twitter:title" content="SGC- NOAH" />
-                    <meta name="twitter:description" content="Sistema de gestão de custo" />
+                    <meta name="twitter:title" content="SCA- NOAH" />
+                    <meta name="twitter:description" content="Sistema de controle de armazem" />
                     <meta name="twitter:image" content="https://controle-armazem.vercel.app/icons/android-chrome-192x192.png" />
-                    <meta name="twitter:creator" content="@DavidWShadow" />
+                    <meta name="twitter:creator" content="@JairoSantos" />
                     <meta property="og:type" content="website" />
-                    <meta property="og:title" content="SGC- NOAH" />
-                    <meta property="og:description" content="Sistema de gestão de custo" />
-                    <meta property="og:site_name" content="SGC- NOAH" />
+                    <meta property="og:title" content="SCA- NOAH" />
+                    <meta property="og:description" content="Sistema de controle de armazem" />
+                    <meta property="og:site_name" content="SCA- NOAH" />
                     <meta property="og:url" content="https://controle-armazem.vercel.app/" />
                     <meta property="og:image" content="https://controle-armazem.vercel.app/icons/apple-touch-icon.png" />
 

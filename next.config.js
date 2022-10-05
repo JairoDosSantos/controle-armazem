@@ -4,13 +4,12 @@ const withPWA = require('next-pwa')({
   dest: 'public'
 })
 
-module.exports = {
-  reactStrictMode: true,
+
+module.exports = withPWA({
+   reactStrictMode: true,
     images: {
     domains: ['i.ibb.co'],
   },
-},
-module.exports = withPWA({
   pwa: {
     dest: "public",
     register: true,
