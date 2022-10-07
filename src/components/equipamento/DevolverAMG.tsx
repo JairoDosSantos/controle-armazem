@@ -19,6 +19,7 @@ import { useDispatch } from 'react-redux'
 import { fetchOneAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
 import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { fetchOneSaida, updateAuditoria } from '../../redux/slices/auditoriaSlice'
+import { TiArrowBackOutline } from 'react-icons/ti'
 
 
 type EquipamentoType = {
@@ -240,9 +241,10 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                 <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                                     <Dialog.Title
                                         as="h3"
-                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
+                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5 flex space-x-3 items-center justify-center"
                                     >
-                                        Devolver ao armazem geral
+                                        <TiArrowBackOutline />
+                                        <span> Devolver ao armazem geral</span>
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>
@@ -263,7 +265,6 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                                             onSubmit={handleSubmit(onSubmit)}>
                                             <div className='flex gap-2 justify-center align-center'>
                                                 {/** Pegar um produto do armazem da Obra e adicionar a quantidade em stock do armazem geral  */}
-
 
                                                 <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
 

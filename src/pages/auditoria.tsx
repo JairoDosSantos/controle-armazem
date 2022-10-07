@@ -260,7 +260,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
 
                 </div >
-                <div className='mt-8 text-end px-4 py-2 max-w-sm lg:max-w-6xl mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                <div className='mt-8 text-end px-4 py-2 flex flex-col flex-1 mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
                     <span className='font-semibold text-lg'>Relatório de {filtroPorMovimentacoes ? 'devoluções' : 'saídas'}</span>
                     {
                         ((searchData || searchObra) && !findedAuditoria.length) ? <span className="p-4 block font-bold text-center">... Movimentação não registrada/encontrada</span> :

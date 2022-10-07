@@ -10,7 +10,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 
 //Imagens
 import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
+import { FaSave, FaPlusCircle } from 'react-icons/fa'
 import Image from 'next/image'
 import { useDispatch } from 'react-redux'
 import { insertEquipamento } from '../../redux/slices/equipamentoSlice'
@@ -131,9 +131,9 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                 <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                                     <Dialog.Title
                                         as="h3"
-                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
+                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5 flex space-x-3 items-center justify-center"
                                     >
-                                        Adicionar equipamento
+                                        <FaPlusCircle /> <span>Adicionar nova descrição de equipamento</span>
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>

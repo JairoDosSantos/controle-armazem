@@ -16,7 +16,9 @@ const styles = StyleSheet.create({
     page: {
         backgroundColor: "#ffff",
         color: "black",
-        padding: 30
+        paddingHorizontal: 30,
+        paddingTop: 30,
+        paddingBottom: 66
     },
     section: {
         paddingHorizontal: 2,
@@ -109,10 +111,11 @@ const styles = StyleSheet.create({
     },
     rodape: {
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'space-around',
         fontSize: '8px',
-        paddingTop: '35px'
+        height: 45,
     }
 
 });
@@ -179,14 +182,17 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                 <Page size="A4" style={styles.page} wrap>
 
 
-                    <View style={styles.fotoTitulo}>
+                    <View style={styles.fotoTitulo} fixed>
                         {/**
                        *   <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
                            <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
                            <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                        */}
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <Text>NOAH CONSTUCTIONS</Text>
+                        <View style={styles.rodape}>
+                            <Text >NOAH CONSTUCTIONS</Text>
+                            <Text >Data emissão: {data}</Text>
+                        </View>
                     </View>
 
                     <View style={styles.titulo}>
@@ -272,9 +278,7 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                         </View>
                     </View>
 
-                    <View style={styles.rodape}>
-                        <Text>Luanda aos, {data}</Text>
-                    </View>
+
 
 
                 </Page>

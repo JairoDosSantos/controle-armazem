@@ -16,6 +16,8 @@ import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralPara
 
 //Componentes Externos
 import { FaSave, FaPlusCircle } from 'react-icons/fa'
+import { BiTransferAlt } from 'react-icons/bi'
+import { TiArrowBackOutline } from 'react-icons/ti'
 import nookies from 'nookies'
 import { useDispatch } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
@@ -261,7 +263,9 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             <button
                                 onClick={() => setIsOpenRemoveObraAddAMG(true)}
                                 type="button"
-                                className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75">Devolver ao armazem geral
+                                className="bg-gray-700 text-white font-bold px-4 py-2 hover:brightness-75 animacao-link flex space-x-2 items-center justify-center">
+                                <TiArrowBackOutline />
+                                <span>Devolver ao armazem geral</span>
                             </button>
                             {isOpenRemoveObraAddAMG && (<DevolverAMG
                                 equipamentos={equipamentos} isOpen={isOpenRemoveObraAddAMG}
@@ -274,7 +278,9 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             <button
                                 onClick={() => setIsOpenRemove(true)}
                                 type="button"
-                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75">Transferir para almoxarifado
+                                className="bg-gray-200 text-gray-600 font-bold px-4 py-2 hover:brightness-75 animacao-link flex space-x-2 items-center justify-center">
+                                <BiTransferAlt />
+                                <span>Transferir para almoxarifado</span>
                             </button>
                             {/** Aqui o equipamento será diminuído do armazem para ser cadastrado ao armazem da obra */}
                             {isOpenRemove && (
@@ -289,7 +295,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                         <button
                             onClick={() => setIsOpenAddNovoModal(true)}
                             type="button"
-                            className="bg-blue-700 text-white font-bold px-4 py-2 hover:brightness-75 flex justify-center items-center gap-2">
+                            className="bg-blue-700 text-white font-bold px-4 py-2 hover:brightness-75 flex justify-center items-center gap-2 animacao-link">
                             <FaPlusCircle /><span>Adicionar novo equipamento</span>
                         </button>
                         {isOpenAddNovoModal && (
@@ -313,10 +319,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
                         <div className="flex gap-3">
                             <input
-                                {...register('preco', {
-                                    required: { message: "Por favor, introduza o Preço do equipamento.", value: true },
-                                    minLength: { message: "Preenchimento obrigatório!", value: 1 },
-                                })}
+                                {...register('preco')}
                                 type="number"
                                 placeholder="Preço"
                                 className="w-1/2 rounded shadow"
@@ -359,12 +362,12 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
                         <div className="flex gap-2 justify-end">
                             <button
-                                type={'reset'}
+                                onClick={() => reset()}
                                 className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
                             </button>
                             <button
                                 disabled={!isValid}
-                                className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500" >
+                                className={`bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500 ${isValid && 'animacao-link'}`} >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}
                                 <span>Salvar</span>
                             </button>
@@ -380,7 +383,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
 
 
                 </div>
-                <div className=' mt-4 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                <div className=' mt-4 text-end px-4 py-2 mx-auto flex flex-col flex-1  bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
                     <span className='font-semibold text-lg'>Lista de Equipamentos arm. geral</span>
                     <table className='table  w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>

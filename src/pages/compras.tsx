@@ -283,7 +283,7 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                 </div>
 
                 {/** Relatório- tabela de compras */}
-                <div className=' mt-8 text-end px-4 py-2 mx-auto max-w-sm lg:max-w-6xl bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                <div className=' mt-8 text-end px-4 pt-4 pb-2 mx-auto flex flex-col flex-1 bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
 
                     <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>

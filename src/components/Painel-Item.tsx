@@ -13,7 +13,7 @@ type PainelItemProps = {
 
 const PainelItem = ({ titulo, quantidade, rodape, icone }: PainelItemProps) => {
     return (
-        <div className='w-64 flex flex-col  gap-6 bg-white rounded shadow'>
+        <div className='w-64 flex flex-col  gap-6 bg-white rounded shadow animacao-link'>
 
             <div className='w-full text-end px-4 mt-3'>
                 <span className='text-base font-semibold text-gray-500 select-none'>{titulo}</span>
@@ -30,7 +30,7 @@ const PainelItem = ({ titulo, quantidade, rodape, icone }: PainelItemProps) => {
 
                 </div>
 
-                <span className={`font-bold ${quantidade > 0 ? 'text-blue-700' : 'text-red-700'} text-6xl select-none`}>{quantidade}</span>
+                <span className={`font-bold ${quantidade > 0 ? 'text-indigo-600' : 'text-red-700'} text-6xl select-none`}>{quantidade}</span>
 
             </div>
 

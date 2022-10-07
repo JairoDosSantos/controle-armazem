@@ -16,7 +16,10 @@ const styles = StyleSheet.create({
     page: {
         backgroundColor: "#ffff",
         color: "black",
-        padding: 30
+        paddingHorizontal: 30,
+        paddingTop: 30,
+        paddingBottom: 66
+
     },
     section: {
         paddingHorizontal: 2,
@@ -109,10 +112,11 @@ const styles = StyleSheet.create({
     },
     rodape: {
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'space-around',
         fontSize: '8px',
-        paddingTop: '35px'
+        height: 45,
     }
 
 });
@@ -175,9 +179,12 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                     {/**
                         * <a href="https://imgbox.com/d3WKdgPQ" target="_blank"><img src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" alt="image host"/></a>
                      */}
-                    <View style={styles.fotoTitulo}>
+                    <View style={styles.fotoTitulo} >
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <Text>NOAH CONSTUCTIONS</Text>
+                        <View style={styles.rodape} >
+                            <Text >NOAH CONSTUCTIONS</Text>
+                            <Text >Data emissão: {data}</Text>
+                        </View>
                     </View>
 
                     <View style={styles.titulo}>
@@ -241,11 +248,6 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                         </View>
 
                     </View>
-
-                    <View style={styles.rodape}>
-                        <Text>Luanda aos, {data}</Text>
-                    </View>
-
 
                 </Page>
             </Document>

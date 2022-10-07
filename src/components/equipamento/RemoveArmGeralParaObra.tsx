@@ -20,6 +20,7 @@ import { deleteAlmoxarifario, fetchOneAlmoxarifario, insertAlmoxarifario, update
 import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { insertAuditoria } from '../../redux/slices/auditoriaSlice'
 import { useRouter } from 'next/router'
+import { BiTransferAlt } from 'react-icons/bi'
 
 type EquipamentoType = {
     id: number;
@@ -244,9 +245,11 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                                 <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                                     <Dialog.Title
                                         as="h3"
-                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5"
+                                        className="text-lg font-bold leading-6 text-gray-900 text-center mb-5 flex space-x-3 items-center justify-center"
                                     >
-                                        Transferir para obra
+
+                                        <BiTransferAlt />
+                                        <span>Transferir para obra</span>
                                     </Dialog.Title>
                                     <div className="mt-2 flex flex-col justify-center">
                                         <div className='w-[552px]'>

@@ -47,5 +47,8 @@
     .pagination__link--disabled {
         @apply flex items-center justify-center rounded-full text-blue-700 
     }
-
+    .animacao-link{
+        @apply transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300
+    }
+   
 }

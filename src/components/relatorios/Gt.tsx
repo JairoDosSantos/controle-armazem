@@ -245,7 +245,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             <View style={styles.section}>
                                 <Text>Endereço Casa</Text>
                             </View>
-
+                            <View style={styles.section}>
+                                <Text>Data Emissão</Text>
+                            </View>
                         </View>
 
                         <View style={styles.corpoHeader}>
@@ -261,6 +263,9 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             </View>
                             <View style={styles.section}>
                                 <Text>{auditoria.length && auditoria[0].obra_id.obra_nome}</Text>
+                            </View>
+                            <View style={styles.section}>
+                                <Text> {data}</Text>
                             </View>
 
                         </View>
@@ -327,9 +332,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                         </View>
                     </View>
 
-                    <View style={styles.rodape}>
-                        <Text>Luanda aos, {data}</Text>
-                    </View>
+
 
 
                 </Page>

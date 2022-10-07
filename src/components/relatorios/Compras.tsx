@@ -16,7 +16,9 @@ const styles = StyleSheet.create({
     page: {
         backgroundColor: "#ffff",
         color: "black",
-        padding: 30
+        paddingHorizontal: 30,
+        paddingTop: 30,
+        paddingBottom: 66
     },
     section: {
         paddingHorizontal: 2,
@@ -107,10 +109,11 @@ const styles = StyleSheet.create({
     },
     rodape: {
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'space-around',
         fontSize: '8px',
-        paddingTop: '35px'
+        height: 45,
     }
 
 });
@@ -151,7 +154,10 @@ export default function BasicDocument({ compras }: CompraProps) {
 
                     <View style={styles.fotoTitulo}>
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <Text>NOAH CONSTUCTIONS</Text>
+                        <View style={styles.rodape}>
+                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
+                            <Text >Data emissão: {data}</Text>
+                        </View>
                     </View>
 
                     <View style={styles.titulo}>
@@ -222,11 +228,6 @@ export default function BasicDocument({ compras }: CompraProps) {
 
 
                     </View>
-
-                    <View style={styles.rodape}>
-                        <Text>Luanda aos, {data}</Text>
-                    </View>
-
 
                 </Page>
             </Document>

@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
 
 
             let comprasFiltradas = []
-            if (slug?.length === 1 && decriptedSTR(slug[0]) === 'all') comprasFiltradas = compras
+            if (slug?.length === 1 && slug[0] === 'all') comprasFiltradas = compras
             else {
                 if (slug?.length && compras) {
                     if (decriptedSTR(slug[0]) !== 'equipamento' && decriptedSTR(slug[1]) === '') comprasFiltradas = compras?.filter((compra: CompraType) => compra.equipamento_id.descricao.toLowerCase().includes(decriptedSTR(slug[0]).toLowerCase()))
