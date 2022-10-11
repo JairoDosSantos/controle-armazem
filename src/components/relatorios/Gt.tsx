@@ -222,7 +222,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             <Text style={{ marginBottom: 4 }}>ENDEREÇO: URBANIZAÇÃO BOA VIDA, Nº7, BAIRRO BENFICA</Text>
                         </View>
                         <View>
-                            <Text>NOAH CONSTUCTIONS, Lda.</Text>
+                            <Text>NOAH CONSTRUCTIONS, Lda.</Text>
 
                         </View>
                     </View>

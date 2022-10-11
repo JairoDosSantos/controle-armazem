@@ -261,8 +261,6 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                         )
                     }
 
-
-
                     <View style={styles.assinaturas}>
 
                         <View>
@@ -273,9 +271,11 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                             <Text style={styles.assinaturaIndividual}>O Encarregado</Text>
                         </View>
 
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
-                        </View>
+                        {/**
+                        *  <View>
+                                <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                            </View>
+                        */}
                     </View>
 
 

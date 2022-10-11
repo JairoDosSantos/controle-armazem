@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         marginTop: 55,
         fontSize: '10px',
@@ -243,9 +243,11 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                         <View>
                             <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
                         </View>
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
-                        </View>
+                        {/**
+                       *   <View>
+                                <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                            </View>
+                       */}
 
                     </View>
 

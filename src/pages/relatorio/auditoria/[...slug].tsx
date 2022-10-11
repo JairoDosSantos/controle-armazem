@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
                 if (slug && auditoria) {
 
                     if (Number(slug[0]) !== 0 && slug[1] === '') movimentacoesFiltradas = auditoria.filter((saidaEntrada: AuditoriaType) => saidaEntrada.obra_id.id === Number(slug[0]))
+                    else if (slug?.length === 1 && Number(slug[0]) !== 0) movimentacoesFiltradas = auditoria.filter((entradaSaida: AuditoriaType) => entradaSaida.obra_id.id === Number(slug[0]))
                     else if (slug[1] && Number(slug[0]) === 0) movimentacoesFiltradas = auditoria.filter((entradaSaida: AuditoriaType) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()))
                     else movimentacoesFiltradas = auditoria.filter((entradaSaida: AuditoriaType) => entradaSaida.data_retirada.toLowerCase().includes(slug[1].toLowerCase()) && entradaSaida.obra_id.id === Number(slug[0]))
                 }
