@@ -21,6 +21,7 @@ import { wrapper } from '../../redux/store'
 import { deleteEncarregado, fetchEncarregados, insertEncarregado } from '../../redux/slices/encarregadoSlice'
 import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
+import ReactPaginate from 'react-paginate'
 
 
 //Tipagem do formulário
@@ -33,6 +34,14 @@ type EncarregadoType = {
     encarregados: FormValues[]
 }
 const Encarregado = ({ encarregados }: EncarregadoType) => {
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 2;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+    let currentFilteredData: FormValues[] = []
+    let currentPageData: FormValues[] = []
 
     const [idEncarregado, setIdEncarregado] = useState(0)
     const [search, setSearch] = useState('')
@@ -82,6 +91,24 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
     }
 
     const filteredEncarregados = search && encarregados ? encarregados.filter((encarregado) => encarregado.nome.toLowerCase().includes(search.toLowerCase())) : []
+
+
+    if (filteredEncarregados.length) {
+        currentFilteredData = filteredEncarregados
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(filteredEncarregados.length / PER_PAGE);
+    } else {
+
+        currentPageData = encarregados
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(encarregados.length / PER_PAGE);
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
+    }
 
     return (
         <div className='flex'>
@@ -223,7 +250,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                         </thead>
                         <tbody className=''>
                             {
-                                encarregados && encarregados.length && search === '' ? encarregados.map((encarregado, index) => (
+                                encarregados && encarregados.length && search === '' ? currentPageData?.map((encarregado, index) => (
                                     <tr key={index}
                                         className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{encarregado.id}</td>
@@ -249,7 +276,7 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                                             </button>
                                         </td>
                                     </tr>
-                                )) : filteredEncarregados.map((encarregadoFiltered, index) => {
+                                )) : currentFilteredData?.map((encarregadoFiltered, index) => {
                                     return (
                                         <tr key={index}
                                             className='flex justify-between border shadow-md mt-4 px-4 py-2'>
@@ -281,6 +308,19 @@ const Encarregado = ({ encarregados }: EncarregadoType) => {
                             }
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
 
             </main>

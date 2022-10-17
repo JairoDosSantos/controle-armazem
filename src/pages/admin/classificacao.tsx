@@ -20,6 +20,7 @@ import nookies from 'nookies'
 
 import { useRouter } from "next/router"
 import { deleteClassificacao, fetchClassificacao, insertClassificacao } from "../../redux/slices/classificacaoSlice"
+import ReactPaginate from "react-paginate"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -34,6 +35,15 @@ type ObraProps = {
 }
 
 const Classificacao = ({ classificacao }: ObraProps) => {
+
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 2;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+    let currentFilteredData: ClassificacaoType[] = []
+    let currentPageData: ClassificacaoType[] = []
 
     const [idClassificacao, setClassificacao] = useState(0)
 
@@ -82,6 +92,23 @@ const Classificacao = ({ classificacao }: ObraProps) => {
         if (resultDispatch.payload) {
             setShowConfirmAlert(true)
         }
+    }
+
+    if (filteredObras.length) {
+        currentFilteredData = filteredObras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(filteredObras.length / PER_PAGE);
+    } else {
+
+        currentPageData = classificacao
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(classificacao.length / PER_PAGE);
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
 
     return (
@@ -220,7 +247,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
 
                             {
 
-                                (classificacao && classificacao.length && search === '') ? classificacao.map((classific) => (
+                                (classificacao && classificacao.length && search === '') ? currentPageData?.map((classific) => (
                                     <tr key={classific.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{classific.id}</td>
                                         <td className="w-72 ">{classific.tipo}</td>
@@ -241,7 +268,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
                                             </button>
                                         </td>
                                     </tr>
-                                )) : filteredObras.map((filteredObra) => (
+                                )) : currentFilteredData?.map((filteredObra) => (
                                     <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{filteredObra.id}</td>
                                         <td className="w-72 ">{filteredObra.tipo}</td>
@@ -268,6 +295,19 @@ const Classificacao = ({ classificacao }: ObraProps) => {
 
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main>
         </div>

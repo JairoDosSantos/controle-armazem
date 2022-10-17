@@ -21,6 +21,7 @@ import { fetchEncarregados } from "../../redux/slices/encarregadoSlice"
 import nookies from 'nookies'
 
 import { useRouter } from "next/router"
+import ReactPaginate from "react-paginate"
 
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
@@ -57,6 +58,13 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
        console.log(Obras)
      */
 
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 2;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+    let currentFilteredData: ObraType[] = []
+    let currentPageData: ObraType[] = []
 
     const [idObra, setIdObra] = useState(0)
 
@@ -105,6 +113,24 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
             setShowConfirmAlert(true)
         }
     }
+
+    if (filteredObras.length) {
+        currentFilteredData = filteredObras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(filteredObras.length / PER_PAGE);
+    } else {
+
+        currentPageData = obras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(obras.length / PER_PAGE);
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
+    }
+
     return (
 
         <div className='flex'>
@@ -262,7 +288,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
 
                             {
 
-                                (obras && obras.length && search === '') ? obras.map((obra) => (
+                                (obras && obras.length && search === '') ? currentPageData?.map((obra) => (
                                     <tr key={obra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{obra.id}</td>
                                         <td className="w-72 ">{obra.obra_nome}</td>
@@ -285,7 +311,7 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                                             </button>
                                         </td>
                                     </tr>
-                                )) : filteredObras.map((filteredObra) => (
+                                )) : currentFilteredData?.map((filteredObra) => (
                                     <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{filteredObra.id}</td>
                                         <td className="w-72 ">{filteredObra.obra_nome}</td>
@@ -312,6 +338,19 @@ const Obra = ({ obras, encarregados }: ObraProps) => {
                             }
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main>
         </div>

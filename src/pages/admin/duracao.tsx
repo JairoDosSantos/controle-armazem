@@ -20,6 +20,7 @@ import nookies from 'nookies'
 
 import { useRouter } from "next/router"
 import { deleteDuracao, fetchDuracao, insertDuracao } from "../../redux/slices/duracaoSlice.ts"
+import ReactPaginate from "react-paginate"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -35,6 +36,15 @@ type DuracaoProps = {
 }
 
 const Classificacao = ({ duracoes }: DuracaoProps) => {
+
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const PER_PAGE = 2;
+    const offset = currentPage * PER_PAGE;
+    let pageCount = 1;
+    let currentFilteredData: DuracaoType[] = []
+    let currentPageData: DuracaoType[] = []
 
     const [idDuracao, setDuracao] = useState(0)
 
@@ -82,6 +92,23 @@ const Classificacao = ({ duracoes }: DuracaoProps) => {
         if (resultDispatch.payload) {
             setShowConfirmAlert(true)
         }
+    }
+
+    if (filteredObras.length) {
+        currentFilteredData = filteredObras
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(filteredObras.length / PER_PAGE);
+    } else {
+
+        currentPageData = duracoes
+            .slice(offset, offset + PER_PAGE)
+
+        pageCount = Math.ceil(duracoes.length / PER_PAGE);
+    }
+
+    function handlePageClick({ selected: selectedPage }: any) {
+        setCurrentPage(selectedPage);
     }
     return (
 
@@ -221,7 +248,7 @@ const Classificacao = ({ duracoes }: DuracaoProps) => {
 
                             {
 
-                                (duracoes && duracoes.length && search === '') ? duracoes.map((duracao) => (
+                                (duracoes && duracoes.length && search === '') ? currentPageData?.map((duracao) => (
                                     <tr key={duracao.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{duracao.id}</td>
                                         <td className="w-52 ">{duracao.tempo}</td>
@@ -242,7 +269,7 @@ const Classificacao = ({ duracoes }: DuracaoProps) => {
                                             </button>
                                         </td>
                                     </tr>
-                                )) : filteredObras.map((filteredObra) => (
+                                )) : currentFilteredData?.map((filteredObra) => (
                                     <tr key={filteredObra.id} className='flex justify-between border shadow-md mt-4 px-4 py-2'>
                                         <td className="w-16 ">{filteredObra.id}</td>
                                         <td className="w-52 ">{filteredObra.tempo}</td>
@@ -269,6 +296,19 @@ const Classificacao = ({ duracoes }: DuracaoProps) => {
 
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        breakLabel={'...'}
+                        containerClassName={"pagination"}
+                        previousLinkClassName={"pagination__link"}
+                        nextLinkClassName={"pagination__link"}
+                        disabledClassName={"pagination__link--disabled"}
+                        activeClassName={"pagination__link--active"}
+
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                    />
                 </div>
             </main>
         </div>

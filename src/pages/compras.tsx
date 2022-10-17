@@ -89,7 +89,6 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
      */
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
-
         return duration as DuracaoType
     }
     /**
