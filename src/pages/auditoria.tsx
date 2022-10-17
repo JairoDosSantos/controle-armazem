@@ -82,12 +82,12 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
 
     if (findedAuditoria.length) {
         currentFilteredData = findedAuditoria
-            .slice(offset, offset + PER_PAGE)
+            ?.slice(offset, offset + PER_PAGE)
 
         pageCount = Math.ceil(findedAuditoria.length / PER_PAGE);
     } else {
         currentPageData = auditoria
-            .slice(offset, offset + PER_PAGE)
+            ?.slice(offset, offset + PER_PAGE)
 
         pageCount = Math.ceil(auditoria.length / PER_PAGE);
     }

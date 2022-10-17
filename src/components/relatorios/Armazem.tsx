@@ -10,7 +10,6 @@ import {
 } from "@react-pdf/renderer";
 import moment from 'moment'
 
-
 // Create styles
 const styles = StyleSheet.create({
     page: {
@@ -19,7 +18,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         paddingTop: 30,
         paddingBottom: 66
-
     },
     section: {
         paddingHorizontal: 2,
@@ -79,7 +77,7 @@ const styles = StyleSheet.create({
     },
     logo: {
         width: 74,
-        height: 40,
+        height: 40
     },
     assinaturas: {
         width: '100%',
@@ -116,11 +114,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
         fontSize: '8px',
-        height: 45,
+        height: 45
+    },
+    numPagina: {
+        position: 'absolute',
+        bottom: '30px',
+        right: '40px',
+        fontSize: '8px',
     }
-
 });
-
 
 type EquipamentoType = {
     id: number;
@@ -158,15 +160,20 @@ type PosicaoArmazemProps = {
 export default function BasicDocument({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
 
     const data = moment().format("DD/MM/yyyy")
+    const numRelatorio = ((equipamentosARM.length - 100) / (new Date()).getHours()) + 1;
     //Funções
     const findDuracao = (id: number) => {
-        const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
+        const duration = (duracao && duracao.length)
+            ? duracao.find((dur) => (dur.id === id))
+            : []
 
         return duration as DuracaoType
     }
 
     const findClassificacao = (id: number) => {
-        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        const classification = (classificacao && classificacao.length)
+            ? classificacao.find((classific) => (classific.id === id))
+            : []
         return classification as ClassificacaoType
     }
     return (
@@ -174,21 +181,22 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
             {/* Start of the document*/}
             <Document title="Relatório de Equipamentos em armazem">
                 {/*render a single page*/}
-                <Page size="A4" style={styles.page} wrap>
+                <Page size="A4" style={styles.page} wrap={false}>
 
                     {/**
                         * <a href="https://imgbox.com/d3WKdgPQ" target="_blank"><img src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" alt="image host"/></a>
                      */}
-                    <View style={styles.fotoTitulo} >
+                    <View style={styles.fotoTitulo}>
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <View style={styles.rodape} >
-                            <Text >NOAH CONSTUCTIONS</Text>
+                        <View style={styles.rodape}>
+                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
                             <Text >Data emissão: {data}</Text>
                         </View>
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZEM </Text>
+                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZÉM - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()}
+                        </Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -213,9 +221,10 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
 
                     </View>
 
-                    {
-                        equipamentosARM && equipamentosARM.map((armazem, index) => (
-                            <View style={styles.corpo} key={index}>
+                    <View >
+                        {equipamentosARM && equipamentosARM.map((armazem, index) => (
+
+                            <View style={styles.corpo} key={index} wrap={false} >
 
                                 <View style={styles.section}>
                                     <Text>{armazem.equipamento_id.descricao}</Text>
@@ -234,23 +243,29 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                                 <View style={styles.section}>
                                     <Text>{armazem.quantidade}</Text>
                                 </View>
-
                             </View>
+
                         ))
-                    }
+                        }
+                    </View>
 
                     <View style={styles.assinaturas}>
                         <View>
-                            <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
+                            <Text style={styles.assinaturaIndividual}>Responsável do Armazém</Text>
                         </View>
-                        {/**
-                       *   <View>
-                                <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
-                            </View>
-                       */}
+                        {
+                            /**
+                           *   <View>
+                                    <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                                </View>
+                           */
+                        }
 
                     </View>
-
+                    <Text
+                        style={styles.numPagina}
+                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                        fixed />
                 </Page>
             </Document>
         </PDFViewer>

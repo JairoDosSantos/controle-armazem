@@ -167,6 +167,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         fontSize: '8px',
         paddingTop: '35px'
+    },
+    numPagina: {
+        position: 'absolute',
+        bottom: '30px',
+        right: '40px',
+        fontSize: '8px',
     }
 
 });
@@ -291,12 +297,10 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             <Text>QTD</Text>
                         </View>
 
-
-
                     </View>
                     {
                         auditoria && auditoria.map((mov, index) => (
-                            <View style={styles.corpo} key={index}>
+                            <View style={styles.corpo} key={index} wrap={false}>
 
                                 <View style={styles.section}>
                                     <Text>{mov.equipamento_id.id}</Text>
@@ -321,7 +325,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
 
                     <View style={styles.divisaoAssinatura}>
                         <View style={styles.assinaturas1}>
-                            <Text style={styles.assinaturaIndividual1}>Responsável do armazem</Text>
+                            <Text style={styles.assinaturaIndividual1}>Responsável do armazém</Text>
                             <Text style={styles.assinaturaIndividual1}>Assinatura Transporte</Text>
                             <Text style={styles.assinaturaIndividual1}>Assinatura Conferente</Text>
                         </View>
@@ -332,9 +336,10 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                         </View>
                     </View>
 
-
-
-
+                    <Text
+                        style={styles.numPagina}
+                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                        fixed />
                 </Page>
             </Document>
 

@@ -74,7 +74,7 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
 
     currentFilteredData = findedAuditoria
-        .slice(offset, offset + PER_PAGE)
+        ?.slice(offset, offset + PER_PAGE)
 
     pageCount = Math.ceil(findedAuditoria.length / PER_PAGE);
 

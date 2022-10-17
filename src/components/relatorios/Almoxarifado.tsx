@@ -116,6 +116,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         fontSize: '8px',
         height: 45,
+    },
+    numPagina: {
+        position: 'absolute',
+        bottom: '30px',
+        right: '40px',
+        fontSize: '8px',
     }
 
 });
@@ -160,7 +166,7 @@ type AlmoxarifadoProps = {
 // Create Document Component
 export default function BasicDocument({ almoxarifadoFiltrados, classificacao, duracao }: AlmoxarifadoProps) {
     const data = moment().format("DD/MM/yyyy")
-
+    const numRelatorio = ((almoxarifadoFiltrados.length - (almoxarifadoFiltrados.length / 2)) / (new Date()).getHours()) + 1;
 
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
@@ -173,7 +179,6 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
         return classification as ClassificacaoType
     }
 
-
     return (
         <PDFViewer style={styles.viewer}>
             {/* Start of the document*/}
@@ -182,7 +187,7 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                 <Page size="A4" style={styles.page} wrap>
 
 
-                    <View style={styles.fotoTitulo} fixed>
+                    <View style={styles.fotoTitulo} >
                         {/**
                        *   <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
                            <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
@@ -190,13 +195,13 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                        */}
                         <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
                         <View style={styles.rodape}>
-                            <Text >NOAH CONSTUCTIONS</Text>
+                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
                             <Text >Data emissão: {data}</Text>
                         </View>
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO</Text>
+                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()} </Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -227,7 +232,7 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
 
                             if (almoxarifado.quantidade > 0) return (
 
-                                <View style={styles.corpo} key={index}>
+                                <View style={styles.corpo} key={index} wrap={false}>
 
                                     <View style={styles.section}>
                                         <Text>{almoxarifado.equipamento_id.descricao}</Text>
@@ -278,8 +283,10 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
                         */}
                     </View>
 
-
-
+                    <Text
+                        style={styles.numPagina}
+                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                        fixed />
 
                 </Page>
             </Document>

@@ -114,6 +114,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         fontSize: '8px',
         height: 45,
+    },
+    numPagina: {
+        position: 'absolute',
+        bottom: '30px',
+        right: '40px',
+        fontSize: '8px',
     }
 
 });
@@ -190,7 +196,7 @@ export default function BasicDocument({ compras }: CompraProps) {
                     </View>
                     {
                         compras.length && compras.map((compra, index) => (
-                            <View style={styles.corpo} key={index}>
+                            <View style={styles.corpo} key={index} wrap={false}>
 
                                 <View style={styles.section}>
                                     <Text>{compra.equipamento_id.descricao}</Text>
@@ -220,7 +226,7 @@ export default function BasicDocument({ compras }: CompraProps) {
 
                     <View style={styles.assinaturas}>
                         <View>
-                            <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
+                            <Text style={styles.assinaturaIndividual}>Responsável do Armazém</Text>
                         </View>
                         <View>
                             <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
@@ -228,7 +234,10 @@ export default function BasicDocument({ compras }: CompraProps) {
 
 
                     </View>
-
+                    <Text
+                        style={styles.numPagina}
+                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                        fixed />
                 </Page>
             </Document>
         </PDFViewer>

@@ -114,6 +114,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         fontSize: '8px',
         height: 45,
+    },
+    numPagina: {
+        position: 'absolute',
+        bottom: '30px',
+        right: '40px',
+        fontSize: '8px',
     }
 
 });
@@ -167,7 +173,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                     </View>
 
                     <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE MOV. DE EQUIP. NOS ALMOXARIFADOS </Text>
+                        <Text>RELATÓRIO DE MOV. DE EQUIP. NOS ALMOXARIFADOS - Nº {`${auditoria.length} / ${(new Date()).getFullYear()}`} </Text>
                     </View>
 
                     <View style={styles.cabecalho}>
@@ -204,7 +210,7 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                     </View>
                     {
                         auditoria && auditoria.map((mov, index) => (
-                            <View style={styles.corpo} key={index}>
+                            <View style={styles.corpo} key={index} wrap={false}>
 
                                 <View style={styles.section}>
                                     <Text>{mov.equipamento_id.descricao}</Text>
@@ -251,7 +257,10 @@ export default function BasicDocument({ auditoria }: AuditoriaProps) {
                             <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
                         </View>
                     </View>
-
+                    <Text
+                        style={styles.numPagina}
+                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                        fixed />
                 </Page>
             </Document>
 
