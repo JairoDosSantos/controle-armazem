@@ -75,16 +75,27 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
             const getEquipamentosNoARM = await dispatch(fetchOne({ id: data.descricao_equipamento, estado: data.estado }))
             const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
 
+
             if (equipamentoQuantidade.length > 0) {
 
                 const findInAmoxarifario = await dispatch(fetchOneAlmoxarifario({ equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, estado: data.estado }))
                 const almoxarifarioFinded = unwrapResult(findInAmoxarifario)
 
+
+
+
                 if (almoxarifarioFinded && almoxarifarioFinded.length > 0) {
                     //Se a quantidade no armazem for maior ou igual a quantidade que se pretende, então faz-se a operação
                     if (Number(equipamentoQuantidade[0].quantidade) >= Number(data.quantidade)) {
 
+                        let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+
+
+                        if (qtdTotalArm < 0) { notifyError('Estoque em armazem insuficiente! 😥'); return }
+
+
                         let qtdTotal = Number(almoxarifarioFinded[0].quantidade) + Number(data.quantidade)
+
 
 
                         const almoxarifarioUpdate = await dispatch(updateAlmoxarifario({ ...almoxarifarioFinded[0], quantidade_a_levar: qtdTotal }))
@@ -96,7 +107,8 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                             return
                         }
 
-                        let qtdTotalArm = Number(equipamentoQuantidade[0].quantidade) - Number(data.quantidade)
+
+
                         const armQtdUpdate = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtdTotalArm }))
 
                         //se acontecer um erro ao retirar do armazem, visto que a quantidade já foi adicionada no almoxarifário então devemos retirar do almoxarifário
@@ -117,6 +129,16 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                         return
                     }
 
+                    const auditoria = await dispatch(insertAuditoria({ estado: data.estado, data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+                    if (auditoria.meta.arg) {
+                        // console.log('sucesso', auditoria.payload)
+                        //sucesso
+                        notifySuccess()
+                    } else {
+                        notifyError('Erro insesperado. Contacte o admin. 🤔')
+                    }
+                    setLoad(false)
+
                 } else {
 
                     const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ estado: data.estado, data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
@@ -133,11 +155,20 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                         }
                     }
 
-
+                    const auditoria = await dispatch(insertAuditoria({ estado: data.estado, data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+                    if (auditoria.meta.arg) {
+                        // console.log('sucesso', auditoria.payload)
+                        //sucesso
+                        notifySuccess()
+                    } else {
+                        notifyError('Erro insesperado. Contacte o admin. 🤔')
+                    }
+                    setLoad(false)
 
                 }
 
-                const auditoria = await dispatch(insertAuditoria({ estado: data.estado, data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
+                /**
+                 * const auditoria = await dispatch(insertAuditoria({ estado: data.estado, data_retirada: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_retirada: data.quantidade }))
                 if (auditoria.meta.arg) {
                     // console.log('sucesso', auditoria.payload)
                     //sucesso
@@ -146,6 +177,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
                     notifyError('Erro insesperado. Contacte o admin. 🤔')
                 }
                 setLoad(false)
+                 */
             }
         } catch (error) {
             notifyError('Erro ao submeter o formulário. Contacte o admin. 🤔')

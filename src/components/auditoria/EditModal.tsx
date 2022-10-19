@@ -90,7 +90,6 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
         //4º Actualizar o stcok do armazem
         const updateARM = await dispatch(updateArmGeral({ ...ARMunwrap[0], quantidade_entrada: qtdFinal }))
 
-
         if (updateARM.payload === null) { notifyError('Erro ao efectuar a devolução'); setLoad(false); return }
         //5º Actualizar o stock do almoxarifado
         const updateAlmoxarifado = await dispatch(updateAlmoxarifario({ ...AlmoxarifadoUnwrap[0], quantidade_a_levar: arm.quantidade }))

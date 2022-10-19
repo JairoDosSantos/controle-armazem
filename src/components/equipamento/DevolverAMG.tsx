@@ -133,6 +133,19 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
                     setLoad(false)
                     return
                 }
+
+                //Vê bem esta actualização
+                let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
+
+                const auditoria = await dispatch(updateAuditoria({ ...auditorias[0], data_devolucao: data.data_devolucao, quantidade_devolvida: qtdAuditoria }))
+                if (auditoria.meta.arg) {
+
+                    notifySuccess()
+                    //sucesso
+                } else {
+                    notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
+                }
+                setLoad(false)
             } else {
 
                 setLoad(false)
@@ -142,18 +155,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
             }
 
 
-            //Vê bem esta actualização
-            let qtdAuditoria = Number(data.quantidade) + Number(auditorias[0].quantidade_devolvida)
 
-            const auditoria = await dispatch(updateAuditoria({ ...auditorias[0], data_devolucao: data.data_devolucao, quantidade_devolvida: qtdAuditoria }))
-            if (auditoria.meta.arg) {
-
-                notifySuccess()
-                //sucesso
-            } else {
-                notifyError('Ocorreu um erro inesperado, por favor contacte o admin.')
-            }
-            setLoad(false)
         } catch (error) {
             notifyError('Ocorreu um erro ao efectuar a submissão do formulário. Tente mais tarde!')
             setLoad(false)

@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { wrapper } from '../redux/store';
 import { useEffect } from 'react';
 import Router from "next/router";
+
 function MyApp({ Component, pageProps, router }: AppProps) {
 
   /* ... */
