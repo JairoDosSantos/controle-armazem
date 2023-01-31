@@ -222,30 +222,34 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
                     </View>
 
                     <View >
-                        {equipamentosARM && equipamentosARM.map((armazem, index) => (
+                        {equipamentosARM && equipamentosARM.map((armazem, index) => {
+                            if (armazem.quantidade > 0) {
+                                return (
 
-                            <View style={styles.corpo} key={index} wrap={false} >
+                                    <View style={styles.corpo} key={index} wrap={false} >
 
-                                <View style={styles.section}>
-                                    <Text>{armazem.equipamento_id.descricao}</Text>
-                                </View>
-                                <View style={styles.section}>
-                                    <Text>{armazem.estado}</Text>
-                                </View>
-                                <View style={styles.section}>
-                                    <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>
-                                </View>
+                                        <View style={styles.section}>
+                                            <Text>{armazem.equipamento_id.descricao}</Text>
+                                        </View>
+                                        <View style={styles.section}>
+                                            <Text>{armazem.estado}</Text>
+                                        </View>
+                                        <View style={styles.section}>
+                                            <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>
+                                        </View>
 
-                                <View style={styles.section}>
-                                    <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
-                                </View>
+                                        <View style={styles.section}>
+                                            <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
+                                        </View>
 
-                                <View style={styles.section}>
-                                    <Text>{armazem.quantidade}</Text>
-                                </View>
-                            </View>
+                                        <View style={styles.section}>
+                                            <Text>{armazem.quantidade}</Text>
+                                        </View>
+                                    </View>
 
-                        ))
+                                )
+                            }
+                        })
                         }
                     </View>
 

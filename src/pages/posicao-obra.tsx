@@ -81,6 +81,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
     const [showEditModal, setShowEditModal] = useState(false)
     const [almoxarifarioObject, setAlmoxarifarioObject] = useState({} as Almoxarifario)
+
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
