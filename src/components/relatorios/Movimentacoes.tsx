@@ -1,14 +1,12 @@
 import {
-    Document,
-    Page,
-    Text,
-    View,
-    StyleSheet,
-    PDFViewer,
-    Image
+    Document, Image, Page, PDFDownloadLink, StyleSheet, Text,
+    View
 } from "@react-pdf/renderer";
+import moment from 'moment';
+import Img from 'next/image';
+import { FaPrint } from "react-icons/fa";
+import Load from '../../assets/Load.gif';
 
-import moment from 'moment'
 // Create styles
 const styles = StyleSheet.create({
     page: {
@@ -27,11 +25,6 @@ const styles = StyleSheet.create({
     },
     total: {
         color: '#cd1212'
-    },
-    viewer: {
-        width: window.innerWidth, //the pdf viewer will take up all of the width and height
-        height: window.innerHeight,
-
     },
     cabecalho: {
         backgroundColor: '#D3D3D3',
@@ -124,6 +117,11 @@ const styles = StyleSheet.create({
 
 });
 
+type ButtonType = {
+    auditoria: AuditoriaType[];
+    legenda: string
+}
+
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -155,115 +153,133 @@ type AuditoriaProps = {
 }
 // Create Document Component
 
-export default function BasicDocument({ auditoria }: AuditoriaProps) {
+export function Movimentacoes({ auditoria }: AuditoriaProps) {
     const data = moment().format("DD/MM/yyyy")
     return (
-        <PDFViewer style={styles.viewer} >
-            {/* Start of the document*/}
-            <Document title="Relatório de Movimentações">
-                {/*render a single page*/}
-                <Page size="A4" style={styles.page} >
+        <Document title="Relatório de Movimentações">
+            {/*render a single page*/}
+            <Page size="A4" style={styles.page} >
 
-                    <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <View style={styles.rodape}>
-                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
-                            <Text >Data emissão: {data}</Text>
-                        </View>
+                <View style={styles.fotoTitulo}>
+                    <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
+                    <View style={styles.rodape}>
+                        <Text >NOAH CONSTRUCTIONS, LDA.</Text>
+                        <Text >Data emissão: {data}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.titulo}>
+                    <Text>RELATÓRIO DE MOV. DE EQUIP. NOS ALMOXARIFADOS - Nº {`${auditoria.length} / ${(new Date()).getFullYear()}`} </Text>
+                </View>
+
+                <View style={styles.cabecalho}>
+
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Descrição</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Estado</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Almoxarifado</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text>Qtd. recebida</Text>
                     </View>
 
-                    <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE MOV. DE EQUIP. NOS ALMOXARIFADOS - Nº {`${auditoria.length} / ${(new Date()).getFullYear()}`} </Text>
+                    <View style={styles.section}>
+                        <Text>Qtd. Devolvida</Text>
                     </View>
 
-                    <View style={styles.cabecalho}>
-
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Descrição</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Estado</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Almoxarifado</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text>Qtd. recebida</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Qtd. Devolvida</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Data Receb.</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Data Devol.</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Total em Almox.</Text>
-                        </View>
-
+                    <View style={styles.section}>
+                        <Text>Data Receb.</Text>
                     </View>
-                    {
-                        auditoria && auditoria.map((mov, index) => (
-                            <View style={styles.corpo} key={index} wrap={false}>
 
-                                <View style={styles.section}>
-                                    <Text>{mov.equipamento_id.descricao}</Text>
-                                </View>
+                    <View style={styles.section}>
+                        <Text>Data Devol.</Text>
+                    </View>
 
-                                <View style={styles.section}>
-                                    <Text>{mov.estado}</Text>
-                                </View>
-                                <View style={styles.section}>
-                                    <Text>{mov.obra_id.obra_nome}</Text>
-                                </View>
+                    <View style={styles.section}>
+                        <Text>Total em Almox.</Text>
+                    </View>
 
-                                <View style={styles.section}>
-                                    <Text>{mov.quantidade_retirada}</Text>
-                                </View>
+                </View>
+                {
+                    auditoria && auditoria.map((mov, index) => (
+                        <View style={styles.corpo} key={index} wrap={false}>
 
-                                <View style={styles.section}>
-                                    <Text>{mov.quantidade_devolvida}</Text>
-                                </View>
-
-                                <View style={styles.section}>
-                                    <Text>{mov.data_retirada}</Text>
-                                </View>
-
-                                <View style={styles.section}>
-                                    <Text>{mov.data_devolucao}</Text>
-                                </View>
-
-                                <View style={styles.section}>
-                                    <Text style={styles.total}>{mov.quantidade_retirada - mov.quantidade_devolvida}</Text>
-                                </View>
-
+                            <View style={styles.section}>
+                                <Text>{mov.equipamento_id.descricao}</Text>
                             </View>
-                        ))
-                    }
 
-                    <View style={styles.assinaturas}>
+                            <View style={styles.section}>
+                                <Text>{mov.estado}</Text>
+                            </View>
+                            <View style={styles.section}>
+                                <Text>{mov.obra_id.obra_nome}</Text>
+                            </View>
 
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
+                            <View style={styles.section}>
+                                <Text>{mov.quantidade_retirada}</Text>
+                            </View>
+
+                            <View style={styles.section}>
+                                <Text>{mov.quantidade_devolvida}</Text>
+                            </View>
+
+                            <View style={styles.section}>
+                                <Text>{mov.data_retirada}</Text>
+                            </View>
+
+                            <View style={styles.section}>
+                                <Text>{mov.data_devolucao}</Text>
+                            </View>
+
+                            <View style={styles.section}>
+                                <Text style={styles.total}>{mov.quantidade_retirada - mov.quantidade_devolvida}</Text>
+                            </View>
+
                         </View>
+                    ))
+                }
 
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
-                        </View>
+                <View style={styles.assinaturas}>
+
+                    <View>
+                        <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
                     </View>
-                    <Text
-                        style={styles.numPagina}
-                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
-                        fixed />
-                </Page>
-            </Document>
 
-        </PDFViewer>
+                    <View>
+                        <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                    </View>
+                </View>
+                <Text
+                    style={styles.numPagina}
+                    render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                    fixed />
+            </Page>
+        </Document>
     );
 }
+
+const LinkDonwloadMovimentacoes = ({ auditoria, legenda }: ButtonType) => (
+    <PDFDownloadLink
+        className='bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75'
+        document={<Movimentacoes auditoria={auditoria} />}
+    >
+
+        {({ blob, url, loading, error }) =>
+            loading ?
+                <>
+                    <Img src={Load} height={8} width={8} objectFit={'contain'} />
+                    <span>loading</span>
+                </>
+                : <>
+                    <FaPrint />
+                    <span>{legenda} </span>
+                </>
+        }
+
+    </PDFDownloadLink >)
+
+export default LinkDonwloadMovimentacoes;

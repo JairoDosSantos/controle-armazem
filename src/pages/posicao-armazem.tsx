@@ -1,26 +1,26 @@
-import { useState } from "react"
 import Head from "next/head"
+import { useState } from "react"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 
 
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import dynamic from "next/dynamic"
 import EditarModal from "../components/equipamento/EditModal"
 import { wrapper } from "../redux/store"
-import { GetServerSideProps, GetServerSidePropsContext } from "next"
 
+import AES from 'crypto-js/aes'
+import { useRouter } from "next/router"
+import ReactPaginate from 'react-paginate'
 import { fetchArmGeral } from "../redux/slices/armGeralSlice"
 import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
-import { useRouter } from "next/router"
+import api from "../services/api"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
-import AES from 'crypto-js/aes';
-import ReactPaginate from 'react-paginate'
-
+const LinkDonwloadArmazem = dynamic(() => import('../components/relatorios/Armazem'), { ssr: false })
 
 type EquipamentoType = {
     id: number;
@@ -51,10 +51,14 @@ type ClassificacaoType = {
 type PosicaoArmazemProps = {
     equipamentosARM: EquipamentosARMType[];
     duracao: DuracaoType[];
-    classificacao: ClassificacaoType[]
+    classificacao: ClassificacaoType[];
+    especialidade: EspecialidadeType[]
 }
-
-const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArmazemProps) => {
+type EspecialidadeType = {
+    id: number;
+    especialidade: string
+}
+const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao, especialidade }: PosicaoArmazemProps) => {
 
     const route = useRouter()
 
@@ -115,7 +119,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
         pageCount = Math.ceil(findedEquipamento.length / PER_PAGE);
     } else {
         currentPageData = equipamentosARM
-            .slice(offset, offset + PER_PAGE)
+            ?.slice(offset, offset + PER_PAGE)
 
         pageCount = Math.ceil(equipamentosARM.length / PER_PAGE);
     }
@@ -139,7 +143,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
     function handlePageClick({ selected: selectedPage }: any) {
         setCurrentPage(selectedPage);
     }
-
+    const toPrint = findedEquipamento.length ? findedEquipamento : equipamentosARM
     return (
         <div className='flex'>
             <SiderBar itemActive="posicao-armazem" />
@@ -210,7 +214,18 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Posição Armazem geral</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
-                        <div className="lg:ml-auto  flex gap-2 -mt-4">
+                        <div className="flex gap-5 -mt-4">
+
+                            <select
+                                onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
+                                className="rounded shadow cursor-pointer w-full" >
+                                <option value={0} className='text-gray-400'>Selecione a especialidade</option>
+                                {
+                                    especialidade?.map((especialidadeEquipamento, index) => (
+                                        <option value={especialidadeEquipamento.id}>{especialidadeEquipamento.especialidade}</option>
+                                    ))
+                                }
+                            </select>
 
                             <select
                                 onChange={(event) => setSearchByClassificacao(Number(event.target.value))}
@@ -226,6 +241,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                             </select>
 
                         </div>
+
                         <div className="flex gap-5">
                             <input
                                 onChange={(event) => setSearch(event.target.value)}
@@ -235,7 +251,13 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
 
                         </div>
                         <div className=" ml-auto flex gap-2">
-                            <button
+                            <LinkDonwloadArmazem
+                                legenda={(search.length || searchByClassificacao) ? 'Imprimir' : 'Imprimir Tudo'}
+                                classificacao={classificacao}
+                                duracao={duracao}
+                                equipamentosARM={toPrint} />
+                            {/**
+                            *  <button
                                 onClick={() => route.push('/relatorio/armazem/all')}
                                 className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
@@ -248,6 +270,7 @@ const PosicaoArmazem = ({ equipamentosARM, classificacao, duracao }: PosicaoArma
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>
+                            */}
                         </div>
                     </div>
 
@@ -331,8 +354,10 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const duracaoDispatch: any = await store.dispatch(fetchDuracao());
             const equipamentoARM: any = await store.dispatch(fetchArmGeral());
 
+            const especialidades = await api.get('api/especialidade')
+            const { data } = especialidades.data
 
-            // const equipamentos = equipamentoDispatch.payload
+            //const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
             const equipamentosARM = equipamentoARM.payload
@@ -342,7 +367,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
                 props: {
                     equipamentosARM,
                     classificacao,
-                    duracao
+                    duracao,
+                    especialidade: data
                 },
             };
         }

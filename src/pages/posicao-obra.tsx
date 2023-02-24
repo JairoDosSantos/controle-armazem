@@ -1,26 +1,27 @@
-import { useState } from "react"
 import Head from "next/head"
+import { useState } from "react"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 //Imagens
 //import Load from '../assets/load.gif'
 //import Image from "next/image"
-import dynamic from "next/dynamic"
-import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
+import AES from 'crypto-js/aes'
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { wrapper } from "../redux/store"
-import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
-import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
-import { fetchAlmoxarifario } from "../redux/slices/almoxarifarioSlice"
-import { fetchObra } from "../redux/slices/obraSlice"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
-import AES from 'crypto-js/aes';
-const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 import ReactPaginate from 'react-paginate'
+import EditarModalPorObra from "../components/equipamento/EditarModalPorObra"
+import { fetchAlmoxarifario } from "../redux/slices/almoxarifarioSlice"
+import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
+import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
+import { fetchObra } from "../redux/slices/obraSlice"
+import { wrapper } from "../redux/store"
+const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
+const LinkDonwloadAlmoxarifado = dynamic(() => import('../components/relatorios/Almoxarifado'), { ssr: false })
+
 type DuracaoType = {
     id: number;
     tempo: string;
@@ -133,7 +134,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
         pageCount = Math.ceil(almoxarifarios.length / PER_PAGE);
     }
-
+    const toPrint = findedEquipamento.length ? findedEquipamento : almoxarifarios
 
     /**
      * 
@@ -233,13 +234,29 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                     <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold">Posição Armazem por obra</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
-                        <div className="lg:ml-auto flex gap-2 -mt-4">
+                        <div className="flex gap-5 -mt-4">
 
+                            <select
+
+                                className="rounded shadow cursor-pointer w-full ">
+                                <option
+                                    className="text-gray-400"
+                                    value={0}>Selecione a especialidade</option>
+                                <option value="">AVAC</option>
+                                <option value="">ALVENARIA</option>
+                                <option value="">COFRAGEM / ESTRUTURA</option>
+                                <option value="">ELECTRICIDADE</option>
+                                <option value="">HIDRÁULICA</option>
+                                <option value="">HSST</option>
+                                <option value="">MÁQUINA</option>
+                            </select>
 
                             <select
                                 onChange={(event) => setSearchClassificacao(Number(event.target.value))}
                                 className="rounded shadow cursor-pointer w-full" >
-                                <option value={0}>Selecione a classificação</option>
+                                <option
+                                    className="text-gray-400"
+                                    value={0}>Selecione a classificação</option>
                                 {
                                     (classificacao && classificacao.length) && classificacao.map((classific, index) => (
                                         <option
@@ -247,7 +264,6 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                             value={classific.id}> {classific.tipo}</option>
                                     ))}
                             </select>
-
 
                         </div>
                         <div className="flex flex-col lg:flex-row gap-5">
@@ -261,7 +277,9 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                 onChange={(event) => setSearchByObraId(Number(event.target.value))}
                                 id="obra"
                                 className="lg:w-1/2 w-full rounded shadow cursor-pointer">
-                                <option value={0}>Selecione a obra</option>
+                                <option
+                                    className="text-gray-400"
+                                    value={0}>Selecione a obra</option>
                                 {
                                     (obras && obras.length) && obras.map((obr, index) => (
                                         <option
@@ -273,7 +291,14 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </div>
 
                         <div className=" ml-auto flex gap-2">
-                            <button
+                            <LinkDonwloadAlmoxarifado
+                                almoxarifadoFiltrados={toPrint}
+                                classificacao={classificacao}
+                                duracao={duracao}
+                                legenda={(search.length || searchByObraId || searchClassificacao) ? 'Imprimir' : 'Imprimir Tudo'} />
+                            {
+                                /**
+                                 *   <button
                                 onClick={() => route.push('/relatorio/almoxarifado/all')}
                                 className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
@@ -286,6 +311,8 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>
+                                 */
+                            }
                         </div>
                     </div>
 

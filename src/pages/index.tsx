@@ -7,14 +7,14 @@ import { FormEvent, useState } from 'react'
 import { FaArrowAltCircleRight } from 'react-icons/fa'
 import { useDispatch } from 'react-redux'
 
-import Logo from '../assets/noah.png'
-import Load from '../assets/load.gif'
 import dynamic from 'next/dynamic'
+import Load from '../assets/load.gif'
+import Logo from '../assets/noah.png'
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 //Api
-import api from '../services/api'
 import { updateUser } from '../redux/slices/geralSlice'
+import api from '../services/api'
 
 
 const Home: NextPage = () => {
@@ -33,6 +33,7 @@ const Home: NextPage = () => {
     setLoad(true)
 
     try {
+
       const response = await api.post('api/login', {
         email: email,
         password: password
@@ -46,17 +47,20 @@ const Home: NextPage = () => {
         setLoad(false)
         return
       }
+
       if (user) {
         await dispatch(updateUser({ user: user.email }))
         // setShowSuccess('flex')
         setLoad(false)
         router.push('/painel-controlo')
       }
+
     } catch (error) {
       console.log(error)
       setShowErrorAlert(true)
       setLoad(false)
     }
+
   };
 
   return (

@@ -2,19 +2,19 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 //Imagens
-import LoadImage from '../../assets/load.gif';
-import { FaSave, FaPlusCircle } from 'react-icons/fa'
 import Image from 'next/image'
-import { useDispatch } from 'react-redux'
-import { insertEquipamento } from '../../redux/slices/equipamentoSlice'
 import { useRouter } from 'next/router'
+import { FaPlusCircle, FaSave } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
+import LoadImage from '../../assets/load.gif'
+import { insertEquipamento } from '../../redux/slices/equipamentoSlice'
 
 type EditarModalProps = {
     isOpen: boolean;
@@ -150,6 +150,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                             />
                                         </div>
                                         <form
+                                            autoComplete={'off'}
                                             className='flex flex-col gap-3 justify-center align-center w-[552px] mx-auto'
                                             onSubmit={handleSubmit(onSubmit)}>
 
@@ -167,6 +168,19 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                             </div>
 
                                             <div className='flex gap-2 justify-center align-center'>
+
+                                                <select
+                                                    className="w-full rounded shadow cursor-pointer" >
+                                                    <option value={0} className='text-gray-400'>Selecione a especialidade</option>
+                                                    <option value="">AVAC</option>
+                                                    <option value="">ALVENARIA</option>
+                                                    <option value="">COFRAGEM / ESTRUTURA</option>
+                                                    <option value="">ELECTRICIDADE</option>
+                                                    <option value="">HIDRÁULICA</option>
+                                                    <option value="">HSST</option>
+                                                    <option value="">MÁQUINA</option>
+
+                                                </select>
 
                                                 <select
                                                     {...register('classificacao_id', {

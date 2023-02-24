@@ -1,15 +1,11 @@
 import {
-    Document,
-    Page,
-    Text,
-    View,
-    StyleSheet,
-    PDFViewer,
-    Image
-
+    Document, Image, Page, PDFDownloadLink, StyleSheet, Text,
+    View
 } from "@react-pdf/renderer";
-import moment from 'moment'
-
+import moment from 'moment';
+import Img from 'next/image';
+import { FaPrint } from "react-icons/fa";
+import Load from '../../assets/load.gif';
 // Create styles
 const styles = StyleSheet.create({
     page: {
@@ -26,11 +22,6 @@ const styles = StyleSheet.create({
         fontSize: '8px',
         textAlign: 'center'
 
-    },
-    viewer: {
-        width: window.innerWidth, //the pdf viewer will take up all of the width and height
-        height: window.innerHeight,
-        zIndex: 0
     },
     cabecalho: {
         backgroundColor: '#D3D3D3',
@@ -157,7 +148,7 @@ type PosicaoArmazemProps = {
 }
 
 // Create Document Component
-export default function BasicDocument({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
+export function RelatorioArmazem({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
 
     const data = moment().format("DD/MM/yyyy")
     const numRelatorio = ((equipamentosARM.length - 100) / (new Date()).getHours()) + 1;
@@ -177,101 +168,134 @@ export default function BasicDocument({ equipamentosARM, duracao, classificacao 
         return classification as ClassificacaoType
     }
     return (
-        <PDFViewer style={styles.viewer}>
-            {/* Start of the document*/}
-            <Document title="Relatório de Equipamentos em armazem">
-                {/*render a single page*/}
-                <Page size="A4" style={styles.page} wrap={false}>
 
-                    {/**
+
+        <Document title="Relatório de Equipamentos em armazem">
+            {/*render a single page*/}
+            <Page size="A4" style={styles.page} wrap={false}>
+
+                {/**
                         * <a href="https://imgbox.com/d3WKdgPQ" target="_blank"><img src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" alt="image host"/></a>
                      */}
-                    <View style={styles.fotoTitulo}>
-                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <View style={styles.rodape}>
-                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
-                            <Text >Data emissão: {data}</Text>
-                        </View>
+                <View style={styles.fotoTitulo}>
+                    <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
+                    <View style={styles.rodape}>
+                        <Text >NOAH CONSTRUCTIONS, LDA.</Text>
+                        <Text >Data emissão: {data}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.titulo}>
+                    <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZÉM - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()}
+                    </Text>
+                </View>
+
+                <View style={styles.cabecalho}>
+
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Descrição</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Estado</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text>Classificação</Text>
                     </View>
 
-                    <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ARMAZÉM - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()}
-                        </Text>
+                    <View style={styles.section}>
+                        <Text>Tempo de duração</Text>
                     </View>
 
-                    <View style={styles.cabecalho}>
-
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Descrição</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Estado</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text>Classificação</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Tempo de duração</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Quantidade</Text>
-                        </View>
-
+                    <View style={styles.section}>
+                        <Text>Quantidade</Text>
                     </View>
 
-                    <View >
-                        {equipamentosARM && equipamentosARM.map((armazem, index) => {
-                            if (armazem.quantidade > 0) {
-                                return (
+                </View>
 
-                                    <View style={styles.corpo} key={index} wrap={false} >
+                <View >
+                    {equipamentosARM && equipamentosARM.map((armazem, index) => {
+                        if (armazem.quantidade > 0) {
+                            return (
 
-                                        <View style={styles.section}>
-                                            <Text>{armazem.equipamento_id.descricao}</Text>
-                                        </View>
-                                        <View style={styles.section}>
-                                            <Text>{armazem.estado}</Text>
-                                        </View>
-                                        <View style={styles.section}>
-                                            <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>
-                                        </View>
+                                <View style={styles.corpo} key={index} wrap={false} >
 
-                                        <View style={styles.section}>
-                                            <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
-                                        </View>
-
-                                        <View style={styles.section}>
-                                            <Text>{armazem.quantidade}</Text>
-                                        </View>
+                                    <View style={styles.section}>
+                                        <Text>{armazem.equipamento_id.descricao}</Text>
+                                    </View>
+                                    <View style={styles.section}>
+                                        <Text>{armazem.estado}</Text>
+                                    </View>
+                                    <View style={styles.section}>
+                                        <Text>{findClassificacao(armazem.equipamento_id.classificacao_id).tipo}</Text>
                                     </View>
 
-                                )
-                            }
-                        })
-                        }
-                    </View>
+                                    <View style={styles.section}>
+                                        <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
+                                    </View>
 
-                    <View style={styles.assinaturas}>
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Responsável do Armazém</Text>
-                        </View>
-                        {
-                            /**
-                           *   <View>
-                                    <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                                    <View style={styles.section}>
+                                        <Text>{armazem.quantidade}</Text>
+                                    </View>
                                 </View>
-                           */
-                        }
 
+                            )
+                        }
+                    })
+                    }
+                </View>
+
+                <View style={styles.assinaturas}>
+                    <View>
+                        <Text style={styles.assinaturaIndividual}>Responsável do Armazém</Text>
                     </View>
-                    <Text
-                        style={styles.numPagina}
-                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
-                        fixed />
-                </Page>
-            </Document>
-        </PDFViewer>
+                    {
+                        /**
+                       *   <View>
+                                <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
+                            </View>
+                       */
+                    }
+
+                </View>
+                <Text
+                    style={styles.numPagina}
+                    render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                    fixed />
+            </Page>
+        </Document>
+
     );
 }
+
+type LinkButtonDownload = {
+
+    classificacao: ClassificacaoType[];
+    duracao: DuracaoType[];
+    equipamentosARM: EquipamentosARMType[];
+    legenda: string
+}
+
+const LinkDonwloadArmazem = ({ classificacao, duracao, equipamentosARM, legenda }: LinkButtonDownload) => (
+
+    <PDFDownloadLink
+        className='bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75'
+        document={<RelatorioArmazem
+            classificacao={classificacao}
+            duracao={duracao}
+            equipamentosARM={equipamentosARM} />}
+    >
+        {({ blob, url, loading, error }) =>
+            loading ?
+                <>
+                    <Img src={Load} height={8} width={8} objectFit={'contain'} />
+                    <span>loading</span>
+                </>
+                : <>
+                    <FaPrint />
+                    <span>{legenda}</span>
+                </>
+        }
+
+    </PDFDownloadLink >)
+
+export default LinkDonwloadArmazem;

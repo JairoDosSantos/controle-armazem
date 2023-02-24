@@ -1,22 +1,22 @@
-import { useState } from "react"
 import Head from "next/head"
+import { useState } from "react"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
+import { FaEdit } from 'react-icons/fa'
 
-import dynamic from "next/dynamic"
-import EditarModal from "../components/auditoria/EditModal"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { wrapper } from "../redux/store"
-import { fetchSaida } from "../redux/slices/auditoriaSlice"
-import { fetchObra } from "../redux/slices/obraSlice"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import ReactPaginate from 'react-paginate'
+import EditarModal from "../components/auditoria/EditModal"
+import { fetchSaida } from "../redux/slices/auditoriaSlice"
+import { fetchObra } from "../redux/slices/obraSlice"
+import { wrapper } from "../redux/store"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
-
+const LinkDonwloadMovimentacoes = dynamic(() => import('../components/relatorios/Movimentacoes'), { ssr: false })
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -100,7 +100,7 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
     function handlePageClick({ selected: selectedPage }: any) {
         setCurrentPage(selectedPage);
     }
-
+    const toPrint = findedAuditoria.length ? findedAuditoria : auditoria
     return (
         <div className='flex'>
             <SiderBar itemActive="saidas" />
@@ -242,7 +242,13 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                             }
                         </div>
                         <div className=" ml-auto flex gap-2">
-                            <button
+
+                            <LinkDonwloadMovimentacoes
+                                auditoria={toPrint}
+                                legenda={(searchData.length || searchObra.toString().length) ? 'Imprimir' : 'Imprimir Tudo'} />
+
+                            {/**
+                             * <button
                                 onClick={() => route.push('/relatorio/auditoria/all')}
                                 className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
                                 <FaPrint />
@@ -255,6 +261,8 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                                 <FaPrint />
                                 <span>Imprimir</span>
                             </button>
+                             */}
+
                         </div>
                     </div>
 

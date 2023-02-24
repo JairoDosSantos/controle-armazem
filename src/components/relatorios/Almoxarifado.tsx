@@ -1,16 +1,19 @@
 import {
-    Document,
-    Page,
-    Text,
-    View,
-    StyleSheet,
-    PDFViewer,
-    Image
-
+    Document, Image, Page, PDFDownloadLink, StyleSheet, Text,
+    View
 } from "@react-pdf/renderer";
 
-import moment from 'moment'
+import moment from 'moment';
+import Img from 'next/image';
+import { FaPrint } from "react-icons/fa";
+import Load from '../../assets/load.gif';
 
+type ButtonType = {
+    almoxarifadoFiltrados: Almoxarifario[];
+    classificacao: ClassificacaoType[];
+    duracao: DuracaoType[];
+    legenda: string
+}
 // Create styles
 const styles = StyleSheet.create({
     page: {
@@ -164,7 +167,7 @@ type AlmoxarifadoProps = {
     classificacao: ClassificacaoType[]
 }
 // Create Document Component
-export default function BasicDocument({ almoxarifadoFiltrados, classificacao, duracao }: AlmoxarifadoProps) {
+export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, duracao }: AlmoxarifadoProps) {
     const data = moment().format("DD/MM/yyyy")
     const numRelatorio = ((almoxarifadoFiltrados.length - (almoxarifadoFiltrados.length / 2)) / (new Date()).getHours()) + 1;
 
@@ -180,116 +183,140 @@ export default function BasicDocument({ almoxarifadoFiltrados, classificacao, du
     }
 
     return (
-        <PDFViewer style={styles.viewer}>
-            {/* Start of the document*/}
-            <Document title="Relatório de Equipamentos em Almoxarifado">
-                {/*render a single page*/}
-                <Page size="A4" style={styles.page} wrap>
+
+        <Document title="Relatório de Equipamentos em Almoxarifado">
+            {/*render a single page*/}
+            <Page size="A4" style={styles.page} wrap>
 
 
-                    <View style={styles.fotoTitulo} >
-                        {/**
+                <View style={styles.fotoTitulo} >
+                    {/**
                        *   <Image style={styles.logo} src="https://img.icons8.com/android/96/000000/phone.png" />
                            <Image src={{ uri: _your_image_url_goes_here_, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
                            <Image style={styles.logo} src="https://images2.imgbox.com/cd/ab/d3WKdgPQ_o.png" />
                        */}
-                        <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
-                        <View style={styles.rodape}>
-                            <Text >NOAH CONSTRUCTIONS, LDA.</Text>
-                            <Text >Data emissão: {data}</Text>
-                        </View>
+                    <Image style={styles.logo} src="https://i.ibb.co/ZJpGsHm/noah.png" />
+                    <View style={styles.rodape}>
+                        <Text >NOAH CONSTRUCTIONS, LDA.</Text>
+                        <Text >Data emissão: {data}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.titulo}>
+                    <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()} </Text>
+                </View>
+
+                <View style={styles.cabecalho}>
+
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Descrição</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Estado</Text>
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.textoTitulo}>Almoxarifado</Text>
                     </View>
 
-                    <View style={styles.titulo}>
-                        <Text>RELATÓRIO DE EQUIPAMENTOS EM ALMOXARIFADO - {Math.floor(numRelatorio)}/{(new Date()).getFullYear()} </Text>
+                    <View style={styles.section}>
+                        <Text>Classificação</Text>
                     </View>
-
-                    <View style={styles.cabecalho}>
-
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Descrição</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Estado</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text style={styles.textoTitulo}>Almoxarifado</Text>
-                        </View>
-
-                        <View style={styles.section}>
-                            <Text>Classificação</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text>Tempo de duração</Text>
-                        </View>
-                        <View style={styles.section}>
-                            <Text>Quantidade</Text>
-                        </View>
+                    <View style={styles.section}>
+                        <Text>Tempo de duração</Text>
                     </View>
+                    <View style={styles.section}>
+                        <Text>Quantidade</Text>
+                    </View>
+                </View>
 
-                    {
-                        almoxarifadoFiltrados && almoxarifadoFiltrados.map((almoxarifado, index) => {
+                {
+                    almoxarifadoFiltrados && almoxarifadoFiltrados.map((almoxarifado, index) => {
 
-                            if (almoxarifado.quantidade > 0) return (
+                        if (almoxarifado.quantidade > 0) return (
 
-                                <View style={styles.corpo} key={index} wrap={false}>
+                            <View style={styles.corpo} key={index} wrap={false}>
 
-                                    <View style={styles.section}>
-                                        <Text>{almoxarifado.equipamento_id.descricao}</Text>
-                                    </View>
-                                    <View style={styles.section}>
-                                        <Text>{almoxarifado.estado}</Text>
-                                    </View>
-
-                                    <View style={styles.section}>
-                                        <Text>{almoxarifado.obra_id.obra_nome}</Text>
-                                    </View>
-
-                                    <View style={styles.section}>
-                                        <Text>{findClassificacao(almoxarifado.equipamento_id.classificacao_id).tipo}</Text>
-                                    </View>
-
-                                    <View style={styles.section}>
-                                        <Text>{findDuracao(almoxarifado.equipamento_id.duracao_id).tempo}</Text>
-                                    </View>
-
-
-                                    <View style={styles.section}>
-                                        <Text>{almoxarifado.quantidade}</Text>
-                                    </View>
-
+                                <View style={styles.section}>
+                                    <Text>{almoxarifado.equipamento_id.descricao}</Text>
+                                </View>
+                                <View style={styles.section}>
+                                    <Text>{almoxarifado.estado}</Text>
                                 </View>
 
-                            )
+                                <View style={styles.section}>
+                                    <Text>{almoxarifado.obra_id.obra_nome}</Text>
+                                </View>
 
-                        }
+                                <View style={styles.section}>
+                                    <Text>{findClassificacao(almoxarifado.equipamento_id.classificacao_id).tipo}</Text>
+                                </View>
+
+                                <View style={styles.section}>
+                                    <Text>{findDuracao(almoxarifado.equipamento_id.duracao_id).tempo}</Text>
+                                </View>
+
+
+                                <View style={styles.section}>
+                                    <Text>{almoxarifado.quantidade}</Text>
+                                </View>
+
+                            </View>
+
                         )
+
                     }
+                    )
+                }
 
-                    <View style={styles.assinaturas}>
+                <View style={styles.assinaturas}>
 
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
-                        </View>
+                    <View>
+                        <Text style={styles.assinaturaIndividual}>Responsável do Armazem</Text>
+                    </View>
 
-                        <View>
-                            <Text style={styles.assinaturaIndividual}>O Encarregado</Text>
-                        </View>
+                    <View>
+                        <Text style={styles.assinaturaIndividual}>O Encarregado</Text>
+                    </View>
 
-                        {/**
+                    {/**
                         *  <View>
                                 <Text style={styles.assinaturaIndividual}>Director NOAH</Text>
                             </View>
                         */}
-                    </View>
+                </View>
 
-                    <Text
-                        style={styles.numPagina}
-                        render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
-                        fixed />
+                <Text
+                    style={styles.numPagina}
+                    render={({ pageNumber, totalPages }) => (`Página ${pageNumber} de ${totalPages}`)}
+                    fixed />
 
-                </Page>
-            </Document>
-        </PDFViewer>
+            </Page>
+        </Document>
+
     );
 }
+
+const LinkDonwloadAlmoxarifado = ({ almoxarifadoFiltrados, classificacao, duracao, legenda }: ButtonType) => (
+    <PDFDownloadLink
+        className='bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75'
+        document={<RelatorioAlmoxarifado
+            almoxarifadoFiltrados={almoxarifadoFiltrados}
+            classificacao={classificacao}
+            duracao={duracao} />}
+    >
+
+        {({ blob, url, loading, error }) =>
+            loading ?
+                <>
+                    <Img src={Load} height={8} width={8} objectFit={'contain'} />
+                    <span>loading</span>
+                </>
+                : <>
+                    <FaPrint />
+                    <span>{legenda}</span>
+                </>
+        }
+
+    </PDFDownloadLink >)
+
+export default LinkDonwloadAlmoxarifado;

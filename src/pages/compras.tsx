@@ -1,27 +1,28 @@
-import { useState } from "react"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
+import dynamic from "next/dynamic"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import dynamic from "next/dynamic"
+import { useState } from "react"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaEdit, FaPrint } from 'react-icons/fa'
+import { FaEdit } from 'react-icons/fa'
 
 //import Load from '../assets/load.gif'
 import EditarModal from "../components/compras/EditarModal"
 
 
-import AES from 'crypto-js/aes';
+import AES from 'crypto-js/aes'
 //import { enc } from 'crypto-js';
 
-import { wrapper } from "../redux/store"
-import { fetchCompra } from "../redux/slices/compraSlice"
-import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
-import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import nookies from 'nookies'
 import ReactPaginate from 'react-paginate'
+import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
+import { fetchCompra } from "../redux/slices/compraSlice"
+import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
+import { wrapper } from "../redux/store"
+const LinkDonwloadExtratoDeCarregamentoDeCartao = dynamic(() => import("../components/relatorios/Compras"), { ssr: false })
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 type EquipamentoType = {
@@ -97,16 +98,28 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
      * @returns 
      */
     const findClassificacao = (id: number) => {
-        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+
+        const classification = (classificacao && classificacao.length) ?
+            classificacao.
+                find((classific) => (classific.id === id))
+            : []
+
         return classification as ClassificacaoType
     }
 
     let findedCompras: CompraType[] = []
 
     if (compras.length && filtroTipo) {
-        if (searchByEquipamento && searchByDate === '') findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()))
-        else if (searchByEquipamento === '' && searchByDate) findedCompras = compras.filter((compra) => compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
-        else findedCompras = compras.filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) && compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
+
+        if (searchByEquipamento && searchByDate === '') findedCompras = compras.
+            filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()))
+
+        else if (searchByEquipamento === '' && searchByDate) findedCompras = compras.
+            filter((compra) => compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
+
+        else findedCompras = compras.
+            filter((compra) => compra.equipamento_id.descricao.toLowerCase().includes(searchByEquipamento.toLowerCase()) &&
+                compra.data_compra.toLowerCase().includes(searchByDate.toLowerCase()))
     }
 
 
@@ -123,9 +136,9 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     }
 
     /**
-     * 
      * @param compra 
      */
+
     const handleEdit = (compra: CompraType) => {
 
         setCompraObject(compra)
@@ -144,6 +157,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
     function handlePageClick({ selected: selectedPage }: any) {
         setCurrentPage(selectedPage);
     }
+
+    const toPrint = findedCompras.length ? findedCompras : compras
 
     return (
         <div className='flex overflow-x-hidden'>
@@ -179,7 +194,8 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                     backdrop={true}
                     show={showErrorAlert}
                     title='Erro'
-                    text='Ocorreu um erro ao efectuar a operação. Por favor, verifique se o fornecedor já não está cadastrado no sistema!'
+                    text='Ocorreu um erro ao efectuar a operação. Por favor, 
+                    verifique se o fornecedor já não está cadastrado no sistema!'
                     icon='error'
                     onConfirm={() => setShowErrorAlert(false)}
                     didClose={() => setShowErrorAlert(false)}
@@ -213,10 +229,12 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
 
                 />
                 {
-                    showEditModal && <EditarModal compraData={compraObject} isOpen={showEditModal} setIsOpen={setShowEditModal} />
+                    showEditModal && <EditarModal compraData={compraObject} isOpen={showEditModal} setIsOpen={setShowEditModal}
+                    />
                 }
                 <div className='overflow-y-auto max-h-[85vh] max-w-4xl mx-auto'>
-                    <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 rounded mt-5 animate__animated animate__fadeIn">
+                    <div className="bg-white shadow max-w-6xl mx-auto flex flex-col space-y-6 p-6 
+                    rounded mt-5 animate__animated animate__fadeIn">
                         <h2 className=" h-5 text-2xl font-semibold">Compras de Equipamentos</h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
                         <div className="flex justify-end items-center gap-2 -mt-4">
@@ -234,7 +252,6 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                 <label htmlFor="material" className="bg-white">Por eq. / data&nbsp;</label>
                                 <input
                                     onClick={() => setFiltroTipo(true)}
-
                                     type={"radio"}
                                     name='classificacao'
                                     id='material'
@@ -262,27 +279,19 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                             }
                         </div>
                         <div className=" flex justify-end gap-2">
-                            <button
-                                onClick={() => route.push(`/relatorio/compras/all`)}
-                                className="bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75">
-                                <FaPrint />
-                                <span>Imprimir tudo</span>
-                            </button>
 
-                            <button
-                                disabled={!(searchByEquipamento || searchByDate)}
-                                onClick={() => route.push(`/relatorio/compras/${searchByEquipamento === '' ? encriptSTR('equipamento') : encriptSTR(searchByEquipamento)}/${searchByDate === '' ? '' : encriptSTR(searchByDate)}`)}
-                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
-                                <FaPrint />
-                                <span>Imprimir</span>
-                            </button>
+                            <LinkDonwloadExtratoDeCarregamentoDeCartao
+                                compras={toPrint}
+                                legenda={(searchByEquipamento.length || searchByDate.length) ? 'Imprimir' : 'Imprimir Tudo'} />
+
                         </div>
                     </div>
 
                 </div>
 
                 {/** Relatório- tabela de compras */}
-                <div className=' mt-8 text-end px-4 pt-4 pb-2 mx-auto flex flex-col flex-1 bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
+                <div className=' mt-8 text-end px-4 pt-4 pb-2 mx-auto flex flex-col flex-1 bg-white rounded overflow-x-auto 
+                overflow-hide-scroll-bar'>
 
                     <table className='table w-full text-center mt-2 animate__animated animate__fadeIn'>
                         <thead>
@@ -313,7 +322,9 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-16">{compra.id}</td>
                                             <td className="w-72">{compra.equipamento_id.descricao}</td>
-                                            <td className="w-52">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-52">
+                                                {findClassificacao(compra.equipamento_id.classificacao_id).tipo}
+                                            </td>
                                             <td className="w-52">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-40">{compra.quantidade_comprada}</td>
                                             <td className="w-40">{compra.estado}</td>
@@ -350,7 +361,9 @@ const Devolucoes = ({ compras, classificacao, duracao }: CompraProps) => {
                                             className='flex justify-between items-center border shadow-md mt-4 px-4 py-2'>
                                             <td className="w-16  ">{compra.id}</td>
                                             <td className="w-72  ">{compra.equipamento_id.descricao}</td>
-                                            <td className="w-52  ">{findClassificacao(compra.equipamento_id.classificacao_id).tipo}</td>
+                                            <td className="w-52  ">
+                                                {findClassificacao(compra.equipamento_id.classificacao_id).tipo}
+                                            </td>
                                             <td className="w-52  ">{findDuracao(compra.equipamento_id.duracao_id).tempo}</td>
                                             <td className="w-40  ">{compra.quantidade_comprada}</td>
                                             <td className="w-40  ">{compra.estado}</td>

@@ -1,21 +1,20 @@
-import { useState } from "react"
 import Head from "next/head"
+import { useState } from "react"
 
 import Header from "../components/Header"
 import SiderBar from "../components/SiderBar"
 
-import { FaPrint } from 'react-icons/fa'
 import nookies from 'nookies'
 
-import dynamic from "next/dynamic"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { wrapper } from "../redux/store"
-import { fetchSaida } from "../redux/slices/auditoriaSlice"
-import { fetchObra } from "../redux/slices/obraSlice"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import ReactPaginate from 'react-paginate'
+import { fetchSaida } from "../redux/slices/auditoriaSlice"
+import { fetchObra } from "../redux/slices/obraSlice"
+import { wrapper } from "../redux/store"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
-
+const LinkDonwloadGT = dynamic(() => import('../components/relatorios/Gt'), { ssr: false })
 type EquipamentoType = {
     id: number;
     descricao: string;
@@ -175,14 +174,11 @@ const GT = ({ auditoria, obras }: AuditoriaProps) => {
 
                         </div>
                         <div className=" ml-auto flex gap-2">
+                            {
+                                (searchData && searchObra && findedAuditoria.length) ?
+                                    (<LinkDonwloadGT auditoria={findedAuditoria} />) : ""
+                            }
 
-                            <button
-                                disabled={!(searchData && searchObra)}
-                                onClick={() => route.push(`/relatorio/Gt/${searchObra}/${searchData}`)}
-                                className="bg-gray-200 text-gray-600 px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75 disabled:cursor-not-allowed">
-                                <FaPrint />
-                                <span>Imprimir Guia</span>
-                            </button>
                         </div>
                     </div>
 

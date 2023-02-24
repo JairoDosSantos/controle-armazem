@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import Image from 'next/image'
-import Head from 'next/head'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import Image from 'next/image'
+import { useState } from 'react'
 
 //Imagens
 import Load from '../assets/load.gif'
@@ -11,32 +11,32 @@ import Header from '../components/Header'
 //import AddObra from '../components/equipamento/AddObra'
 import DevolverAMG from '../components/equipamento/DevolverAMG'
 import EditarModal from '../components/equipamento/EditModal'
-import SiderBar from '../components/SiderBar'
 import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralParaObra'
+import SiderBar from '../components/SiderBar'
 
 //Componentes Externos
-import { FaSave, FaPlusCircle } from 'react-icons/fa'
-import { BiTransferAlt } from 'react-icons/bi'
-import { TiArrowBackOutline } from 'react-icons/ti'
-import nookies from 'nookies'
-import { useDispatch } from 'react-redux'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import nookies from 'nookies'
+import { BiTransferAlt } from 'react-icons/bi'
+import { FaPlusCircle, FaSave } from 'react-icons/fa'
+import { TiArrowBackOutline } from 'react-icons/ti'
+import { useDispatch } from 'react-redux'
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
 
-import AddNovoModal from '../components/equipamento/AddNovoModal'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { wrapper } from '../redux/store'
-import { fetchEquipamento } from '../redux/slices/equipamentoSlice'
-import EquipamentoAutoComplete from '../components/EquipamentoAutoComplete'
-import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
-import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
-import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
-import { insertCompra } from '../redux/slices/compraSlice'
 import ReactPaginate from 'react-paginate'
+import AddNovoModal from '../components/equipamento/AddNovoModal'
+import EquipamentoAutoComplete from '../components/EquipamentoAutoComplete'
+import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
+import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
+import { insertCompra } from '../redux/slices/compraSlice'
+import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
+import { fetchEquipamento } from '../redux/slices/equipamentoSlice'
+import { wrapper } from '../redux/store'
 
-
+import { Switch } from '@headlessui/react'
 
 //Tipagem do formulário
 type FormValues = {
@@ -90,7 +90,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     let pageCount = 1;
 
     let currentPageData: ArmGeralType[] = []
-
+    const [enabled, setEnabled] = useState(false)
 
     const [isOpenRemove, setIsOpenRemove] = useState(false)
     //    const [isOpenAddObra, setIsOpenAddObra] = useState(false)
@@ -119,7 +119,15 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
             if (equipamentoQuantidade.length > 0) {
 
                 //Trecho de código acrescentado hoje 01-09-2022
-                const comprasInsert = await dispatch(insertCompra({ estado: data.estado, data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+                const comprasInsert = await dispatch(
+                    insertCompra(
+                        {
+                            estado: data.estado,
+                            data_compra: data.data_aquisicao,
+                            equipamento_id: data.descricao_equipamento_id,
+                            preco: data.preco,
+                            quantidade_comprada: data.quantidade
+                        }))
 
                 if (!comprasInsert.payload) {
                     setShowErrorAlert(true)
@@ -129,7 +137,8 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                 //Insert nas Compras primeiro
                 let qtd = Number(equipamentoQuantidade[0].quantidade) + Number(data.quantidade);
 
-                const resultDispatchArmGeral = await dispatch(updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtd }))
+                const resultDispatchArmGeral = await dispatch(
+                    updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtd }))
 
                 if (resultDispatchArmGeral.meta.arg) {
                     setShowConfirmAlert(true)
@@ -139,12 +148,31 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
             } else {
                 //Insert nas Compras primeiro
                 //Trecho de código acrescentado hoje 01-09-2022
-                const comprasInsert = await dispatch(insertCompra({ estado: data.estado, data_compra: data.data_aquisicao, equipamento_id: data.descricao_equipamento_id, preco: data.preco, quantidade_comprada: data.quantidade }))
+                const comprasInsert = await dispatch(
+                    insertCompra(
+                        {
+                            estado: data.estado,
+                            data_compra: data.data_aquisicao,
+                            equipamento_id: data.descricao_equipamento_id,
+                            preco: data.preco,
+                            quantidade_comprada: data.quantidade
+                        })
+                )
+
                 if (!comprasInsert.payload) {
                     setShowErrorAlert(true)
                     return
                 }
-                const resultDispatch = await dispatch(insertArmGeral({ estado: data.estado, equipamento_id: data.descricao_equipamento_id, quantidade_entrada: data.quantidade, data_aquisicao: data.data_aquisicao }))
+
+                const resultDispatch = await dispatch(
+                    insertArmGeral(
+                        {
+                            estado: data.estado,
+                            equipamento_id: data.descricao_equipamento_id,
+                            quantidade_entrada: data.quantidade,
+                            data_aquisicao: data.data_aquisicao
+                        })
+                )
                 // const unwrapresultado = unwrapResult(resultDispatch)
                 if (resultDispatch.meta.arg) {
                     setShowConfirmAlert(true)
@@ -177,7 +205,8 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     }
 
     const findClassificacao = (id: number) => {
-        const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
+        const classification = (classificacao && classificacao.length) ?
+            classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
     }
 
@@ -309,29 +338,53 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                     </div>
 
                     <form
+                        autoComplete={'off'}
                         onSubmit={handleSubmit(onSubmit)}
                         className="bg-white shadow max-w-2xl mx-auto flex flex-col space-y-5 p-6  rounded mt-10 animate__animated animate__fadeIn">
                         <h2 className="divide-x-2 h-5 text-2xl font-semibold select-none flex gap-2">Cadastro <span className='hidden lg:flex'>de Eq. no armazem geral</span> </h2>
                         <div className="border w-1/5 border-gray-700 ml-4"></div>
+
+                        <div className='flex justify-center py-1'>
+                            <Switch
+                                checked={enabled}
+                                onChange={setEnabled}
+                                className={`${enabled ? 'bg-gray-700' : 'bg-gray-500'}
+                                    relative inline-flex h-[25px] w-[40px] shrink-0 cursor-pointer rounded-full 
+                                    border-2 border-transparent transition-colors duration-200 ease-in-out 
+                                    focus:outline-none focus-visible:ring-2 focus-visible:ring-white
+                                    focus-visible:ring-opacity-75`}
+                            >
+                                <span className="sr-only text-black">Comprar ?</span>
+                                <span
+                                    aria-hidden="true"
+                                    className={`${enabled ? 'translate-x-4' : 'translate-x-0'} pointer-events-none 
+                                    inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0
+                                    transition duration-200 ease-in-out`}
+                                />
+                            </Switch>
+
+                        </div>
                         <div className="flex gap-3">
                             <EquipamentoAutoComplete equipamentos={equipamentos} setIdEquipamento={setIdEquipamento} />
                         </div>
 
                         <div className="flex gap-3">
-                            <input
-                                {...register('preco')}
-                                type="number"
-                                placeholder="Preço"
-                                className="w-1/2 rounded shadow"
-                                min={0}
-                            />
+                            {
+                                enabled && <input
+                                    {...register('preco')}
+                                    type="number"
+                                    placeholder="Preço"
+                                    className="w-1/2 rounded shadow"
+                                    min={0}
+                                />
+                            }
 
                             <select
                                 {...register('estado', {
                                     required: { message: "Por favor, introduza a Estado do equipamento.", value: true },
                                     minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                 })}
-                                className="w-1/2 rounded shadow cursor-pointer ">
+                                className={`${enabled ? 'w-1/2' : 'w-full'} rounded shadow cursor-pointer`}>
                                 <option className='text-gray-400' value="">Selecione o estado</option>
                                 <option value="Novo">Novo</option>
                                 <option value="Avariado">{'Avariado(a)'}</option>
@@ -352,6 +405,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                 min={0}
                             />
                             <input
+                                title='Data de compra'
                                 type={'date'}
                                 {...register('data_aquisicao', {
                                     required: { message: "Por favor, introduza a data de aquisição do produto.", value: true },
