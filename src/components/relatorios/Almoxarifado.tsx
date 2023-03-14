@@ -4,9 +4,7 @@ import {
 } from "@react-pdf/renderer";
 
 import moment from 'moment';
-import Img from 'next/image';
 import { FaPrint } from "react-icons/fa";
-import Load from '../../assets/load.gif';
 
 type ButtonType = {
     almoxarifadoFiltrados: Almoxarifario[];
@@ -321,8 +319,7 @@ const LinkDonwloadAlmoxarifado = ({ almoxarifadoFiltrados, classificacao, duraca
         {({ blob, url, loading, error }) =>
             loading ?
                 <>
-                    <Img src={Load} height={8} width={8} objectFit={'contain'} />
-                    <span>loading</span>
+                    <span>loading...</span>
                 </>
                 : <>
                     <FaPrint />

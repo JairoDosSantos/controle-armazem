@@ -3,9 +3,7 @@ import {
     View
 } from "@react-pdf/renderer";
 import moment from 'moment';
-import Img from 'next/image';
 import { FaPrint } from "react-icons/fa";
-import Load from '../../assets/Load.gif';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -271,8 +269,8 @@ const LinkDonwloadMovimentacoes = ({ auditoria, legenda }: ButtonType) => (
         {({ blob, url, loading, error }) =>
             loading ?
                 <>
-                    <Img src={Load} height={8} width={8} objectFit={'contain'} />
-                    <span>loading</span>
+
+                    <span>loading...</span>
                 </>
                 : <>
                     <FaPrint />
