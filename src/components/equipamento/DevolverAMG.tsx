@@ -55,7 +55,8 @@ type FormValues = {
     obra_id: number;
     data_devolucao: string;
     data_retirada: string;
-    estado: string
+    estado: string;
+    mes?: string
 }
 
 const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {

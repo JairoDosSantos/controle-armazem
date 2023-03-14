@@ -29,7 +29,8 @@ type EquipamentosARMType = {
     quantidade: number;
     equipamento_id: EquipamentoType;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+    mes: string
 }
 
 type EditarModalProps = {
@@ -44,7 +45,8 @@ type FormValues = {
     descricao_equipamento: string;
     quantidade: number;
     classificacao_id: number;
-    tempo_duracao: string
+    tempo_duracao: string;
+    mes: string
 }
 const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
@@ -57,7 +59,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
         setLoad(true)
 
-        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade, }))
+        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
 
         setLoad(false)
         if (editEquipamentoDispatch.payload !== null) notifySuccess()

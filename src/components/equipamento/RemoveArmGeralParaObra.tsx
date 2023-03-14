@@ -55,7 +55,8 @@ type FormValues = {
     quantidade: number;
     obra_id: number;
     data_transferencia: string;
-    estado: string
+    estado: string;
+    mes?: string
 }
 
 

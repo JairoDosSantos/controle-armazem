@@ -1,22 +1,22 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 //Imagens
-import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
-import Image from 'next/image'
-import { useDispatch } from 'react-redux'
-import { updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
-import { useRouter } from 'next/router'
-import { fetchObra, fetchObraActiva } from '../../redux/slices/obraSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { FaSave } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
+import LoadImage from '../../assets/load.gif'
+import { updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
+import { fetchObraActiva } from '../../redux/slices/obraSlice'
 
 type AddObraProps = {
     isOpen: boolean;
@@ -30,7 +30,8 @@ type FormValues = {
     descricao_equipamento: string;
     quantidade: number;
     obra_id: number;
-    data_compra: string
+    data_compra: string;
+    mes: string
 }
 type ObraType = {
     id: number
@@ -51,7 +52,8 @@ type Almoxarifario = {
     quantidade: number;
     obra_id: ObraType;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+    mes: string
 }
 const EditarModalPorObra = ({ isOpen, setIsOpen, data }: AddObraProps) => {
 

@@ -70,7 +70,8 @@ type ArmGeralType = {
     equipamento_id: EquipamentoType;
     quantidade: number;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+    mes: string
 }
 type EspecialidadeType = {
     id: number;
