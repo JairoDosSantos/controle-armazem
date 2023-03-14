@@ -120,7 +120,9 @@ type EquipamentoType = {
     descricao: string;
     duracao_id: number;
     classificacao_id: number;
-    data: string
+    data: string;
+    especialidade_id: number;
+
 }
 
 type EquipamentosARMType = {
@@ -128,7 +130,8 @@ type EquipamentosARMType = {
     quantidade: number;
     equipamento_id: EquipamentoType;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+
 }
 type DuracaoType = {
     id: number;
@@ -140,18 +143,23 @@ type ClassificacaoType = {
     tipo: string;
 
 }
+type EspecialidadeType = {
+    id: number;
+    especialidade: string
+}
 
 type PosicaoArmazemProps = {
     equipamentosARM: EquipamentosARMType[];
     duracao: DuracaoType[];
-    classificacao: ClassificacaoType[]
+    classificacao: ClassificacaoType[];
+    especialidade: EspecialidadeType[]
 }
 
 // Create Document Component
-export function RelatorioArmazem({ equipamentosARM, duracao, classificacao }: PosicaoArmazemProps) {
+export function RelatorioArmazem({ equipamentosARM, duracao, classificacao, especialidade }: PosicaoArmazemProps) {
 
     const data = moment().format("DD/MM/yyyy")
-    const numRelatorio = ((equipamentosARM.length - 100) / (new Date()).getHours()) + 1;
+    const numRelatorio = ((equipamentosARM?.length - 100) / ((new Date()).getHours()) + (new Date()).getDay() + (new Date()).getFullYear()) + 1;
     //Funções
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length)
@@ -167,6 +175,14 @@ export function RelatorioArmazem({ equipamentosARM, duracao, classificacao }: Po
             : []
         return classification as ClassificacaoType
     }
+
+    const findEspecialidade = (id: number) => {
+        const especialidad = (especialidade && especialidade.length)
+            ? especialidade.find((especiality) => (especiality.id === id))
+            : []
+        return especialidad as EspecialidadeType
+    }
+
     return (
 
 
@@ -203,7 +219,7 @@ export function RelatorioArmazem({ equipamentosARM, duracao, classificacao }: Po
                     </View>
 
                     <View style={styles.section}>
-                        <Text>Tempo de duração</Text>
+                        <Text>Especialidade</Text>
                     </View>
 
                     <View style={styles.section}>
@@ -230,7 +246,7 @@ export function RelatorioArmazem({ equipamentosARM, duracao, classificacao }: Po
                                     </View>
 
                                     <View style={styles.section}>
-                                        <Text>{findDuracao(armazem.equipamento_id.duracao_id).tempo}</Text>
+                                        <Text>{findEspecialidade(armazem.equipamento_id.especialidade_id).especialidade}</Text>
                                     </View>
 
                                     <View style={styles.section}>
@@ -272,14 +288,16 @@ type LinkButtonDownload = {
     classificacao: ClassificacaoType[];
     duracao: DuracaoType[];
     equipamentosARM: EquipamentosARMType[];
-    legenda: string
+    legenda: string;
+    especialidade: EspecialidadeType[]
 }
 
-const LinkDonwloadArmazem = ({ classificacao, duracao, equipamentosARM, legenda }: LinkButtonDownload) => (
+const LinkDonwloadArmazem = ({ classificacao, duracao, equipamentosARM, legenda, especialidade }: LinkButtonDownload) => (
 
     <PDFDownloadLink
         className='bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75'
         document={<RelatorioArmazem
+            especialidade={especialidade}
             classificacao={classificacao}
             duracao={duracao}
             equipamentosARM={equipamentosARM} />}

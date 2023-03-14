@@ -15,7 +15,6 @@ import RemoveArmGeralParaObra from '../components/equipamento/RemoveArmGeralPara
 import SiderBar from '../components/SiderBar'
 
 //Componentes Externos
-import { unwrapResult } from '@reduxjs/toolkit'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import nookies from 'nookies'
 import { BiTransferAlt } from 'react-icons/bi'
@@ -31,12 +30,14 @@ import AddNovoModal from '../components/equipamento/AddNovoModal'
 import EquipamentoAutoComplete from '../components/EquipamentoAutoComplete'
 import { fetchArmGeral, fetchOne, insertArmGeral, updateArmGeral } from '../redux/slices/armGeralSlice'
 import { fetchClassificacao } from '../redux/slices/classificacaoSlice'
-import { insertCompra } from '../redux/slices/compraSlice'
 import { fetchDuracao } from '../redux/slices/duracaoSlice.ts'
 import { fetchEquipamento } from '../redux/slices/equipamentoSlice'
 import { wrapper } from '../redux/store'
 
 import { Switch } from '@headlessui/react'
+import { unwrapResult } from '@reduxjs/toolkit'
+import { insertCompra } from '../redux/slices/compraSlice'
+import api from '../services/api'
 
 //Tipagem do formulário
 type FormValues = {
@@ -71,15 +72,21 @@ type ArmGeralType = {
     data_aquisicao: string;
     estado: string
 }
-
+type EspecialidadeType = {
+    id: number;
+    especialidade: string
+}
 type EquipamentoProps = {
     equipamentos: EquipamentoType[];
     duracao: DuracaoType[];
     classificacao: ClassificacaoType[]
-    armazem: ArmGeralType[]
+    armazem: ArmGeralType[];
+    especialidade: EspecialidadeType[]
 }
 
-const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: EquipamentoProps) => {
+const Equipamento = ({ equipamentos, duracao, classificacao, armazem, especialidade }: EquipamentoProps) => {
+
+    const allMonths = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
     const [load, setLoad] = useState(false)
 
@@ -109,6 +116,10 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
+
+        const mes = (new Date(data.data_aquisicao)).getMonth();
+        const ano = (new Date(data.data_aquisicao)).getFullYear();
+
         setLoad(true)
         try {
             data.descricao_equipamento_id = idEquipamento;
@@ -126,7 +137,8 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             data_compra: data.data_aquisicao,
                             equipamento_id: data.descricao_equipamento_id,
                             preco: data.preco,
-                            quantidade_comprada: data.quantidade
+                            quantidade_comprada: data.quantidade,
+
                         }))
 
                 if (!comprasInsert.payload) {
@@ -141,6 +153,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                     updateArmGeral({ ...equipamentoQuantidade[0], quantidade_entrada: qtd }))
 
                 if (resultDispatchArmGeral.meta.arg) {
+
                     setShowConfirmAlert(true)
                 } else {
                     setShowErrorAlert(true)
@@ -170,7 +183,8 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                             estado: data.estado,
                             equipamento_id: data.descricao_equipamento_id,
                             quantidade_entrada: data.quantidade,
-                            data_aquisicao: data.data_aquisicao
+                            data_aquisicao: data.data_aquisicao,
+                            mes: `${ano}-${allMonths[mes]}`
                         })
                 )
                 // const unwrapresultado = unwrapResult(resultDispatch)
@@ -187,14 +201,12 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
             setShowErrorAlert(true)
             setLoad(false)
         }
+
     }
 
+    currentPageData = armazem?.slice(offset, offset + PER_PAGE)
 
-
-    currentPageData = armazem
-        .slice(offset, offset + PER_PAGE)
-
-    pageCount = Math.ceil(armazem.length / PER_PAGE);
+    pageCount = Math.ceil(armazem?.length / PER_PAGE);
 
 
 
@@ -329,6 +341,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                         </button>
                         {isOpenAddNovoModal && (
                             <AddNovoModal
+                                especialidade={especialidade}
                                 duracao={duracao}
                                 classificacao={classificacao}
                                 isOpen={isOpenAddNovoModal}
@@ -420,7 +433,7 @@ const Equipamento = ({ equipamentos, duracao, classificacao, armazem }: Equipame
                                 className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
                             </button>
                             <button
-                                disabled={!isValid}
+                                disabled={(!isValid || load)}
                                 className={`bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500 ${isValid && 'animacao-link'}`} >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}
                                 <span>Salvar</span>
@@ -529,7 +542,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const classificacaoDispatch: any = await store.dispatch(fetchClassificacao());
             const duracaoDispatch: any = await store.dispatch(fetchDuracao());
             const armazemDispatch: any = await store.dispatch(fetchArmGeral());
-
+            const especialidades = await api.get('api/especialidade')
+            const { data } = especialidades.data
             const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
             const duracao = duracaoDispatch.payload
@@ -541,7 +555,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
                     equipamentos,
                     classificacao,
                     duracao,
-                    armazem
+                    armazem,
+                    especialidade: data
                 },
             };
         }

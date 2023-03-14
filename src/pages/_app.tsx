@@ -1,18 +1,17 @@
-import '../../styles/globals.css'
-import type { AppProps } from 'next/app'
-import { ThemeProvider } from 'next-themes';
 import 'animate.css';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import "nprogress/nprogress.css";
 import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+import '../../styles/globals.css';
 
 import { motion } from 'framer-motion';
-import { wrapper } from '../redux/store';
-import { useEffect } from 'react';
 import Router from "next/router";
-
+import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { wrapper } from '../redux/store';
 function MyApp({ Component, pageProps, router }: AppProps) {
-
+  const queryClient = new QueryClient()
   /* ... */
   useEffect(() => {
 
@@ -33,7 +32,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   /* ... */
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Head>
         <title>Sistema de Controle de Armazem</title>
         {/**  <link rel="icon" href='/noah.png' /> */}
@@ -57,7 +56,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
         }}>
         <Component {...pageProps} />
       </motion.div>
-    </>
+    </QueryClientProvider>
   )
 }
 

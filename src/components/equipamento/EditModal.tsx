@@ -2,19 +2,19 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 //Imagens
-import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
 import Image from 'next/image'
-import { useDispatch } from 'react-redux'
-import { updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { useRouter } from 'next/router'
+import { FaSave } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
+import LoadImage from '../../assets/load.gif'
+import { updateArmGeral } from '../../redux/slices/armGeralSlice'
 
 type EquipamentoType = {
     id: number;
@@ -57,7 +57,7 @@ const EditarModal = ({ isOpen, setIsOpen, data }: EditarModalProps) => {
 
         setLoad(true)
 
-        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade }))
+        const editEquipamentoDispatch = await dispatch(updateArmGeral({ ...data, equipamento_id: data.equipamento_id.id, quantidade_entrada: arm.quantidade, }))
 
         setLoad(false)
         if (editEquipamentoDispatch.payload !== null) notifySuccess()

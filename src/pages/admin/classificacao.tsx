@@ -2,25 +2,25 @@ import { useState } from "react"
 import Header from "../../components/Header"
 import SiderBar from "../../components/SiderBar"
 
-import { FaSave, FaEdit, FaTrash } from 'react-icons/fa'
+import { FaEdit, FaSave, FaTrash } from 'react-icons/fa'
 
-import Load from '../../assets/load.gif'
-import Image from "next/image"
-import EditarModal from "../../components/classificacao/EditarModal"
-import dynamic from "next/dynamic"
-import Head from "next/head"
-import { SubmitHandler, useForm } from "react-hook-form"
-import { useDispatch } from "react-redux"
 import { unwrapResult } from "@reduxjs/toolkit"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
+import dynamic from "next/dynamic"
+import Head from "next/head"
+import Image from "next/image"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
+import Load from '../../assets/load.gif'
+import EditarModal from "../../components/classificacao/EditarModal"
 
 import { wrapper } from "../../redux/store"
 
 import nookies from 'nookies'
 
 import { useRouter } from "next/router"
-import { deleteClassificacao, fetchClassificacao, insertClassificacao } from "../../redux/slices/classificacaoSlice"
 import ReactPaginate from "react-paginate"
+import { deleteClassificacao, fetchClassificacao, insertClassificacao } from "../../redux/slices/classificacaoSlice"
 
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 
@@ -86,11 +86,12 @@ const Classificacao = ({ classificacao }: ObraProps) => {
         setShowEditModal(true)
     }
 
-    const handleDeleteObra = async () => {
+    const handleDeleteClassificacao = async () => {
         const resultDispatch = await dispatch(deleteClassificacao(idClassificacao))
 
         if (resultDispatch.payload) {
             setShowConfirmAlert(true)
+            route.reload()
         }
     }
 
@@ -175,7 +176,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
                     title='Atenção'
                     text='Tem a certeza que deseja efectuar esta operação?'
                     icon='question'
-                    onConfirm={handleDeleteObra}
+                    onConfirm={handleDeleteClassificacao}
                     didClose={() => setShowQuestionAlert(false)}
                     didDestroy={() => setShowQuestionAlert(false)}
                     allowOutsideClick={true}
@@ -214,7 +215,7 @@ const Classificacao = ({ classificacao }: ObraProps) => {
                                 className="bg-gray-700 text-white  font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded">Cancelar
                             </button>
                             <button
-                                disabled={!isValid}
+                                disabled={!isValid || load}
                                 title="Salvar a classificação"
                                 className="bg-blue-700 text-white font-semibold px-4 py-2 mt-4 hover:brightness-75 rounded flex items-center gap-2 disabled:cursor-not-allowed disabled:bg-blue-500" >
                                 {load ? (<Image src={Load} objectFit={"contain"} width={20} height={15} />) : (<FaSave />)}

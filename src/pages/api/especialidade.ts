@@ -11,7 +11,8 @@ export default async function Especialidade(req: NextApiRequest, res: NextApiRes
 
                 const { data, error } = await supabase
                     .from('especialidade')
-                    .select("especialidade")
+                    .select("*")
+                    .order('id', { ascending: true })
                 if (error) return res.status(400).json({ error })
                 return res.status(200).json({ data });
 

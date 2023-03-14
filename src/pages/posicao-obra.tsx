@@ -32,6 +32,11 @@ type ClassificacaoType = {
     tipo: string;
 
 }
+type EspecialidadeType = {
+    id: number;
+    especialidade: string
+}
+
 type ObraType = {
     id: number
     obra_nome: string;
@@ -44,6 +49,7 @@ type EquipamentoType = {
     duracao_id: number;
     classificacao_id: number;
     data: string
+    especialidade_id: number
 }
 type Almoxarifario = {
     id: number;
@@ -51,16 +57,18 @@ type Almoxarifario = {
     quantidade: number;
     obra_id: ObraType;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+    mes: string;
 }
 type PosicaoObraProps = {
     almoxarifarios: Almoxarifario[];
     classificacao: ClassificacaoType[];
     duracao: DuracaoType[];
-    obras: ObraType[]
+    obras: ObraType[];
+    especialidade: EspecialidadeType[]
 }
 
-const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoObraProps) => {
+const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras, especialidade }: PosicaoObraProps) => {
 
     const [currentPage, setCurrentPage] = useState(0);
     const PER_PAGE = 3;
@@ -82,44 +90,65 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
     const [showEditModal, setShowEditModal] = useState(false)
     const [almoxarifarioObject, setAlmoxarifarioObject] = useState({} as Almoxarifario)
+    const [searchByDateMonth, setSearchByDateMonth] = useState('')
 
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
     const findDuracao = (id: number) => {
         const duration = (duracao && duracao.length) ? duracao.find((dur) => (dur.id === id)) : []
 
         return duration as DuracaoType
     }
 
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
     const findClassificacao = (id: number) => {
         const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
     }
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
+    const findEspecialidade = (id: number) => {
+        const especialidades = especialidade.length ? especialidade.find((especial) => (especial.id === id)) : []
+        return especialidades as EspecialidadeType
+    }
 
     let findedEquipamento: Almoxarifario[] = []
-
+    let equipamentosFiltradosPorMesData: Almoxarifario[] = []
 
     if (almoxarifarios) {
+        equipamentosFiltradosPorMesData = searchByDateMonth ? almoxarifarios.filter((equipamentoEmAlmoxarife) => equipamentoEmAlmoxarife.mes.trim() === searchByDateMonth) : almoxarifarios
         if (search && searchByObraId === 0 && searchClassificacao === 0) {
 
-            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
         else if
 
             (searchClassificacao !== 0 && search === '' && searchByObraId === 0) {
-            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
         }
 
         else if (searchByObraId !== 0 && search === '' && searchClassificacao === 0) {
-            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
+            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
         }
         else if (searchByObraId !== 0 && search && searchClassificacao === 0) {
-            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
         else if
 
             (searchClassificacao !== 0 && search && searchByObraId === 0) {
-            findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
-        else { findedEquipamento = almoxarifarios.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
+        else { findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
 
@@ -129,12 +158,12 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
         pageCount = Math.ceil(findedEquipamento.length / PER_PAGE);
     } else {
-        currentPageData = almoxarifarios
+        currentPageData = equipamentosFiltradosPorMesData
             .slice(offset, offset + PER_PAGE)
 
-        pageCount = Math.ceil(almoxarifarios.length / PER_PAGE);
+        pageCount = Math.ceil(equipamentosFiltradosPorMesData.length / PER_PAGE);
     }
-    const toPrint = findedEquipamento.length ? findedEquipamento : almoxarifarios
+    const toPrint = findedEquipamento.length ? findedEquipamento : equipamentosFiltradosPorMesData
 
     /**
      * 
@@ -267,11 +296,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
                         </div>
                         <div className="flex flex-col lg:flex-row gap-5">
-                            <input
-                                onChange={(event) => setSearch(event.target.value)}
-                                type="search"
-                                placeholder="Pesquise pelo equipamento"
-                                className="lg:w-1/2 w-full rounded shadow" />
+
                             {/** Lista apenas na tabela se no mínimo uma obra for selecionada, caso contrário a tabela deve ser vazia */}
                             <select
                                 onChange={(event) => setSearchByObraId(Number(event.target.value))}
@@ -288,6 +313,19 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                     ))
                                 }
                             </select>
+                            <input
+                                onChange={(event) => setSearchByDateMonth(event.target.value)}
+                                type="month"
+                                placeholder="Pesquise pelo equipamento"
+                                className="lg:w-1/2 w-full rounded shadow" />
+                        </div>
+
+                        <div className="flex flex-col lg:flex-row gap-5">
+                            <input
+                                onChange={(event) => setSearch(event.target.value)}
+                                type="search"
+                                placeholder="Pesquise pelo equipamento"
+                                className=" w-full rounded shadow" />
                         </div>
 
                         <div className=" ml-auto flex gap-2">
@@ -295,6 +333,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                 almoxarifadoFiltrados={toPrint}
                                 classificacao={classificacao}
                                 duracao={duracao}
+                                especialidade={especialidade}
                                 legenda={(search.length || searchByObraId || searchClassificacao) ? 'Imprimir' : 'Imprimir Tudo'} />
                             {
                                 /**
@@ -316,7 +355,6 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                         </div>
                     </div>
 
-
                 </div>
                 <div className='mt-8 text-end px-4 py-2 flex flex-col flex-1 mx-auto bg-white rounded overflow-x-auto overflow-hide-scroll-bar'>
                     <span className='font-semibold text-lg '>Relatório almoxarifário</span>
@@ -327,11 +365,10 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                 <th className='text-gray-600 font-bold w-16'>ID</th>
                                 <th className='text-gray-600 font-bold w-72 '>Descrição</th>
                                 <th className='text-gray-600 font-bold w-52'>Classificação</th>
-                                <th className='text-gray-600 font-bold w-42'>Duração</th>
+                                <th className='text-gray-600 font-bold w-72'>Especialidade</th>
                                 <th className='text-gray-600 font-bold w-20'>Qtd</th>
                                 <th className='text-gray-600 font-bold w-52'>Obra</th>
                                 <th className='text-gray-600 font-bold w-40'>Estado</th>
-
                             </tr>
                         </thead>
                         <tbody className=''>
@@ -346,7 +383,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
                                             <td className="w-52"> {findClassificacao(almoxarifario.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-42 "> {findDuracao(almoxarifario.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-72 "> {findEspecialidade(almoxarifario.equipamento_id.especialidade_id).especialidade} </td>
                                             <td className="w-20 ">{almoxarifario.quantidade}</td>
                                             <td className="w-52 ">{almoxarifario.obra_id.obra_nome}</td>
                                             <td className="w-40 ">{almoxarifario.estado}</td>
@@ -361,7 +398,7 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
 
                                             <td className="w-52"> {findClassificacao(finded.equipamento_id.classificacao_id).tipo} </td>
 
-                                            <td className="w-42 "> {findDuracao(finded.equipamento_id.duracao_id).tempo} </td>
+                                            <td className="w-72 "> {findEspecialidade(finded.equipamento_id.especialidade_id).especialidade} </td>
                                             <td className="w-20 ">{finded.quantidade}</td>
                                             <td className="w-52 ">{finded.obra_id.obra_nome}</td>
                                             <td className="w-40 ">{finded.estado}</td>
@@ -369,8 +406,6 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras }: PosicaoO
                                         </tr>
                                     ))
                             }
-
-
 
                         </tbody>
                     </table>

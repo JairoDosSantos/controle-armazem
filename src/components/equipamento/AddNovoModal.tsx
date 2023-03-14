@@ -20,7 +20,8 @@ type EditarModalProps = {
     isOpen: boolean;
     setIsOpen: (valor: boolean) => void;
     duracao: DuracaoType[];
-    classificacao: ClassificacaoType[]
+    classificacao: ClassificacaoType[];
+    especialidade: Especialidade[]
 }
 
 //Tipagem do formulário
@@ -29,7 +30,8 @@ type FormValues = {
     descricao_equipamento: string;
     classificacao_id: number;
     tempo_duracao: number;
-    stock_emergencia: number
+    stock_emergencia: number;
+    especialidade_id: number;
 }
 type DuracaoType = {
     id: number;
@@ -41,9 +43,13 @@ type ClassificacaoType = {
     tipo: string;
 
 }
+type Especialidade = {
+    id: number;
+    especialidade: string
+}
 
 
-const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModalProps) => {
+const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao, especialidade }: EditarModalProps) => {
 
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
@@ -55,8 +61,15 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
+
         const dispatchResult = await dispatch(insertEquipamento(
-            { classificacao_id: data.classificacao_id, descricao: data.descricao_equipamento, duracao_id: data.tempo_duracao, stock_emergencia: data.stock_emergencia }
+            {
+                classificacao_id: data.classificacao_id,
+                especialidade_id: data.especialidade_id,
+                descricao: data.descricao_equipamento,
+                duracao_id: data.tempo_duracao,
+                stock_emergencia: data.stock_emergencia
+            }
         ))
 
         if (dispatchResult.payload) notifySuccess()
@@ -151,7 +164,7 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                         </div>
                                         <form
                                             autoComplete={'off'}
-                                            className='flex flex-col gap-3 justify-center align-center w-[552px] mx-auto'
+                                            className='flex flex-col gap-3 justify-center align-center lg:w-[552px] mx-auto'
                                             onSubmit={handleSubmit(onSubmit)}>
 
                                             <div className='flex gap-2 justify-center align-center'>
@@ -167,18 +180,22 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
                                             </div>
 
-                                            <div className='flex gap-2 justify-center align-center'>
+                                            <div className='flex lg:flex-row flex-col gap-2 justify-center align-center'>
 
                                                 <select
+                                                    {...register('especialidade_id', {
+                                                        required: { message: "Por favor, introduza a especilaidade do equipamento.", value: true },
+                                                        minLength: { message: "Preenchimento obrigatório!", value: 1 },
+                                                    })}
                                                     className="w-full rounded shadow cursor-pointer" >
                                                     <option value={0} className='text-gray-400'>Selecione a especialidade</option>
-                                                    <option value="">AVAC</option>
-                                                    <option value="">ALVENARIA</option>
-                                                    <option value="">COFRAGEM / ESTRUTURA</option>
-                                                    <option value="">ELECTRICIDADE</option>
-                                                    <option value="">HIDRÁULICA</option>
-                                                    <option value="">HSST</option>
-                                                    <option value="">MÁQUINA</option>
+                                                    {
+                                                        especialidade.map((espec, index) => (
+                                                            <option
+                                                                key={index}
+                                                                value={espec.id}>{espec.especialidade}</option>
+                                                        ))
+                                                    }
 
                                                 </select>
 
@@ -200,14 +217,14 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
 
 
                                             </div>
-                                            <div className='flex gap-2 justify-center align-center'>
+                                            <div className='flex lg:flex-row flex-col gap-2 justify-center align-center'>
 
                                                 <select
                                                     {...register('tempo_duracao', {
                                                         required: { message: "Por favor, introduza a durabilidade do equipamento.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
-                                                    className="w-1/2 rounded shadow cursor-pointer" >
+                                                    className="lg:w-1/2 w-full rounded shadow cursor-pointer" >
                                                     <option value="#" className='text-gray-400'>Tempo de duração</option>
                                                     {duracao.length && duracao.map((time, index) => (
                                                         <option
@@ -222,16 +239,16 @@ const AddNovoModal = ({ isOpen, setIsOpen, classificacao, duracao }: EditarModal
                                                     type={'number'}
                                                     placeholder="Stock de emergência"
                                                     min={0}
-                                                    className="w-1/2 rounded shadow"
+                                                    className="lg:w-1/2 w-full rounded shadow"
                                                     {...register('stock_emergencia', {
                                                         required: { message: "Por favor, introduza o Stock de emergência.", value: true },
                                                         minLength: { message: "Preenchimento obrigatório!", value: 1 },
                                                     })}
                                                 />
                                             </div>
-                                            <div className="mt-4 flex justify-end">
+                                            <div className="mt-4 flex lg:justify-end justify-center">
                                                 <button
-                                                    disabled={!isValid}
+                                                    disabled={!isValid || load}
                                                     className="flex items-center justify-center gap-2 rounded-md border border-transparent 
                           bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-500 
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 

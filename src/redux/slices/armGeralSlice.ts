@@ -8,7 +8,9 @@ type ArmGeralType = {
     equipamento_id: number;
     quantidade_entrada: number;
     data_aquisicao: string;
-    estado: string
+    estado: string;
+    mes: string;
+
 }
 
 type ArmGeralState = {
@@ -59,7 +61,7 @@ export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => 
         //acrescentei classificacao_id,duracao_id dia 01-09-2022
         const { data, error } = await supabase
             .from('armgeral')
-            .select("id, equipamento_id(id,descricao,classificacao_id,duracao_id),quantidade,data_aquisicao,estado")
+            .select("id, equipamento_id(id,descricao,classificacao_id,duracao_id,especialidade_id),quantidade,data_aquisicao,estado,mes")
         if (error) return null
         return data
 
@@ -68,7 +70,7 @@ export const fetchArmGeral = createAsyncThunk('/armgeral/fetchAll', async () => 
     }
 })
 
-export const fetchOne = createAsyncThunk('/armGeral/fetchOne', async ({ estado, id }: Omit<ArmGeralType, 'data_aquisicao' | 'equipamento_id' | 'quantidade_entrada'>) => {
+export const fetchOne = createAsyncThunk('/armGeral/fetchOne', async ({ estado, id }: Omit<ArmGeralType, 'data_aquisicao' | 'equipamento_id' | 'quantidade_entrada' | 'mes' | 'ano'>) => {
     try {
 
         const { data, error } = await supabase
@@ -85,12 +87,12 @@ export const fetchOne = createAsyncThunk('/armGeral/fetchOne', async ({ estado, 
     }
 })
 
-export const insertArmGeral = createAsyncThunk('/armgeral/create', async ({ data_aquisicao, equipamento_id, quantidade_entrada, estado }: Omit<ArmGeralType, 'id'>) => {
+export const insertArmGeral = createAsyncThunk('/armgeral/create', async ({ data_aquisicao, equipamento_id, quantidade_entrada, estado, mes }: Omit<ArmGeralType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('armgeral')
-            .insert({ data_aquisicao, equipamento_id, quantidade: quantidade_entrada, estado })
+            .insert({ data_aquisicao, equipamento_id, quantidade: quantidade_entrada, estado, mes })
             .single()
         if (error) return null
         return data

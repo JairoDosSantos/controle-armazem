@@ -9,7 +9,8 @@ type ObraEquipamentoType = {
     equipamento_id: number;
     data_aquisicao: string;
     quantidade_a_levar: number;
-    estado: string
+    estado: string;
+    mes: string
 }
 
 type ObraEquipamentoState = {
@@ -24,7 +25,7 @@ const initialState: ObraEquipamentoState = {
 
 
 
-export const fetchOneAlmoxarifario = createAsyncThunk('/almoxarifario/fetchOne', async ({ equipamento_id, obra_id, estado }: Omit<ObraEquipamentoType, 'id' | 'data_aquisicao' | 'quantidade_a_levar'>) => {
+export const fetchOneAlmoxarifario = createAsyncThunk('/almoxarifario/fetchOne', async ({ equipamento_id, obra_id, estado }: Omit<ObraEquipamentoType, 'id' | 'data_aquisicao' | 'quantidade_a_levar' | 'mes'>) => {
     try {
 
         const { data, error } = await supabase
@@ -47,7 +48,7 @@ export const fetchAlmoxarifario = createAsyncThunk('/almoxarifario/fetchAll', as
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .select("id,data_aquisicao,equipamento_id(id,descricao,classificacao_id,duracao_id),obra_id(obra_nome,id,estado),quantidade,estado")
+            .select("id,data_aquisicao,equipamento_id(id,descricao,classificacao_id,duracao_id,especialidade_id),obra_id(obra_nome,id,estado),quantidade,estado,mes")
         if (error) return null
         return data
 
@@ -56,12 +57,12 @@ export const fetchAlmoxarifario = createAsyncThunk('/almoxarifario/fetchAll', as
     }
 })
 
-export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar, estado }: Omit<ObraEquipamentoType, 'id'>) => {
+export const insertAlmoxarifario = createAsyncThunk('/almoxarifarioNew/create', async ({ data_aquisicao, equipamento_id, obra_id, quantidade_a_levar, estado, mes }: Omit<ObraEquipamentoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('almoxarifario')
-            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar, estado })
+            .insert({ data_aquisicao, equipamento_id, obra_id, quantidade: quantidade_a_levar, estado, mes })
 
         if (error) return error
 

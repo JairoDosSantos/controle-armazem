@@ -2,25 +2,25 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useState } from 'react'
 
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 //Imagens
-import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
-import Image from 'next/image'
-import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
-import { useDispatch } from 'react-redux'
-import { fetchObra } from '../../redux/slices/obraSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { BiTransferAlt } from 'react-icons/bi'
+import { FaSave } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
+import LoadImage from '../../assets/load.gif'
 import { deleteAlmoxarifario, fetchOneAlmoxarifario, insertAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
 import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { insertAuditoria } from '../../redux/slices/auditoriaSlice'
-import { useRouter } from 'next/router'
-import { BiTransferAlt } from 'react-icons/bi'
+import { fetchObra } from '../../redux/slices/obraSlice'
+import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
 
 type EquipamentoType = {
     id: number;
@@ -60,6 +60,7 @@ type FormValues = {
 
 
 const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGeralParaObraProps) => {
+    const allMonths = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
     const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm<FormValues>({ mode: 'onChange' });
     const [load, setLoad] = useState(false)
@@ -70,7 +71,11 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setLoad(true)
+        const mes = (new Date(data.data_transferencia)).getMonth();
+        const ano = (new Date(data.data_transferencia)).getFullYear();
+
         try {
+
             data.descricao_equipamento = idEquipamento
             const getEquipamentosNoARM = await dispatch(fetchOne({ id: data.descricao_equipamento, estado: data.estado }))
             const equipamentoQuantidade = unwrapResult(getEquipamentosNoARM);
@@ -141,7 +146,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
                 } else {
 
-                    const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ estado: data.estado, data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade }))
+                    const almoxarifarioInsert = await dispatch(insertAlmoxarifario({ estado: data.estado, data_aquisicao: data.data_transferencia, equipamento_id: data.descricao_equipamento, obra_id: data.obra_id, quantidade_a_levar: data.quantidade, mes: `${ano}-${allMonths[mes]}` }))
                     const almoxarifarioData = unwrapResult(almoxarifarioInsert)
 
 
@@ -367,7 +372,7 @@ const RemoveArmGeralParaObra = ({ isOpen, setIsOpen, equipamentos }: RemoveArmGe
 
                                             <div className="mt-4 flex justify-end">
                                                 <button
-                                                    disabled={!isValid}
+                                                    disabled={!isValid || load}
                                                     className="flex items-center justify-center gap-2 rounded-md border border-transparent 
                           bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-500 
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 

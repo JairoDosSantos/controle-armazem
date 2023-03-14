@@ -8,7 +8,8 @@ type EquipamentoType = {
     descricao: string;
     classificacao_id: number;
     duracao_id: number;
-    stock_emergencia: number
+    stock_emergencia: number;
+    especialidade_id: number
 }
 
 type equipamentoState = {
@@ -27,7 +28,7 @@ export const fetchEquipamento = createAsyncThunk('/equipamento/fetchAll', async 
 
         const { data, error } = await supabase
             .from('equipamento')
-            .select("id,descricao,classificacao_id(id,tipo),duracao_id(id,tempo),stock_emergencia")
+            .select("id,descricao,classificacao_id(id,tipo),duracao_id(id,tempo),stock_emergencia,especialidade(id,especialidade)")
 
         if (error) return false
         return data
@@ -37,12 +38,12 @@ export const fetchEquipamento = createAsyncThunk('/equipamento/fetchAll', async 
     }
 })
 
-export const insertEquipamento = createAsyncThunk('/equipamento/create', async ({ classificacao_id, descricao, duracao_id, stock_emergencia }: Omit<EquipamentoType, 'id'>) => {
+export const insertEquipamento = createAsyncThunk('/equipamento/create', async ({ classificacao_id, descricao, duracao_id, stock_emergencia, especialidade_id }: Omit<EquipamentoType, 'id'>) => {
     try {
 
         const { data, error } = await supabase
             .from('equipamento')
-            .insert({ classificacao_id, descricao, duracao_id, stock_emergencia })
+            .insert({ classificacao_id, descricao, duracao_id, stock_emergencia, especialidade_id })
             .single()
 
         if (error) return false

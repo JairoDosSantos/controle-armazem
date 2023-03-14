@@ -2,24 +2,24 @@ import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useState } from 'react'
 
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 //Componentes Externos
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 //Imagens
-import LoadImage from '../../assets/load.gif';
-import { FaSave } from 'react-icons/fa'
-import Image from 'next/image'
-import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
-import { fetchObra } from '../../redux/slices/obraSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import Image from 'next/image'
+import { FaSave } from 'react-icons/fa'
+import { TiArrowBackOutline } from 'react-icons/ti'
 import { useDispatch } from 'react-redux'
+import LoadImage from '../../assets/load.gif'
 import { fetchOneAlmoxarifario, updateAlmoxarifario } from '../../redux/slices/almoxarifarioSlice'
 import { fetchOne, updateArmGeral } from '../../redux/slices/armGeralSlice'
 import { fetchOneSaida, updateAuditoria } from '../../redux/slices/auditoriaSlice'
-import { TiArrowBackOutline } from 'react-icons/ti'
+import { fetchObra } from '../../redux/slices/obraSlice'
+import EquipamentoAutoComplete from '../EquipamentoAutoComplete'
 
 
 type EquipamentoType = {
@@ -347,7 +347,7 @@ const DevolverAMG = ({ isOpen, setIsOpen, equipamentos }: DevolverAMGProps) => {
 
                                             <div className="mt-4 flex justify-end">
                                                 <button
-                                                    disabled={!isValid}
+                                                    disabled={!isValid || load}
                                                     className="flex items-center justify-center gap-2 rounded-md border border-transparent 
                           bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-500 
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 

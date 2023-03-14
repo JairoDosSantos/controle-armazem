@@ -18,7 +18,6 @@ const initialState: ClassificacaoState = {
     loading: 'idle',
 }
 
-
 export const fetchClassificacao = createAsyncThunk('/classificacao/fetch', async () => {
     try {
 
@@ -33,6 +32,7 @@ export const fetchClassificacao = createAsyncThunk('/classificacao/fetch', async
         return (error)
     }
 })
+
 export const insertClassificacao = createAsyncThunk('/classificacao/create', async ({ tipo }: Omit<ClassificacaoType, 'id'>) => {
     try {
 
@@ -40,8 +40,8 @@ export const insertClassificacao = createAsyncThunk('/classificacao/create', asy
             .from('classificacao')
             .insert({ tipo })
             .single()
-
-        return data
+        if (error) return error
+        return true
 
     } catch (error) {
         return (error)
@@ -56,7 +56,7 @@ export const updateClassificacao = createAsyncThunk('/classificacao/update', asy
             .update([{ tipo }])
             .match({ id })
 
-        return data
+        return true
 
     } catch (error) {
         return (error)
@@ -71,7 +71,7 @@ export const deleteClassificacao = createAsyncThunk('/classificacao/delete', asy
             .delete()
             .match({ id })
 
-        return data
+        return true
 
     } catch (error) {
         return (error)

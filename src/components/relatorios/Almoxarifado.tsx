@@ -12,6 +12,7 @@ type ButtonType = {
     almoxarifadoFiltrados: Almoxarifario[];
     classificacao: ClassificacaoType[];
     duracao: DuracaoType[];
+    especialidade: EspecialidadeType[]
     legenda: string
 }
 // Create styles
@@ -150,7 +151,8 @@ type EquipamentoType = {
     descricao: string;
     duracao_id: number;
     classificacao_id: number;
-    data: string
+    data: string;
+    especialidade_id: number
 }
 type Almoxarifario = {
     id: number;
@@ -161,13 +163,19 @@ type Almoxarifario = {
     estado: string
 }
 
+type EspecialidadeType = {
+    id: number;
+    especialidade: string
+}
+
 type AlmoxarifadoProps = {
     almoxarifadoFiltrados: Almoxarifario[];
     duracao: DuracaoType[];
-    classificacao: ClassificacaoType[]
+    classificacao: ClassificacaoType[];
+    especialidade: EspecialidadeType[]
 }
 // Create Document Component
-export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, duracao }: AlmoxarifadoProps) {
+export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, duracao, especialidade }: AlmoxarifadoProps) {
     const data = moment().format("DD/MM/yyyy")
     const numRelatorio = ((almoxarifadoFiltrados.length - (almoxarifadoFiltrados.length / 2)) / (new Date()).getHours()) + 1;
 
@@ -180,6 +188,10 @@ export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, du
     const findClassificacao = (id: number) => {
         const classification = (classificacao && classificacao.length) ? classificacao.find((classific) => (classific.id === id)) : []
         return classification as ClassificacaoType
+    }
+    const findEspecialidade = (id: number) => {
+        const especialidades = especialidade.length ? especialidade.find((especial) => (especial.id === id)) : []
+        return especialidades as EspecialidadeType
     }
 
     return (
@@ -222,7 +234,7 @@ export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, du
                         <Text>Classificação</Text>
                     </View>
                     <View style={styles.section}>
-                        <Text>Tempo de duração</Text>
+                        <Text>Especialidade</Text>
                     </View>
                     <View style={styles.section}>
                         <Text>Quantidade</Text>
@@ -252,7 +264,7 @@ export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, du
                                 </View>
 
                                 <View style={styles.section}>
-                                    <Text>{findDuracao(almoxarifado.equipamento_id.duracao_id).tempo}</Text>
+                                    <Text>{findEspecialidade(almoxarifado.equipamento_id.especialidade_id).especialidade}</Text>
                                 </View>
 
 
@@ -296,10 +308,11 @@ export function RelatorioAlmoxarifado({ almoxarifadoFiltrados, classificacao, du
     );
 }
 
-const LinkDonwloadAlmoxarifado = ({ almoxarifadoFiltrados, classificacao, duracao, legenda }: ButtonType) => (
+const LinkDonwloadAlmoxarifado = ({ almoxarifadoFiltrados, classificacao, duracao, legenda, especialidade }: ButtonType) => (
     <PDFDownloadLink
         className='bg-gray-700 text-white px-4 py-2 shadow font-bold flex items-center gap-2 hover:brightness-75'
         document={<RelatorioAlmoxarifado
+            especialidade={especialidade}
             almoxarifadoFiltrados={almoxarifadoFiltrados}
             classificacao={classificacao}
             duracao={duracao} />}
