@@ -19,6 +19,7 @@ import { fetchClassificacao } from "../redux/slices/classificacaoSlice"
 import { fetchDuracao } from "../redux/slices/duracaoSlice.ts"
 import { fetchObra } from "../redux/slices/obraSlice"
 import { wrapper } from "../redux/store"
+import api from "../services/api"
 const SweetAlert2 = dynamic(() => import('react-sweetalert2'), { ssr: false })
 const LinkDonwloadAlmoxarifado = dynamic(() => import('../components/relatorios/Almoxarifado'), { ssr: false })
 
@@ -126,29 +127,30 @@ const PosicaoObra = ({ almoxarifarios, classificacao, duracao, obras, especialid
     let equipamentosFiltradosPorMesData: Almoxarifario[] = []
 
     if (almoxarifarios) {
-        equipamentosFiltradosPorMesData = searchByDateMonth ? almoxarifarios.filter((equipamentoEmAlmoxarife) => equipamentoEmAlmoxarife.mes.trim() === searchByDateMonth) : almoxarifarios
+        equipamentosFiltradosPorMesData = searchByDateMonth.length ? almoxarifarios.filter((equipamentoEmAlmoxarife) => equipamentoEmAlmoxarife.mes.trim() === searchByDateMonth) : almoxarifarios
+
         if (search && searchByObraId === 0 && searchClassificacao === 0) {
 
-            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
         else if
 
             (searchClassificacao !== 0 && search === '' && searchByObraId === 0) {
-            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao)
+            findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.equipamento_id.classificacao_id === searchClassificacao)
         }
 
         else if (searchByObraId !== 0 && search === '' && searchClassificacao === 0) {
-            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId)
+            findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.obra_id.id === searchByObraId)
         }
         else if (searchByObraId !== 0 && search && searchClassificacao === 0) {
-            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.obra_id.id === searchByObraId && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.obra_id.id === searchByObraId && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
         else if
 
             (searchClassificacao !== 0 && search && searchByObraId === 0) {
-            findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.classificacao_id === searchClassificacao && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
+            findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.equipamento_id.classificacao_id === searchClassificacao && almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()))
         }
-        else { findedEquipamento = equipamentosFiltradosPorMesData.filter((almoxarifario) => almoxarifario.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
+        else { findedEquipamento = equipamentosFiltradosPorMesData?.filter((almoxarifario) => almoxarifario?.equipamento_id.descricao.toLowerCase().includes(search.toLowerCase()) && almoxarifario.obra_id.id === (searchByObraId) && almoxarifario.equipamento_id.classificacao_id === searchClassificacao) }
 
     }
 
@@ -439,7 +441,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
             const duracaoDispatch: any = await store.dispatch(fetchDuracao());
             const almoxarifario: any = await store.dispatch(fetchAlmoxarifario());
             const obra: any = await store.dispatch(fetchObra());
-
+            const especialidades = await api.get('api/especialidade')
+            const { data } = especialidades.data
 
             // const equipamentos = equipamentoDispatch.payload
             const classificacao = classificacaoDispatch.payload
@@ -452,7 +455,8 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
                     almoxarifarios,
                     classificacao,
                     duracao,
-                    obras
+                    obras,
+                    especialidade: data
                 },
             };
         }
