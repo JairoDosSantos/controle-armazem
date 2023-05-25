@@ -253,7 +253,7 @@ export function GuiaTransporte({ auditoria }: AuditoriaProps) {
                             <Text>{auditoria.length && auditoria[0].obra_id.obra_nome}</Text>
                         </View>
                         <View style={styles.section}>
-                            <Text>Engº Fernando Alexandre</Text>
+                            <Text>Engº Lídio Gomes</Text>
                         </View>
                         <View style={styles.section}>
                             <Text>NOAH</Text>
