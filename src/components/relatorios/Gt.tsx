@@ -321,7 +321,7 @@ export function GuiaTransporte({ auditoria }: AuditoriaProps) {
                         <Text style={styles.assinaturaIndividual1}>Assinatura Conferente</Text>
                     </View>
                     <View style={styles.assinaturas1}>
-                        <Text style={styles.assinaturaIndividual1}>Director NOAH</Text>
+                        <Text style={styles.assinaturaIndividual1}>Planeamento</Text>
                         <Text style={styles.assinaturaIndividual1}>Assinatura Segurança</Text>
                         <Text style={styles.assinaturaIndividual1}>Assinatura Solicitante</Text>
                     </View>
