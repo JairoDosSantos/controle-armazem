@@ -25,7 +25,7 @@ const initialState: duracaoState = {
 }
 
 
-export const fetchOneSaida = createAsyncThunk('/auditoria/fetchAll', async ({ data_retirada, equipamento_id, obra_id, estado }: Omit<AuditoriaType, 'id' | 'quantidade_retirada' | 'data_devolucao' | 'quantidade_devolvida'>) => {
+export const fetchOneSaida = createAsyncThunk('/auditoria/fetchOne', async ({ data_retirada, equipamento_id, obra_id, estado }: Omit<AuditoriaType, 'id' | 'quantidade_retirada' | 'data_devolucao' | 'quantidade_devolvida'>) => {
     try {
 
         const { data, error } = await supabase
