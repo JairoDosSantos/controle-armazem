@@ -242,10 +242,12 @@ const Saida = ({ auditoria, obras }: AuditoriaProps) => {
                             }
                         </div>
                         <div className=" ml-auto flex gap-2">
+                            {/**
 
                             <LinkDonwloadMovimentacoes
                                 auditoria={toPrint}
                                 legenda={(searchData.length || searchObra.toString().length) ? 'Imprimir' : 'Imprimir Tudo'} />
+                            */}
 
                             {/**
                              * <button
